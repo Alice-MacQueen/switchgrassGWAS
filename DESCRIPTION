@@ -1,16 +1,42 @@
 Package: switchgrassGWAS
-Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Genome Wide Association on Panicum virgatum
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Alice",
+           family = "MacQueen",
+           role = c("aut", "cre"),
+           email = "alice.macqueen@gmail.com")
+Description: The switchgrass (Panicum virgatum) diversity panel
+    is now being grown at many locations across the United States and
+    Mexico. Many researchers are measuring phenotypes on this panel to
+    understand the genes and genetic regions affecting these phenotypes.
+    This package provides the code for fast, less memory intensive genome- 
+    wide association (GWAS) using bigsnpr. It also provides functions to link 
+    diversity panel phenotypic data with SNP data, to prepare basic plots
+    for further customization, and to prepare multiple GWAS results for
+    use in the downstream application mash.
+License: GPL (>= 2)
+Depends: 
+    R (>= 3.5)
+Imports:
+    bigsnpr,
+    bigstatsr,
+    dplyr,
+    ggman,
+    ggplot2,
+    magrittr,
+    multtest,
+    purrr,
+    readr,
+    tibble,
+    tidyr
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 2.1.0)
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
-Imports: 
-    magrittr,
-    tibble

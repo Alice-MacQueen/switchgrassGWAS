@@ -14,11 +14,14 @@
 #' @param snp Genomic information to include for Panicum virgatum. Contact
 #'     tjuenger <at> utexas <dot> edu to obtain this information pre-publication.
 #' @param covar Optional covariance matrix to include in the regression. You
-#'     can generate these using \code{\link{snp_autoSVD()}}.
+#'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
 #'
 #' @import bigsnpr
+#' @import bigstatsr
 #' @import dplyr
+#' @import purrr
+#' @import tibble
 #'
 #' @return The gwas results for the last phenotype in the dataframe. That
 #'     phenotype, as well as the remaining phenotypes, are saved as RDS objects
@@ -37,7 +40,7 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
   # Scaffolds that remain will be called 19, but note for some analyses that
   # they need to be ordered (so two scaffolds can't have the same number)
   CHRN <- enframe(CHR, name = NULL) %>%
-    dplyr::rename(CHR = value) %>%
+    dplyr::rename(CHR = .data$value) %>%
     mutate(CHRN = case_when(CHR == "Chr01K" ~ 1,
                             CHR == "Chr01N" ~ 2,
                             CHR == "Chr02K" ~ 3,
@@ -65,7 +68,7 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
     ind_u <- covar$u[!is.na(df[,i+1]),] # 4 PC's for phenotyped individuals.
 
     gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
-                             ind.train = ind_y, ncores = NCORES)
+                             ind.train = ind_y, ncores = ncores)
     saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i+1], ".rds"))
 
   }
