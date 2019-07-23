@@ -38,8 +38,23 @@ txdb <- loadDb(file = "Pvirgatum_516_v5.1.gene.txdb.sqlite")
 Genome-Wide Association
 -----------------------
 
+You can use `pvdiv_gwas` to run linear or logistic univariate regression on 21 million SNPs with a minor allele frequency of 2% or higher. The following example demonstrates running a genome-wide association on a continuous trait via linear regression. The trait is tiller count at the end of the 2018 season in Brookings, South Dakota.
+
 ``` r
 NCORES <- nb_cores()
-gwasdf <- pvdiv_gwas(df = switchgrassGWAS::phenotypes[,1:2], type = "linear",
+
+one_phenotype <- data(phenotypes) %>%
+  dplyr::select(PLANT_ID, BRKG_TC_EOS_2018)
+
+gwas <- pvdiv_gwas(df = one_phenotype, type = "linear",
                      snp = snp, covar = svd0, ncores = NCORES)
+```
+
+You can then plot the results of this GWAS using built in functions in bigsnpr.
+
+Note that while the GWAS will run quickly, the plotting functions take about ten times as long to run, because of the large number of datapoints to plot (&gt;21 million).
+
+``` r
+snp_manhattan(gwas, infos.chr = CHRN$CHRN, infos.pos = POS)
+snp_qq(gwas)
 ```

@@ -19,17 +19,22 @@ License: GPL (>= 2)
 Depends: 
     R (>= 3.5)
 Imports:
+    AnnotationDbi,
+    ashr,
     bigsnpr,
     bigstatsr,
     dplyr,
-    ggman,
+    GenomicFeatures,
     ggplot2,
     magrittr,
     multtest,
     purrr,
     readr,
+    rlang,
+    rlist,
     tibble,
-    tidyr
+    tidyr,
+    VariantAnnotation
 Suggests: 
     knitr,
     rmarkdown,

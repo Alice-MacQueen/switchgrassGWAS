@@ -19,9 +19,9 @@
 #'
 #' @import bigsnpr
 #' @import bigstatsr
-#' @import dplyr
-#' @import purrr
-#' @import tibble
+#' @importFrom dplyr mutate rename case_when
+#' @importFrom purrr as_vector
+#' @importFrom tibble as_tibble enframe
 #'
 #' @return The gwas results for the last phenotype in the dataframe. That
 #'     phenotype, as well as the remaining phenotypes, are saved as RDS objects
