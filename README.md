@@ -4,7 +4,8 @@ switchgrassGWAS
 ===============
 
 <!-- badges: start -->
-<!-- badges: end -->
+[![Travis build status](https://travis-ci.org/Alice-MacQueen/switchgrassGWAS.svg?branch=master)](https://travis-ci.org/Alice-MacQueen/switchgrassGWAS) <!-- badges: end -->
+
 The goal of switchgrassGWAS is to allow fast, powerful genome-wide association analysis on the Panicum virgatum diversity panel.
 
 The switchgrass (Panicum virgatum) diversity panel is now being grown at many locations across the United States and Mexico. Many researchers are measuring phenotypes on this panel to understand the genes and genetic regions affecting these phenotypes. This package provides the code for fast, less memory intensive genome-wide association (GWAS) using bigsnpr. It also provides functions to link diversity panel phenotypic data with SNP data, to prepare basic plots in ggplot for further customization, and to prepare multiple GWAS results for use in the downstream application mash.

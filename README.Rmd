@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 # switchgrassGWAS
 
 <!-- badges: start -->
+[![Travis build status](https://travis-ci.org/Alice-MacQueen/switchgrassGWAS.svg?branch=master)](https://travis-ci.org/Alice-MacQueen/switchgrassGWAS)
 <!-- badges: end -->
 
 The goal of switchgrassGWAS is to allow fast, powerful genome-wide association analysis on the Panicum virgatum diversity panel.
