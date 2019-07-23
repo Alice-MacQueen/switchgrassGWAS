@@ -19,13 +19,14 @@ License: GPL (>= 2)
 Depends: 
     R (>= 3.5)
 Imports:
-    AnnotationDbi,
     ashr,
     bigsnpr,
     bigstatsr,
     dplyr,
     GenomicFeatures,
+    GenomicRanges,
     ggplot2,
+    IRanges,
     magrittr,
     multtest,
     purrr,
