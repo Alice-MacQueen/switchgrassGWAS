@@ -33,8 +33,11 @@ Imports:
     readr,
     rlang,
     rlist,
+    stats,
+    stringr,
     tibble,
     tidyr,
+    tidyselect,
     VariantAnnotation
 Suggests: 
     knitr,
