@@ -2,5 +2,5 @@
 
 language: R
 cache: packages
-bioc_packages: multtest GenomicFeatures GenomicRanges IRanges VariantAnnotation
+bioc_packages: c("multtest", "GenomicFeatures", "GenomicRanges", "IRanges", "VariantAnnotation")
 r_github_packages: privefl/bigsnpr
