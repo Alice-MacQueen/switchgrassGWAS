@@ -23,10 +23,7 @@ Imports:
     bigsnpr,
     bigstatsr,
     dplyr,
-    GenomicFeatures,
-    GenomicRanges,
     ggplot2,
-    IRanges,
     magrittr,
     multtest,
     purrr,
@@ -37,8 +34,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    tidyselect,
-    VariantAnnotation
+    tidyselect
 Suggests: 
     knitr,
     rmarkdown,

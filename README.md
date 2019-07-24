@@ -16,7 +16,14 @@ Installation
 You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("multtest", "GenomicFeatures", "GenomicRanges", "IRanges", "VariantAnnotation"))
+
+if (!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
+devtools::install_github("privefl/bigsnpr")
 devtools::install_github("Alice-MacQueen/switchgrassGWAS")
 ```
 
