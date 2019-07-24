@@ -42,32 +42,32 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
   # they need to be ordered (so two scaffolds can't have the same number)
   CHRN <- enframe(CHR, name = NULL) %>%
     dplyr::rename(CHR = .data$value) %>%
-    mutate(CHRN = case_when(CHR == "Chr01K" ~ 1,
-                            CHR == "Chr01N" ~ 2,
-                            CHR == "Chr02K" ~ 3,
-                            CHR == "Chr02N" ~ 4,
-                            CHR == "Chr03K" ~ 5,
-                            CHR == "Chr03N" ~ 6,
-                            CHR == "Chr04K" ~ 7,
-                            CHR == "Chr04N" ~ 8,
-                            CHR == "Chr05K" ~ 9,
-                            CHR == "Chr05N" ~ 10,
-                            CHR == "Chr06K" ~ 11,
-                            CHR == "Chr06N" ~ 12,
-                            CHR == "Chr07K" ~ 13,
-                            CHR == "Chr07N" ~ 14,
-                            CHR == "Chr08K" ~ 15,
-                            CHR == "Chr08N" ~ 16,
-                            CHR == "Chr09K" ~ 17,
-                            CHR == "Chr09N" ~ 18,
+    mutate(CHRN = case_when(.data$CHR == "Chr01K" ~ 1,
+                            .data$CHR == "Chr01N" ~ 2,
+                            .data$CHR == "Chr02K" ~ 3,
+                            .data$CHR == "Chr02N" ~ 4,
+                            .data$CHR == "Chr03K" ~ 5,
+                            .data$CHR == "Chr03N" ~ 6,
+                            .data$CHR == "Chr04K" ~ 7,
+                            .data$CHR == "Chr04N" ~ 8,
+                            .data$CHR == "Chr05K" ~ 9,
+                            .data$CHR == "Chr05N" ~ 10,
+                            .data$CHR == "Chr06K" ~ 11,
+                            .data$CHR == "Chr06N" ~ 12,
+                            .data$CHR == "Chr07K" ~ 13,
+                            .data$CHR == "Chr07N" ~ 14,
+                            .data$CHR == "Chr08K" ~ 15,
+                            .data$CHR == "Chr08N" ~ 16,
+                            .data$CHR == "Chr09K" ~ 17,
+                            .data$CHR == "Chr09N" ~ 18,
                             TRUE ~ 19
     ))
 
-  for(i in seq_along(names(df)[-1])){
-    y1 <- as_vector(df[!is.na(df[,i+1]), i+1])
-    ind_y <- which(!is.na(df[,i+1]))
-    if(!is.na(covar)[1]){
-      ind_u <- covar$u[!is.na(df[,i+1]),] # 4 PC's for phenotyped individuals.
+  for(i in seq_along(names(df))[-1]){
+    y1 <- as_vector(df[!is.na(df[,i]), i])
+    ind_y <- which(!is.na(df[,i]))
+    if(!is.na(covar[1])){
+      ind_u <- covar$u[!is.na(df[,i]),] # 4 PC's for phenotyped individuals.
       gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
                                ind.train = ind_y, ncores = ncores)
     } else {
@@ -75,7 +75,7 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                                ncores = ncores)
     }
 
-    saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i+1], ".rds"))
+    saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i], ".rds"))
 
   }
   return(gwaspc)
