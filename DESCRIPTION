@@ -22,6 +22,8 @@ Imports:
     ashr,
     bigsnpr,
     bigstatsr,
+    cluster,
+    cowplot,
     dplyr,
     ggplot2,
     magrittr,
@@ -34,7 +36,8 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    tidyselect
+    tidyselect,
+    viridis
 Suggests: 
     knitr,
     rmarkdown,
