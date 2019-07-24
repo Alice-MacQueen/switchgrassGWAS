@@ -12,7 +12,6 @@
 #' @examples
 #'     \dontrun{get_colnames(m = mash_obj)}
 #'
-#' @export
 get_colnames <- function(m){
   column_names <- colnames(m$result$lfsr)
   return(column_names)
@@ -27,7 +26,6 @@ get_colnames <- function(m){
 #'
 #' @return a vector containing the number of significant conditions
 #'
-#' @export
 get_n_significant_conditions = function(m, thresh = 0.05, conditions = NULL,
                                         sig_fn = get_lfsr){
   if (is.null(conditions)) {

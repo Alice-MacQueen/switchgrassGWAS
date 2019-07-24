@@ -67,7 +67,6 @@ get_ncond = function(m){
 #'     lbf_j is log10(Pr(Bj | g=ghat-nonnull)/Pr(Bj | g = 0)) where gha
 #'     t-nonnull is the non-null part of ghat.  Otherwise returns NULL.
 #'
-#' @export
 get_log10bf = function(m) {
   if(is.null(m$null_loglik)){
     return(NULL)
@@ -77,7 +76,7 @@ get_log10bf = function(m) {
 }
 
 
-#' Find effects that are significant in at least one condition
+#' From a mash result, get effects that are significant in at least one condition
 #'
 #' @param m the mash result (from joint or 1by1 analysis)
 #' @param thresh indicates the threshold below which to call signals significant
@@ -112,7 +111,6 @@ get_significant_results = function(m, thresh = 0.05, conditions = NULL,
 #' @importFrom tibble enframe
 #' @importFrom dplyr arrange
 #'
-#' @export
 get_marker_df <- function(m){
   marker_df <- get_significant_results(m, thresh = 1) %>%
     enframe(name = "Marker") %>%

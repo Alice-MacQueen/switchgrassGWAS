@@ -66,10 +66,15 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
   for(i in seq_along(names(df)[-1])){
     y1 <- as_vector(df[!is.na(df[,i+1]), i+1])
     ind_y <- which(!is.na(df[,i+1]))
-    ind_u <- covar$u[!is.na(df[,i+1]),] # 4 PC's for phenotyped individuals.
+    if(!is.na(covar)[1]){
+      ind_u <- covar$u[!is.na(df[,i+1]),] # 4 PC's for phenotyped individuals.
+      gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
+                               ind.train = ind_y, ncores = ncores)
+    } else {
+      gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
+                               ncores = ncores)
+    }
 
-    gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
-                             ind.train = ind_y, ncores = ncores)
     saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i+1], ".rds"))
 
   }
