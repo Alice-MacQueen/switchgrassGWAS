@@ -222,10 +222,10 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
 #' model = "linear", saveoutput = TRUE)}
 #'
 #' @import bigsnpr
-#' @import dplyr
+#' @importFrom dplyr full_join left_join case_when arrange mutate select slice filter group_by n
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_sub
-#' @import tidyr
+#' @importFrom tidyr gather unite
 #' @importFrom tidyselect starts_with
 #'
 #' @export

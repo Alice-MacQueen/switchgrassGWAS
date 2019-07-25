@@ -76,3 +76,29 @@ snp_manhattan(gwas, infos.chr = CHRN$CHRN, infos.pos = POS)
 snp_qq(gwas)
 ```
 
+### Annotations for top Associations
+
+You can also use `pvdiv_table_topsnps` to create dataframes containing annotation information. To do this, first load the provided annotation information. Currently, this is version 5.1 of the annotation information for Panicum virgatum. 
+
+
+
+If you have saved the genomic files you requested access for to your working directory, you would then run the following commands to load the annotation data:
+
+``` r
+load("Markers.rda")
+txdb <- loadDb(file = "Pvirgatum_516_v5.1.gene.txdb.sqlite")
+anno_info <- read_delim(file = "Pvirgatum_516_v5.1.annotation_info.txt",
+                        col_names = TRUE, delim = "\t")
+gene_anno_info <- tbl_df(anno_info) %>%
+  distinct(locusName, .keep_all = TRUE)
+```
+
+You can select a number of top SNPs to find annotation information for, a FDR threshold to find annotation information for, and any distance away from the associated SNP (in bp) for which to pull annotations. Here, we find genes 10kb and 100kb away from the top 50 associations and for associations above a FDR of 5%.
+
+``` r
+pvdiv_table_topsnps(df = gwas, type = "bigsnp", n = 50, FDRalpha = 0.05, 
+                    rangevector = c(10000, 100000), markers = markers, 
+                    anno_info = gene_anno_info, txdb = txdb)
+```
+
+This function will return a list of all of the tables you requested, named according to the criteria used to create the table. You can then save these tables individually as csv or any other type of file.

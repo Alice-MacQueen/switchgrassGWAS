@@ -25,6 +25,7 @@ Imports:
     cluster,
     cowplot,
     dplyr,
+    GGally,
     ggplot2,
     magrittr,
     multtest,
@@ -39,7 +40,9 @@ Imports:
     tidyselect,
     viridis
 Suggests: 
+    dots,
     knitr,
+    mashr,
     rmarkdown,
     testthat (>= 2.1.0),
     VariantAnnotation
