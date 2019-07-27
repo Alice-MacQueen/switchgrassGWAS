@@ -102,3 +102,7 @@ pvdiv_table_topsnps(df = gwas, type = "bigsnp", n = 50, FDRalpha = 0.05,
 ```
 
 This function will return a list of all of the tables you requested, named according to the criteria used to create the table. You can then save these tables individually as csv or any other type of file.
+
+### Analysis of multiple phenotypes or planting locations
+
+Many researchers are measuring phenotypes on the Panicum virgatum diversity panel to understand the genes and genetic regions affecting these phenotypes. When similar phenotypes are collected at many locations, researchers may be interested in 
