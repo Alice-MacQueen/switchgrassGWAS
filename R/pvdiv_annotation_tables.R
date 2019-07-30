@@ -92,7 +92,6 @@ get_top_snps <- function(input_df, n, FDRalpha, type = c("bigsnp", "mash")){
       }
       topsnp_inputlist <- list.append(topsnp_inputlist, FDR1)
     }
-    names1 <- c(paste0("top", n, "SNPs_"), paste0("FDR", FDRalpha, "_"))
   } else if(!is.na(n[1]) & is.na(FDRalpha[1])){
     for(i in seq_along(n)){
       if(type == "bigsnp"){
@@ -103,7 +102,6 @@ get_top_snps <- function(input_df, n, FDRalpha, type = c("bigsnp", "mash")){
           top_n( n[i], .data$log10BayesFactor)
       }
     }
-    names1 <- c(paste0("top", n, "SNPs_"))
   } else if (is.na(n[1]) & !is.na(FDRalpha[1])){
     for(i in seq_along(FDRalpha)){
       if(type == "bigsnp"){
@@ -116,7 +114,6 @@ get_top_snps <- function(input_df, n, FDRalpha, type = c("bigsnp", "mash")){
       }
       topsnp_inputlist <- list.append(topsnp_inputlist, FDR1)
     }
-    names1 <- c(paste0("FDR", FDRalpha, "_"))
   } else {
     stop(paste0("Need to specify at least one of n (as an integer) or FDR",
                 " (between 0 and 1)."))
@@ -295,9 +292,16 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
     }
   }
   if(type %in% c("bigsnp", "mash")){
-  names(topsnp_outputlist) <- paste0(rep(topsnp_outputlist, length(rangevector)),
+    if(!is.na(n) & !is.na(FDRalpha)){
+    names1 <- c(paste0("top", n, "SNPs_"), paste0("FDR", FDRalpha, "_"))
+    } else if(!is.na(n)){
+    names1 <- c(paste0("top", n, "SNPs_"))
+    } else {
+    names1 <- c(paste0("FDR", FDRalpha, "_"))
+    }
+  names(topsnp_outputlist) <- paste0(rep(names1, length(rangevector)),
                                      "within",
-                                     rep(rangevector, each = length(topsnp_outputlist)),
+                                     rep(rangevector, each = length(names1)),
                                      "bp")
   }
   return(topsnp_outputlist)
