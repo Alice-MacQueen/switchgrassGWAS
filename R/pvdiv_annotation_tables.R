@@ -5,7 +5,7 @@
 bigsnp2anno <- function(df, markers, FDRalpha){
   input_df <- df %>%
     mutate(p.value = predict(df, log10 = FALSE))
-  if(!is.na(FDRalpha)){
+  if(!is.na(FDRalpha)[1]){
     res <- mt.rawp2adjp(input_df$p.value, alpha = FDRalpha,
                         proc = "BH")
     adj_p <- res$adjp[order(res$index), ]
@@ -218,7 +218,7 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
     stop(paste0("For 'table' type, need to have columns 'CHR', 'start', and ",
                 "'end' in your data frame."))
   }
-  if(type %in% c("bigsnp", "mash") & is.na(n) & is.na(FDRalpha)){
+  if(type %in% c("bigsnp", "mash") & is.na(n)[1] & is.na(FDRalpha)[1]){
     stop(paste0("For 'mash' and 'bigsnp' types, need to specify at least one",
                 "of n (as an integer) or FDR (between 0 and 1)."))
   }
@@ -292,9 +292,9 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
     }
   }
   if(type %in% c("bigsnp", "mash")){
-    if(!is.na(n) & !is.na(FDRalpha)){
+    if(!is.na(n)[1] & !is.na(FDRalpha)[1]){
     names1 <- c(paste0("top", n, "SNPs_"), paste0("FDR", FDRalpha, "_"))
-    } else if(!is.na(n)){
+    } else if(!is.na(n)[1]){
     names1 <- c(paste0("top", n, "SNPs_"))
     } else {
     names1 <- c(paste0("FDR", FDRalpha, "_"))
