@@ -213,11 +213,14 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
   ## Prepare a dataframe for each type for further analysis.
   if(type == "bigsnp"){
     input_df <- bigsnp2anno(df = df, markers = markers, FDRalpha = FDRalpha)
-  } else if(type == "mash"){
+  }
+  if(type == "mash"){
     input_df <- mash2anno(df = df, markers = markers)
-  } else if(type == "rqtl2"){
+  }
+  if(type == "rqtl2"){
     topsnp_inputlist[[1]] <- rqtl2anno(df = df)
-  } else {
+  }
+  if(type == "df"){
     stopifnot(c("CHR", "start", "end") %in% names(df))
     topsnp_inputlist[[1]] <- df %>%
       mutate(start = as.integer(.data$start),
