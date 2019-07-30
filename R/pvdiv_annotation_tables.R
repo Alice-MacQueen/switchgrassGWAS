@@ -5,15 +5,23 @@
 bigsnp2anno <- function(df, markers, FDRalpha){
   input_df <- df %>%
     mutate(p.value = predict(df, log10 = FALSE))
-  res <- mt.rawp2adjp(input_df$p.value, alpha = FDRalpha,
-                      proc = "BH")
-  adj_p <- res$adjp[order(res$index), ]
-  input_df <- cbind(markers, input_df, adj_p) %>%
-    as_tibble() %>%
-    dplyr::rename(`p value` = .data$p.value,
-                  `FDR Adjusted p value` = .data$`BH`,
-                  `SNP Effect` = .data$estim,
-                  `SNP standard error` = .data$std.err)
+  if(!is.na(FDRalpha)){
+    res <- mt.rawp2adjp(input_df$p.value, alpha = FDRalpha,
+                        proc = "BH")
+    adj_p <- res$adjp[order(res$index), ]
+    input_df <- cbind(markers, input_df, adj_p) %>%
+      as_tibble() %>%
+      dplyr::rename(`p value` = .data$p.value,
+                    `FDR Adjusted p value` = .data$`BH`,
+                    `SNP Effect` = .data$estim,
+                    `SNP standard error` = .data$std.err)
+  } else {
+    input_df <- cbind(markers, input_df) %>%
+      as_tibble() %>%
+      dplyr::rename(`p value` = .data$p.value,
+                    `SNP Effect` = .data$estim,
+                    `SNP standard error` = .data$std.err)
+  }
   return(input_df)
 }
 
@@ -122,10 +130,17 @@ get_top_snps <- function(input_df, n, FDRalpha, type = c("bigsnp", "mash")){
 get_tidy_annos <- function(df, input, anno_info){
   out <- as_tibble(df)
 
+  filter1 <- list(gene_id = out$GENEID)
+  genedf <- as_tibble(genes(txdb, filter = filter1)) %>%
+    dplyr::rename(gene_width = .data$width, gene_start = .data$start,
+                  gene_end = .data$end, gene_strand = .data$strand) %>%
+    mutate(seqnames = as.character(.data$seqnames))
+
   outdf <- out %>%
     mutate(seqnames = as.character(.data$seqnames)) %>%
     dplyr::select(.data$seqnames:.data$TXID, .data$GENEID) %>%
     left_join(input, by = c("seqnames" = "CHR", "start", "end")) %>%
+    left_join(genedf, by = c("seqnames", "GENEID" = "gene_id")) %>%
     left_join(anno_info, by = c("GENEID" = "locusName")) %>%
     dplyr::rename(region_start = .data$start,
                   region_end = .data$end,
@@ -165,7 +180,7 @@ get_tidy_annos <- function(df, input, anno_info){
 #'    or, for Panicum virgatum intervals in another format, a
 #'    data frame containing columns 'CHR', 'start', and 'end'.
 #' @param type Type of Panicum virgatum genomic marker input specified by the
-#'    df parameter. Options are "bigsnp", "mash", "rqtl2", and "df". Defaults
+#'    df parameter. Options are "bigsnp", "mash", "rqtl2", and "table". Defaults
 #'    to 'bigsnp'.
 #' @param n An integer or integer vector The numberof most significant SNPs to
 #'     select (by p-value). Set to NA to omit this table. Default is 10.
@@ -190,7 +205,7 @@ get_tidy_annos <- function(df, input, anno_info){
 #' @importFrom tibble as_tibble
 #'
 #' @export
-pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
+pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table"),
                                 n = 10, FDRalpha = 0.1,
                                 rangevector = c(0, 10000), markers = NULL,
                                 anno_info = NULL, txdb = NULL){
@@ -199,10 +214,11 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
   n <- as.integer(n)
   FDRalpha <- as.numeric(FDRalpha)
   rangevector <- as.integer(rangevector)
-  stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "df"), !is_null(anno_info),
+  stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "table"), !is_null(anno_info),
             !is_null(txdb))
-  if(type == "df" & !(c("CHR", "start", "end") %in% names(df))){
-    stop(paste0("For 'df' type, need to have columns 'CHR', 'start', and ",
+  if(type == "table" & !("CHR" %in% names(df)) & !("start" %in% names(df)) &
+     !("end" %in% names(df))){
+    stop(paste0("For 'table' type, need to have columns 'CHR', 'start', and ",
                 "'end' in your data frame."))
   }
   if(type %in% c("bigsnp", "mash") & is.na(n) & is.na(FDRalpha)){
@@ -224,7 +240,7 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
   if(type == "rqtl2"){
     topsnp_inputlist[[1]] <- rqtl2anno(df = df)
   }
-  if(type == "df"){
+  if(type == "table"){
     topsnp_inputlist[[1]] <- df %>%
       mutate(start = as.integer(.data$start),
              end = as.integer(.data$end))
