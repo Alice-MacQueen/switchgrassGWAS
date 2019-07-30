@@ -201,6 +201,10 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
   rangevector <- as.integer(rangevector)
   stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "df"), !is_null(anno_info),
             !is_null(txdb))
+  if(type == "df" & !(c("CHR", "start", "end") %in% names(df))){
+    stop(paste0("For 'df' type, need to have columns 'CHR', 'start', and ",
+                "'end' in your data frame."))
+  }
   if(type %in% c("bigsnp", "mash") & is.na(n) & is.na(FDRalpha)){
     stop(paste0("For 'mash' and 'bigsnp' types, need to specify at least one",
                 "of n (as an integer) or FDR (between 0 and 1)."))
@@ -221,7 +225,6 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
     topsnp_inputlist[[1]] <- rqtl2anno(df = df)
   }
   if(type == "df"){
-    stopifnot(c("CHR", "start", "end") %in% names(df))
     topsnp_inputlist[[1]] <- df %>%
       mutate(start = as.integer(.data$start),
              end = as.integer(.data$end))
