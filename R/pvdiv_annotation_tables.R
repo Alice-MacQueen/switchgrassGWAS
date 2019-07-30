@@ -165,7 +165,7 @@ get_tidy_annos <- function(df, input, anno_info){
 #'    or, for Panicum virgatum intervals in another format, a
 #'    data frame containing columns 'CHR', 'start', and 'end'.
 #' @param type Type of Panicum virgatum genomic marker input specified by the
-#'    df parameter. Options are "bigsnp", "mash", "rqtl2", and "df". Defaults
+#'    df parameter. Options are "bigsnp", "mash", "rqtl2", and "table". Defaults
 #'    to 'bigsnp'.
 #' @param n An integer or integer vector The numberof most significant SNPs to
 #'     select (by p-value). Set to NA to omit this table. Default is 10.
@@ -190,7 +190,7 @@ get_tidy_annos <- function(df, input, anno_info){
 #' @importFrom tibble as_tibble
 #'
 #' @export
-pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
+pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table"),
                                 n = 10, FDRalpha = 0.1,
                                 rangevector = c(0, 10000), markers = NULL,
                                 anno_info = NULL, txdb = NULL){
@@ -199,9 +199,9 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
   n <- as.integer(n)
   FDRalpha <- as.numeric(FDRalpha)
   rangevector <- as.integer(rangevector)
-  stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "df"), !is_null(anno_info),
+  stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "table"), !is_null(anno_info),
             !is_null(txdb))
-  if(type == "df" & !(c("CHR", "start", "end") %in% names(df))){
+  if(type == "table" & !(c("CHR", "start", "end") %in% names(df))){
     stop(paste0("For 'df' type, need to have columns 'CHR', 'start', and ",
                 "'end' in your data frame."))
   }
@@ -224,7 +224,7 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "df"),
   if(type == "rqtl2"){
     topsnp_inputlist[[1]] <- rqtl2anno(df = df)
   }
-  if(type == "df"){
+  if(type == "table"){
     topsnp_inputlist[[1]] <- df %>%
       mutate(start = as.integer(.data$start),
              end = as.integer(.data$end))
