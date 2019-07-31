@@ -3,7 +3,7 @@
 language: R
 cache: packages
 bioc_packages: multtest
-  VariantAnnotation
+bioc_packages: VariantAnnotation
 r_github_packages: privefl/bigsnpr
-  lcolladotor/dots
-  stephenslab/mashr@v0.2-11
+r_github_packages: lcolladotor/dots
+r_github_packages: stephenslab/mashr@v0.2-11

@@ -472,22 +472,22 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
   }
 
   base_height <- dots::dots(name = 'base_height',
-                            value = nrow(shared_effects)*0.33, ...)
+                            value = nrow(shared_effects)*0.33+1, ...)
 
   if(reorder == TRUE){
-    corrplot <- shared_effects %>%
-      reorder_cormat(.data) %>%
-      ggcorr(data = NULL, cor_matrix = .data, geom = geom, label = label,
-             label_alpha = label_alpha, label_size = label_size, hjust = hjust,
-             vjust = vjust, layout.exp = layout.exp, min_size = min_size,
-             max_size = max_size) +
+    corrdf <- reorder_cormat(cormat = shared_effects)
+    corrplot <- ggcorr(data = NULL, cor_matrix = corrdf, geom = geom,
+                       label = label, label_alpha = label_alpha,
+                       label_size = label_size, hjust = hjust, vjust = vjust,
+                       layout.exp = layout.exp, min_size = min_size,
+                       max_size = max_size) +
       scale_color_viridis(option = option)
   } else {
-    corrplot <- shared_effects %>%
-      ggcorr(data = NULL, cor_matrix = .data, geom = geom, label = label,
-             label_alpha = label_alpha, label_size = label_size, hjust = hjust,
-             vjust = vjust, layout.exp = layout.exp, min_size = min_size,
-             max_size = max_size) +
+    corrplot <- ggcorr(data = NULL, cor_matrix = shared_effects, geom = geom,
+                       label = label, label_alpha = label_alpha,
+                       label_size = label_size, hjust = hjust, vjust = vjust,
+                       layout.exp = layout.exp, min_size = min_size,
+                       max_size = max_size) +
       scale_color_viridis(option = option)
   }
 
@@ -520,6 +520,7 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
 #' @importFrom tibble enframe
 #' @importFrom dplyr mutate
 #' @import ggplot2
+#' @importFrom purrr as_vector
 #'
 #' @export
 mash_plot_effects <- function(m, n = NA, i = NA, saveoutput = FALSE){
@@ -533,24 +534,27 @@ mash_plot_effects <- function(m, n = NA, i = NA, saveoutput = FALSE){
     mutate(mn = get_pm(m)[i,],
            se = get_psd(m)[i,])
 
-  ggplot(data = effectplot) +
-    geom_point(mapping = aes(x = .data$mn, y = .data$Conditions)) +
-    geom_errorbarh(mapping = aes(xmin = .data$mn - .data$se,
-                                 xmax = .data$mn + .data$se,
-                                 y = .data$Conditions), height = 0.3) +
-    geom_vline(xintercept = 0, lty = 2) +
-    labs(x = "Effect Size", y = "Conditions")
+  ggobject <- ggplot(data = effectplot) +
+    geom_point(mapping = aes(x = as.factor(.data$value), y = .data$mn)) +
+    geom_errorbar(mapping = aes(ymin = .data$mn - .data$se,
+                                ymax = .data$mn + .data$se,
+                                x = .data$Conditions), width = 0.3) +
+    geom_hline(yintercept = 0, lty = 2) +
+    labs(x = "Conditions", y = "Effect Size") +
+    scale_x_discrete(labels = as_vector(.data$value)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
   if(saveoutput == TRUE){
     if(is.na(n[1])){
       save_plot(filename = paste0("Effect_plot_",
                                   names(get_significant_results(m))[n], ".png"),
-                plot = last_plot(), base_aspect_ratio = 0.8, base_height = 4.5)
+                plot = ggobject, base_aspect_ratio = 0.8, base_height = 4.5)
     } else {
       plotname <- get_marker_df(m)[i]
       save_plot(filename = paste0("Effect_plot_", plotname$Marker, ".png"),
-                plot = last_plot(), base_aspect_ratio = 0.8, base_height = 4.5)
+                plot = ggobject, base_aspect_ratio = 0.8, base_height = 4.5)
 
     }
   }
+  return(list(marker = i, effect_df = effectplot, ggobject = ggobject))
 }
