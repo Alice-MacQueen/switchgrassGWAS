@@ -71,12 +71,23 @@ pvdiv_vcf_popgenome <- function(path, filename){
 #' @export
 pvdiv_subset_popgenome <- function(path, filename, seqid, start, end){
 
+  filename = as.character(filename)
+  seqid = as.character(seqid)
+  start = as.integer(start)
+  end = as.integer(end)
+  stopifnot(!is.na(filename[1]), !is.na(seqid[1]), !is.na(start[1]),
+            !is.na(end[1]))
+
   outputfile <- pvdiv_vcf_popgenome(path = path, filename = filename)
   dir.create(path = file.path(path, "GFF"), showWarnings = FALSE)
+  seqid = enquo(seqid)
+  start = enquo(start)
+  end = enquo(end)
 
   gff_sub <- switchgrassGWAS::gff_gene %>%
-    filter(.data$seqid == seqid & .data$start >= start & .data$end >= start &
-             .data$start <= end & .data$end <= end) %>%
+    filter(.data$seqid == !! seqid   &
+             .data$start >= !! start & .data$end >= !! start &
+             .data$start <= !! end   & .data$end <= !! end) %>%
     mutate(seqid = case_when(.data$seqid == "Chr01K" ~ 1,
                              .data$seqid == "Chr01N" ~ 2,
                              .data$seqid == "Chr02K" ~ 3,
