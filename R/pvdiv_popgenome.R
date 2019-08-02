@@ -72,17 +72,13 @@ pvdiv_vcf_popgenome <- function(path, filename){
 pvdiv_subset_popgenome <- function(path, filename, seqid, start, end){
 
   filename = as.character(filename)
-  seqid = as.character(seqid)
-  start = as.integer(start)
-  end = as.integer(end)
-  stopifnot(!is.na(filename[1]), !is.na(seqid[1]), !is.na(start[1]),
-            !is.na(end[1]))
+  seqid = enquo(seqid)
+  start = as.double(start)
+  end = as.double(end)
+  stopifnot(!is.na(filename[1]) & !is.na(start[1]) & !is.na(end[1]))
 
   outputfile <- pvdiv_vcf_popgenome(path = path, filename = filename)
   dir.create(path = file.path(path, "GFF"), showWarnings = FALSE)
-  seqid = enquo(seqid)
-  start = enquo(start)
-  end = enquo(end)
 
   gff_sub <- switchgrassGWAS::gff_gene %>%
     filter(.data$seqid == !! seqid   &
@@ -109,7 +105,8 @@ pvdiv_subset_popgenome <- function(path, filename, seqid, start, end){
                              TRUE ~ 19
     ))
 
-  write_delim(switchgrassGWAS::gff_metadata, path = file.path(path, "GFF", outputfile),
+  write_delim(switchgrassGWAS::gff_metadata, path = file.path(path, "GFF",
+                                                              outputfile),
               delim = "\t", col_names = FALSE)
   write_delim(gff_sub, path = file.path(path, "GFF", outputfile), delim = "\t",
               col_names = FALSE, append = TRUE)
