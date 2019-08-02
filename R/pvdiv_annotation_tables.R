@@ -124,11 +124,12 @@ get_top_snps <- function(input_df, n, FDRalpha, type = c("bigsnp", "mash")){
 #' @importFrom dplyr select mutate left_join rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble as_tibble
-get_tidy_annos <- function(df, input, anno_info){
+get_tidy_annos <- function(df, input, anno_info, txdb){
   out <- as_tibble(df)
+  requireNamespace("GenomicFeatures")
 
   filter1 <- list(gene_id = out$GENEID)
-  genedf <- as_tibble(genes(txdb, filter = filter1)) %>%
+  genedf <- as_tibble(GenomicFeatures::genes(txdb, filter = filter1)) %>%
     dplyr::rename(gene_width = .data$width, gene_start = .data$start,
                   gene_end = .data$end, gene_strand = .data$strand) %>%
     mutate(seqnames = as.character(.data$seqnames))
@@ -284,7 +285,8 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
 
         #### Convert a GRanges object to an output data frame
         topsnp_outputlist[[(i + (k-1)*length(topsnp_inputlist))]] <-
-          get_tidy_annos(df = loc, input = input, anno_info = anno_info)
+          get_tidy_annos(df = loc, input = input, anno_info = anno_info,
+                         txdb = txdb)
       } else {
         topsnp_outputlist[[(i + (k-1)*length(topsnp_inputlist))]] <-
           as_tibble(NA)

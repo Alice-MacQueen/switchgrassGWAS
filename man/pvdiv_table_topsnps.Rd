@@ -4,7 +4,7 @@
 \alias{pvdiv_table_topsnps}
 \title{Create a Table of Annotated Top SNPs for Panicum virgatum}
 \usage{
-pvdiv_table_topsnps(df, type = c("bigsnp", "mash", "rqtl2", "df"),
+pvdiv_table_topsnps(df, type = c("bigsnp", "mash", "rqtl2", "table"),
   n = 10, FDRalpha = 0.1, rangevector = c(0, 10000),
   markers = NULL, anno_info = NULL, txdb = NULL)
 }
@@ -15,7 +15,7 @@ or, for Panicum virgatum intervals in another format, a
 data frame containing columns 'CHR', 'start', and 'end'.}
 
 \item{type}{Type of Panicum virgatum genomic marker input specified by the
-df parameter. Options are "bigsnp", "mash", "rqtl2", and "df". Defaults
+df parameter. Options are "bigsnp", "mash", "rqtl2", and "table". Defaults
 to 'bigsnp'.}
 
 \item{n}{An integer or integer vector The numberof most significant SNPs to

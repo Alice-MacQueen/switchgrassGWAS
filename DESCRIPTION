@@ -41,6 +41,7 @@ Imports:
     viridis
 Suggests: 
     dots,
+    GenomicFeatures,
     knitr,
     mashr,
     rmarkdown,
