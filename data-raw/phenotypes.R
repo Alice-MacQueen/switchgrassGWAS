@@ -1,4 +1,5 @@
 library(tidyverse)
+options(java.parameters = "-Xmx7g")
 library(XLConnect)
 library(rlang)
 
@@ -12,6 +13,13 @@ lst_pheno <- readWorksheet(wb_pheno, sheet = getSheets(wb_pheno))
 phenos_planting1 <- lst_pheno$`GWAS 2019 Greenup Data`
 phenos_planting2 <- lst_pheno$`GWAS 2019 Core Phenotype Data`
 phenos_key <- lst_pheno$`Column Key and Notes`
+
+load(file.path("C:", "Users", "ahm543", "OneDrive", "Juenger Projects",
+               "SwitchgrassGWAS", "Package", "switchgrassGWAS", "data",
+               "metadata.rda"))
+load(file.path("C:", "Users", "ahm543", "OneDrive", "Juenger Projects",
+               "SwitchgrassGWAS", "Package", "switchgrassGWAS", "data",
+               "Taxa.rda"))
 
 # Individual site phenotypes
 wb_CLMB2018 <- loadWorkbook(file.path("C:", "Users", "ahm543", "Dropbox",
@@ -94,7 +102,7 @@ all_plants_phenos <- phenos_planting1 %>%
 # Need to figure out the best way to join phenos_planting2 here
 
 pvdiv_784g <- metadata %>%
-  left_join(all_plants_phenos) %>%
+  left_join(all_plants_phenos, by = "PLANT_ID") %>%
   filter(!is.na(SITE)) %>%
   dplyr::select(-(COLLECTION_TYPE:COLLECTION_METHOD))
 
@@ -217,10 +225,11 @@ phenotypes <- phenotypes %>%
   spread(key = SITE_PHE, value = value) %>%
   right_join(Taxa)
 
-#GR10 <- phenotypes %>%
-#  dplyr::select(PLANT_ID, ends_with("GR1"), ends_with("GR50"), ends_with("GR100"))
-#save(GR10, file = "greenup_2019_30_phenotypes.rda")
-# load("C:/Users/alice/OneDrive/Juenger Projects/SwitchgrassGWAS/Package/switchgrassGWAS/data/phenotypes.rda")
+#  saveRDS(phenotypes, file = "upland-vs-lowland/phenotypes.rds")
+#  GR10 <- phenotypes %>%
+#    dplyr::select(PLANT_ID, ends_with("GR1"), ends_with("GR50"), ends_with("GR100"))
+#  save(GR10, file = "greenup_2019_30_phenotypes.rda")
+#  load("C:/Users/alice/OneDrive/Juenger Projects/SwitchgrassGWAS/Package/switchgrassGWAS/data/phenotypes.rda")
 phenotypes <- phenotypes %>%
   dplyr::select(PLANT_ID, GWAS_CT, BRKG_TC_EOS_2018, BRKG_DEAD_2018)
 

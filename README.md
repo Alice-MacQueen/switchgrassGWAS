@@ -200,9 +200,9 @@ input format. Second, you run the mash analysis. Third, you can
 visualize the mash results using `mashr` functions or using functions
 from `switchgrassGWAS`.
 
-### 1\. Run bigsnp2mashr function
+### 1\. Run `pvdiv_bigsnp2mashr` function
 
-The first three commands are setup for running the bigsnp2mashr
+The first three commands are setup for running the `pvdiv_bigsnp2mashr`
 function.
 
 You want a character vector containing the names of the rds files
@@ -226,18 +226,23 @@ this value. Depending on your computing power and the amount of overlap
 of low p-value SNPs between your GWAS, you may need to tweak this number
 further.
 
-Finally, you run the `bigsnp2mashr()` function using these quantities.
-Choose the model type that you ran on your GWAS. Current options are
-“logistic” or “linear”. Mixing these types is not supported (and
-statistically is probably a bad idea, also.) Also choose whether you
-want to save the output to a file in your path - recommended, though the
-default is FALSE, so the user needs to ‘opt in’ to this.
+Finally, you run the `pvdiv_bigsnp2mashr()` function using these
+quantities. Choose the model type that you ran on your GWAS. Current
+options are “logistic” or “linear”. Mixing these types is not supported
+(and statistically is probably a bad idea, also.) Also choose whether
+you want to save the output to a file in your path - recommended, though
+the default is FALSE, so the user needs to ‘opt in’ to this.
 
 ``` r
 data(phenotypes)
 gwas <- pvdiv_gwas(df = phenotypes, type = "linear",
-                     snp = snp, covar = svd0, ncores = NCORES)
-                     
+                   snp = snp, covar = svd0, ncores = NCORES)
+
+
+load("markers.rda")
+load("markers2.rda")
+snp <- snp_attach("Pvirgatum_4x_784g_imp_phased_maf0.02_QC.rds")
+G <- snp$genotypes
 gwas_rds <- pvdiv_results_in_folder(path = ".", pattern = "GWAS_object_")
 
 phenotype_names <- str_sub(gwas_rds, start = 13, end = -5)
@@ -246,8 +251,8 @@ numSNPs <- ceiling(1500000/length(phenotype_names)^2)
 
 mash_input <- bigsnp2mashr(path = ".", gwas_rds = gwas_rds, 
                            phenotypes = phenotype_names, numSNPs = numSNPs, 
-                           markers = markers, model = "linear", 
-                           saveoutput = TRUE)
+                           markers = markers, markers2 = markers2, G = G, 
+                           model = "linear", saveoutput = TRUE)
 ```
 
 ### 2\. Run a standard mash analysis
