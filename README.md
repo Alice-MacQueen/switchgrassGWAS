@@ -30,9 +30,14 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("multtest")
+
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 devtools::install_github("privefl/bigsnpr")
+devtools::install_github("stephens999/ashr")
 devtools::install_github("Alice-MacQueen/switchgrassGWAS")
 ```
 
