@@ -5,7 +5,7 @@
 \title{Wrapper for bigsnpr for GWAS on Panicum virgatum.}
 \usage{
 pvdiv_gwas(df, type = c("linear", "logistic"), snp, covar = NA,
-  ncores = 1)
+  ncores = 1, npcs = 10)
 }
 \arguments{
 \item{df}{Dataframe of phenotypes where the first column is PLANT_ID.}
@@ -20,6 +20,8 @@ tjuenger <at> utexas <dot> edu to obtain this information pre-publication.}
 can generate these using \code{bigsnpr::snp_autoSVD()}.}
 
 \item{ncores}{Number of cores to use. Default is one.}
+
+\item{npcs}{Number of principle components to use. Default is 10.}
 }
 \value{
 The gwas results for the last phenotype in the dataframe. That

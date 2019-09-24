@@ -16,6 +16,7 @@
 #' @param covar Optional covariance matrix to include in the regression. You
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
+#' @param npcs Number of principle components to use. Default is 10.
 #'
 #' @import bigsnpr
 #' @import bigstatsr
@@ -30,7 +31,7 @@
 #'
 #' @export
 pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
-                       covar = NA, ncores = 1){
+                       covar = NA, ncores = 1, npcs = 10){
 
   G <- snp$genotypes
   CHR <- snp$map$chromosome
@@ -67,7 +68,7 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
     y1 <- as_vector(df[!is.na(df[,i]), i])
     ind_y <- which(!is.na(df[,i]))
     if(!is.na(covar[1])){
-      ind_u <- covar$u[!is.na(df[,i]),] # 4 PC's for phenotyped individuals.
+      ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
       gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
                                ind.train = ind_y, ncores = ncores)
     } else {

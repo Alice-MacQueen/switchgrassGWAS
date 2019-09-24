@@ -6,3 +6,5 @@
 ^appveyor\.yml$
 ^popgenome-raw$
 ^upland-vs-lowland$
+^envGWAS$
+^wax-three-sites$
