@@ -83,9 +83,8 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
   for(i in seq_along(names(df))[-1]){
     y1 <- as_vector(df[!is.na(df[,i]), i])
     ind_y <- which(!is.na(df[,i]))
-    for(k in npcs){
+    for(k in 1:length(npcs)){
       if(npcs[k] == 0){
-
         gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
                                  ncores = ncores)
       } else {
