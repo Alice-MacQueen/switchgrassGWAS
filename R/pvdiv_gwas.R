@@ -37,7 +37,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
     }
-  if(is.na(covar)){
+  if(is.na(covar[[1]])){
     stop(paste0("Need to specify covariance matrix (covar) and a vector of",
                 " PC #'s to test (npcs)."))
   }
@@ -75,15 +75,14 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
 
   LambdaGC <- as_tibble(matrix(data =
                                  c(npcs, rep(NA, (ncol(df) - 1)*length(npcs))),
-                               nrow = length(npcs), ncol = ncol(df)))
-  colnames(LambdaGC) <- colnames(df)
+                               nrow = length(npcs), ncol = ncol(df), dimnames = list(npcs, colnames(df))))
   LambdaGC <- LambdaGC %>%
     dplyr::rename("NumPCs" = PLANT_ID)
 
   for(i in seq_along(names(df))[-1]){
     y1 <- as_vector(df[!is.na(df[,i]), i])
     ind_y <- which(!is.na(df[,i]))
-    for(k in 1:length(npcs)){
+    for(k in c(1:length(npcs))){
       if(npcs[k] == 0){
         gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
                                  ncores = ncores)
@@ -93,11 +92,13 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                                  ind.train = ind_y, ncores = ncores)
       }
       gwas2 <- gwaspc[which(!is.na(gwaspc$score)),]
-      LambdaGC[i,k] <- bigsnpr:::getLambdaGC(gwas = gwas2)
+      LambdaGC[k,i] <- bigsnpr:::getLambdaGC(gwas = gwas2)
+      message(paste0("Finished Lambda_GC calculation for ", names(df)[i], " using ", npcs[k], " PCs."))
     }
     if(saveoutput == TRUE){
       write_csv(LambdaGC, path = paste0("Lambda_GC_", names(df)[i], ".rds"))
-      }
+    }
+    message(paste0("Finished phenotype ", i-1, ": ", names(df)[i]))
   }
   if(saveoutput == TRUE){
     write_csv(LambdaGC, path = paste0("Lambda_GC_", names(df)[2], "_to_",
