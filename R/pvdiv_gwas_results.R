@@ -142,8 +142,8 @@ get_marker_df <- function(m){
 #' @return A \code{tbl_df()} of the SNP calls for all individuals for the
 #'    subset of SNPs in the annotation data frame.
 #'
-#' @importFrom bigstatsr rows_along columns_along
-#' @importFrom bigsnpr subset snp_attach
+#' @importFrom bigstatsr rows_along cols_along
+#' @import bigsnpr
 #' @importFrom magrittr %>%
 #' @importFrom dplyr rename
 #' @importFrom tibble as_tibble
@@ -185,8 +185,8 @@ pvdiv_anno_subset <- function(anno_df, snp){
 #' @return A \code{tbl_df()} of the SNP calls for all individuals for the
 #'    subset of SNPs on that chromosome between the two positions specified.
 #'
-#' @importFrom bigstatsr rows_along columns_along
-#' @importFrom bigsnpr subset snp_attach
+#' @importFrom bigstatsr rows_along cols_along
+#' @import bigsnpr
 #' @importFrom magrittr %>%
 #' @importFrom dplyr rename between
 #' @importFrom tibble as_tibble
