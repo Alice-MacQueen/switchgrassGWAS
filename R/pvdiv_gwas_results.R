@@ -145,7 +145,7 @@ get_marker_df <- function(m){
 #' @importFrom bigstatsr rows_along cols_along
 #' @import bigsnpr
 #' @importFrom magrittr %>%
-#' @importFrom dplyr rename
+#' @importFrom dplyr mutate
 #' @importFrom tibble as_tibble
 #'
 #' @export
@@ -157,11 +157,12 @@ pvdiv_anno_subset <- function(anno_df, snp){
   pos_subset <- pos_df[which(pos_df %in% chr_df)]
   subset_name <- subset(snp, ind.col = pos_subset)
   subset <- snp_attach(subset_name)
-  subset_df <- subset$genotypes[rows_along(snp$genotypes),
-                                cols_along(snp$genotypes)]
+  subset_df <- subset$genotypes[rows_along(subset$genotypes),
+                                cols_along(subset$genotypes)]
   colnames(subset_df) <- subset$map$marker.ID
-  subset_tibble <- as_tibble(cbind(subset$fam$sample.ID, subset_df)) %>%
-    rename("PLANT_ID" = V1)
+  subset_tibble <- data.frame(PLANT_ID = subset$fam$sample.ID, subset_df) %>%
+    as_tibble() %>%
+    mutate(PLANT_ID = as.character(PLANT_ID))
   return(subset_tibble)
 }
 
@@ -188,7 +189,7 @@ pvdiv_anno_subset <- function(anno_df, snp){
 #' @importFrom bigstatsr rows_along cols_along
 #' @import bigsnpr
 #' @importFrom magrittr %>%
-#' @importFrom dplyr rename between
+#' @importFrom dplyr mutate between
 #' @importFrom tibble as_tibble
 #'
 #' @export
@@ -202,10 +203,11 @@ pvdiv_range_subset <- function(snp, chr, pos1, pos2){
   pos_subset <- pos_df[which(pos_df %in% chr_df)]
   subset_name <- subset(snp, ind.col = pos_subset)
   subset <- snp_attach(subset_name)
-  subset_df <- subset$genotypes[rows_along(snp$genotypes),
-                                cols_along(snp$genotypes)]
+  subset_df <- subset$genotypes[rows_along(subset$genotypes),
+                                cols_along(subset$genotypes)]
   colnames(subset_df) <- subset$map$marker.ID
-  subset_tibble <- as_tibble(cbind(subset$fam$sample.ID, subset_df)) %>%
-    rename("PLANT_ID" = V1)
+  subset_tibble <- data.frame(PLANT_ID = subset$fam$sample.ID, subset_df) %>%
+    as_tibble() %>%
+    mutate(PLANT_ID = as.character(PLANT_ID))
   return(subset_tibble)
 }
