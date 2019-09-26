@@ -120,6 +120,92 @@ get_marker_df <- function(m){
 }
 
 
+#' @title Make a SNP dataframe subset from annotation table output.
+#'
+#' @description Given a dataframe created using pvdiv_table_topsnps(), this
+#'     function creates a dataframe of SNP calls for the subset of SNPs from
+#'     this annotation table.
+#'
+#' @note bigsnpr already has functions to subset its SNP file format and return
+#'     a bed file and to return its own SNP file format. This function is useful
+#'     if you instead want a small(ish) dataframe of SNPs that can be
+#'     manipulated using data frame tools in R.
+#'
+#' @param anno_df One dataframe of annotations from pvdiv_table_topsnps(). This
+#'    dataframe needs to contain the columns CHR and region_start. It's
+#'    recommended that you set rangevector = 0 in pvdiv_table_topsnps() to get
+#'    the SNP itself using this function.
+#' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
+#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
+#'    pre-publication.
+#'
+#' @return A \code{tbl_df()} of the SNP calls for all individuals for the
+#'    subset of SNPs in the annotation data frame.
+#'
+#' @importFrom bigstatsr rows_along columns_along
+#' @importFrom bigsnpr subset snp_attach
+#' @importFrom magrittr %>%
+#' @importFrom dplyr rename
+#' @importFrom tibble as_tibble
+#'
+#' @export
+pvdiv_anno_subset <- function(anno_df, snp){
+  CHR <- snp$map$chromosome
+  POS <- snp$map$physical.pos
+  pos_df <- which(POS %in% anno_df$region_start)
+  chr_df <- which(CHR %in% anno_df$CHR)
+  pos_subset <- pos_df[which(pos_df %in% chr_df)]
+  subset_name <- subset(snp, ind.col = pos_subset)
+  subset <- snp_attach(subset_name)
+  subset_df <- subset$genotypes[rows_along(snp$genotypes),
+                                cols_along(snp$genotypes)]
+  colnames(subset_df) <- subset$map$marker.ID
+  subset_tibble <- as_tibble(cbind(subset$fam$sample.ID, subset_df)) %>%
+    rename("PLANT_ID" = V1)
+  return(subset_tibble)
+}
 
-
-
+#' @title Make a SNP dataframe subset for a region of the genome.
+#'
+#' @description This function creates a dataframe of SNP calls for a subset of
+#'     SNPs from one region on one chromosome.
+#'
+#' @note bigsnpr already has functions to subset its SNP file format and return
+#'     a bed file and to return its own SNP file format. This function is useful
+#'     if you instead want a small(ish) dataframe of SNPs that can be
+#'     manipulated using data frame tools in R.
+#'
+#' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
+#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
+#'    pre-publication.
+#' @param chr Character string. The chromsome (e.g., "Chr01K") to get SNPs from.
+#' @param pos1 Integer. The low position to start getting SNPs from.
+#' @param pos2 Integer. The high position to stop getting SNPs from.
+#'
+#' @return A \code{tbl_df()} of the SNP calls for all individuals for the
+#'    subset of SNPs on that chromosome between the two positions specified.
+#'
+#' @importFrom bigstatsr rows_along columns_along
+#' @importFrom bigsnpr subset snp_attach
+#' @importFrom magrittr %>%
+#' @importFrom dplyr rename between
+#' @importFrom tibble as_tibble
+#'
+#' @export
+pvdiv_range_subset <- function(snp, chr, pos1, pos2){
+  stopifnot(chr %in% c("Chr01K", "Chr01N", "Chr02K", "Chr02N", "Chr03K", "Chr03N", "Chr04K", "Chr04N", "Chr05K", "Chr05N", "Chr06K", "Chr06N", "Chr07K", "Chr07N", "Chr08K", "Chr08N", "Chr09K", "Chr09N"))
+  stopifnot(is.numeric(pos1) & is.numeric(pos2) & pos2 > pos1)
+  CHR <- snp$map$chromosome
+  POS <- snp$map$physical.pos
+  pos_df <- which(between(POS, pos1, pos2))
+  chr_df <- which(CHR %in% chr)
+  pos_subset <- pos_df[which(pos_df %in% chr_df)]
+  subset_name <- subset(snp, ind.col = pos_subset)
+  subset <- snp_attach(subset_name)
+  subset_df <- subset$genotypes[rows_along(snp$genotypes),
+                                cols_along(snp$genotypes)]
+  colnames(subset_df) <- subset$map$marker.ID
+  subset_tibble <- as_tibble(cbind(subset$fam$sample.ID, subset_df)) %>%
+    rename("PLANT_ID" = V1)
+  return(subset_tibble)
+}
