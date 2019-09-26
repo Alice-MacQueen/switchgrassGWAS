@@ -37,7 +37,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
     }
-  if(is.na(covar[[1]])){
+  if(length(covar) == 1){
     stop(paste0("Need to specify covariance matrix (covar) and a vector of",
                 " PC #'s to test (npcs)."))
   }
@@ -96,7 +96,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
       message(paste0("Finished Lambda_GC calculation for ", names(df)[i], " using ", npcs[k], " PCs."))
     }
     if(saveoutput == TRUE){
-      write_csv(LambdaGC, path = paste0("Lambda_GC_", names(df)[i], ".rds"))
+      write_csv(LambdaGC, path = paste0("Lambda_GC_", names(df)[i], ".csv"))
     }
     message(paste0("Finished phenotype ", i-1, ": ", names(df)[i]))
   }
@@ -104,7 +104,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
     write_csv(LambdaGC, path = paste0("Lambda_GC_", names(df)[2], "_to_",
                                       tail(names(df), n = 1), "_Phenotypes_",
                                       npcs[1], "_to_", tail(npcs, n = 1),
-                                      "_PCs.rds"))
+                                      "_PCs.csv"))
   }
   return(LambdaGC)
 }
