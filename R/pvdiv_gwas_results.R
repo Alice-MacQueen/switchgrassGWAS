@@ -120,71 +120,31 @@ get_marker_df <- function(m){
 }
 
 
-#' @title Make a SNP dataframe subset from annotation table output.
+#' @title Make a SNP dataframe subset from annotation table or a genomic range.
 #'
 #' @description Given a dataframe created using pvdiv_table_topsnps(), this
 #'     function creates a dataframe of SNP calls for the subset of SNPs from
 #'     this annotation table.
 #'
-#' @note bigsnpr already has functions to subset its SNP file format and return
-#'     a bed file and to return its own SNP file format. This function is useful
-#'     if you instead want a small(ish) dataframe of SNPs that can be
-#'     manipulated using data frame tools in R.
+#' @note This function is a wrapper around bigsnpr functions to subset its SNP
+#'     file format that may be useful if you have a small interval to look at or
+#'     a small number of SNPs from an annotation table.     
 #'
+#' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
+#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
+#'    pre-publication.
+#' @param type One of "anno" or "range", depending on if you are using an 
+#'    annotation dataframe from pvdiv_table_topsnps() or a genomic interval.
 #' @param anno_df One dataframe of annotations from pvdiv_table_topsnps(). This
 #'    dataframe needs to contain the columns CHR and region_start. It's
 #'    recommended that you set rangevector = 0 in pvdiv_table_topsnps() to get
 #'    the SNP itself using this function.
-#' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
-#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
-#'    pre-publication.
-#'
-#' @return A \code{tbl_df()} of the SNP calls for all individuals for the
-#'    subset of SNPs in the annotation data frame.
-#'
-#' @importFrom bigstatsr rows_along cols_along
-#' @import bigsnpr
-#' @importFrom magrittr %>%
-#' @importFrom dplyr mutate
-#' @importFrom tibble as_tibble
-#'
-#' @export
-pvdiv_anno_subset <- function(anno_df, snp){
-  CHR <- snp$map$chromosome
-  POS <- snp$map$physical.pos
-  pos_df <- which(POS %in% anno_df$region_start)
-  chr_df <- which(CHR %in% anno_df$CHR)
-  pos_subset <- pos_df[which(pos_df %in% chr_df)]
-  subset_name <- subset(snp, ind.col = pos_subset)
-  subset <- snp_attach(subset_name)
-  subset_df <- subset$genotypes[rows_along(subset$genotypes),
-                                cols_along(subset$genotypes)]
-  colnames(subset_df) <- subset$map$marker.ID
-  subset_tibble <- data.frame(PLANT_ID = subset$fam$sample.ID, subset_df) %>%
-    as_tibble() %>%
-    mutate(PLANT_ID = as.character(PLANT_ID))
-  return(subset_tibble)
-}
-
-#' @title Make a SNP dataframe subset for a region of the genome.
-#'
-#' @description This function creates a dataframe of SNP calls for a subset of
-#'     SNPs from one region on one chromosome.
-#'
-#' @note bigsnpr already has functions to subset its SNP file format and return
-#'     a bed file and to return its own SNP file format. This function is useful
-#'     if you instead want a small(ish) dataframe of SNPs that can be
-#'     manipulated using data frame tools in R.
-#'
-#' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
-#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
-#'    pre-publication.
 #' @param chr Character string. The chromsome (e.g., "Chr01K") to get SNPs from.
 #' @param pos1 Integer. The low position to start getting SNPs from.
 #' @param pos2 Integer. The high position to stop getting SNPs from.
 #'
-#' @return A \code{tbl_df()} of the SNP calls for all individuals for the
-#'    subset of SNPs on that chromosome between the two positions specified.
+#' @return A `FBM.code256` object for the subset of SNPs in the annotation data
+#'    frame or in the genomic interval.
 #'
 #' @importFrom bigstatsr rows_along cols_along
 #' @import bigsnpr
@@ -193,20 +153,61 @@ pvdiv_anno_subset <- function(anno_df, snp){
 #' @importFrom tibble as_tibble
 #'
 #' @export
-pvdiv_range_subset <- function(snp, chr, pos1, pos2){
-  stopifnot(chr %in% c("Chr01K", "Chr01N", "Chr02K", "Chr02N", "Chr03K", "Chr03N", "Chr04K", "Chr04N", "Chr05K", "Chr05N", "Chr06K", "Chr06N", "Chr07K", "Chr07N", "Chr08K", "Chr08N", "Chr09K", "Chr09N"))
-  stopifnot(is.numeric(pos1) & is.numeric(pos2) & pos2 > pos1)
-  CHR <- snp$map$chromosome
-  POS <- snp$map$physical.pos
-  pos_df <- which(between(POS, pos1, pos2))
-  chr_df <- which(CHR %in% chr)
-  pos_subset <- pos_df[which(pos_df %in% chr_df)]
+pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr, 
+                                pos1, pos2){
+  if(type == "anno"){
+    stopifnot("CHR" %in% names(anno_df) & "POS" %in% names(anno_df))
+    anno_df <- anno_df %>%
+      mutate(marker_ID = paste(CHR, POS, sep = "_"))
+    pos_subset <- which(snp$map$marker.ID %in% anno_df$marker_ID)
+  } else if(type == "range"){
+    stopifnot(is.character(chr) & is.numeric(pos1) & is.numeric(pos2) & pos2 > pos1)
+    stopifnot(chr %in% c("Chr01K", "Chr01N", "Chr02K", "Chr02N", "Chr03K", 
+                         "Chr03N", "Chr04K", "Chr04N", "Chr05K", "Chr05N", 
+                         "Chr06K", "Chr06N", "Chr07K", "Chr07N", "Chr08K", 
+                         "Chr08N", "Chr09K", "Chr09N"))
+    pos_df <- which(between(snp$map$physical.pos, pos1, pos2))
+    chr_df <- which(snp$map$chromosome %in% chr)
+    pos_subset <- pos_df[which(pos_df %in% chr_df)]
+  } else {
+    stop("Subset type must be one of 'anno' or 'range'.")
+  }
   subset_name <- subset(snp, ind.col = pos_subset)
   subset <- snp_attach(subset_name)
-  subset_df <- subset$genotypes[rows_along(subset$genotypes),
-                                cols_along(subset$genotypes)]
-  colnames(subset_df) <- subset$map$marker.ID
-  subset_tibble <- data.frame(PLANT_ID = subset$fam$sample.ID, subset_df) %>%
+  return(subset)
+}
+
+
+#' @title Convert A `FBM.code256` SNP subset to a dataframe.
+#'
+#' @description This function creates a dataframe of SNP calls for a 
+#'    `FBM.code256` object. We recommend that this be a dataframe for a small 
+#'    region.
+#'
+#' @note bigsnpr already has functions to subset its SNP file format and return
+#'     a bed file and to return its own SNP file format. This function is useful
+#'     if you instead want a small(ish) dataframe of SNPs that can be
+#'     manipulated using data frame tools in R.
+#'
+#' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
+#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
+#'    pre-publication.
+#'
+#' @return A \code{tbl_df()} of the SNP calls for all individuals for the
+#'    subset of SNPs on that chromosome between the two positions specified.
+#'
+#' @importFrom bigstatsr rows_along cols_along
+#' @import bigsnpr
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate
+#' @importFrom tibble as_tibble
+#'
+#' @export
+pvdiv_bigsnp2tibble <- function(snp){
+  subset_df <- snp$genotypes[rows_along(snp$genotypes),
+                             cols_along(snp$genotypes)]
+  colnames(subset_df) <- snp$map$marker.ID
+  subset_tibble <- data.frame(PLANT_ID = snp$fam$sample.ID, subset_df) %>%
     as_tibble() %>%
     mutate(PLANT_ID = as.character(PLANT_ID))
   return(subset_tibble)
