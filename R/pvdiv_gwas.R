@@ -26,6 +26,8 @@
 #' @importFrom purrr as_vector
 #' @importFrom tibble as_tibble enframe
 #' @importFrom rlang .data
+#' @importFrom readr write_csv
+#' @importFrom utils tail
 #'
 #' @return A dataframe containing the lambda_GC values for each number of PCs
 #'     specified. This is also saved as a .csv file in the working directory.
@@ -75,9 +77,10 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
 
   LambdaGC <- as_tibble(matrix(data =
                                  c(npcs, rep(NA, (ncol(df) - 1)*length(npcs))),
-                               nrow = length(npcs), ncol = ncol(df), dimnames = list(npcs, colnames(df))))
+                               nrow = length(npcs), ncol = ncol(df),
+                               dimnames = list(npcs, colnames(df))))
   LambdaGC <- LambdaGC %>%
-    dplyr::rename("NumPCs" = PLANT_ID)
+    dplyr::rename("NumPCs" = .data$PLANT_ID)
 
   for(i in seq_along(names(df))[-1]){
     y1 <- as_vector(df[!is.na(df[,i]), i])

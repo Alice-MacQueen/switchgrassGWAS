@@ -128,12 +128,12 @@ get_marker_df <- function(m){
 #'
 #' @note This function is a wrapper around bigsnpr functions to subset its SNP
 #'     file format that may be useful if you have a small interval to look at or
-#'     a small number of SNPs from an annotation table.     
+#'     a small number of SNPs from an annotation table.
 #'
 #' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
 #'    Contact tjuenger <at> utexas <dot> edu to obtain this information
 #'    pre-publication.
-#' @param type One of "anno" or "range", depending on if you are using an 
+#' @param type One of "anno" or "range", depending on if you are using an
 #'    annotation dataframe from pvdiv_table_topsnps() or a genomic interval.
 #' @param anno_df One dataframe of annotations from pvdiv_table_topsnps(). This
 #'    dataframe needs to contain the columns CHR and region_start. It's
@@ -153,18 +153,18 @@ get_marker_df <- function(m){
 #' @importFrom tibble as_tibble
 #'
 #' @export
-pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr, 
+pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
                                 pos1, pos2){
   if(type == "anno"){
     stopifnot("CHR" %in% names(anno_df) & "POS" %in% names(anno_df))
     anno_df <- anno_df %>%
-      mutate(marker_ID = paste(CHR, POS, sep = "_"))
+      mutate(marker_ID = paste(.data$CHR, .data$POS, sep = "_"))
     pos_subset <- which(snp$map$marker.ID %in% anno_df$marker_ID)
   } else if(type == "range"){
     stopifnot(is.character(chr) & is.numeric(pos1) & is.numeric(pos2) & pos2 > pos1)
-    stopifnot(chr %in% c("Chr01K", "Chr01N", "Chr02K", "Chr02N", "Chr03K", 
-                         "Chr03N", "Chr04K", "Chr04N", "Chr05K", "Chr05N", 
-                         "Chr06K", "Chr06N", "Chr07K", "Chr07N", "Chr08K", 
+    stopifnot(chr %in% c("Chr01K", "Chr01N", "Chr02K", "Chr02N", "Chr03K",
+                         "Chr03N", "Chr04K", "Chr04N", "Chr05K", "Chr05N",
+                         "Chr06K", "Chr06N", "Chr07K", "Chr07N", "Chr08K",
                          "Chr08N", "Chr09K", "Chr09N"))
     pos_df <- which(between(snp$map$physical.pos, pos1, pos2))
     chr_df <- which(snp$map$chromosome %in% chr)
@@ -180,8 +180,8 @@ pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
 
 #' @title Convert A `FBM.code256` SNP subset to a dataframe.
 #'
-#' @description This function creates a dataframe of SNP calls for a 
-#'    `FBM.code256` object. We recommend that this be a dataframe for a small 
+#' @description This function creates a dataframe of SNP calls for a
+#'    `FBM.code256` object. We recommend that this be a dataframe for a small
 #'    region.
 #'
 #' @note bigsnpr already has functions to subset its SNP file format and return
@@ -209,6 +209,6 @@ pvdiv_bigsnp2tibble <- function(snp){
   colnames(subset_df) <- snp$map$marker.ID
   subset_tibble <- data.frame(PLANT_ID = snp$fam$sample.ID, subset_df) %>%
     as_tibble() %>%
-    mutate(PLANT_ID = as.character(PLANT_ID))
+    mutate(PLANT_ID = as.character(.data$PLANT_ID))
   return(subset_tibble)
 }
