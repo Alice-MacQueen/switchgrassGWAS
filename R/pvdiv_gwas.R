@@ -108,8 +108,53 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                                       tail(names(df), n = 1), "_Phenotypes_",
                                       npcs[1], "_to_", tail(npcs, n = 1),
                                       "_PCs.csv"))
+    best_LambdaGC <- pvdiv_best_PC_df(df = LambdaGC)
+    write_csv(best_LambdaGC, path = paste0("Best_Lambda_GC_", names(df)[2], "_to_",
+                                           tail(names(df), n = 1), "_Phenotypes_",
+                                           npcs[1], "_to_", tail(npcs, n = 1),
+                                           "_PCs.csv"))
   }
   return(LambdaGC)
+}
+
+#' Return best number of PCs in terms of lambda_GC for Panicum virgatum.
+#'
+#' @description Given a dataframe created using pvdiv_lambda_GC, this function
+#'     returns the first lambda_GC less than 1.05, or the smallest lambda_GC,
+#'     for each column in the dataframe.
+#'
+#' @param df Dataframe of phenotypes where the first column is NumPCs and
+#'     subsequent column contains lambda_GC values for some phenotype.
+#'
+#' @importFrom dplyr filter top_n select full_join arrange
+#' @importFrom tidyr gather
+#' @importFrom rlang .data sym !!
+#'
+#' @return A dataframe containing the best lambda_GC value and number of PCs
+#'     for each phenotype in the data frame.
+pvdiv_best_PC_df <- function(df){
+  column <- names(df)[ncol(df)]
+  bestPCs <- df %>%
+    filter(!! sym(column) < 1.05) %>%
+    top_n(n = -1, wt = .data$NumPCs) %>%
+    select(.data$NumPCs, column)
+
+  for(i in c((ncol(df)-2):1)){
+    column <- names(df)[i+1]
+
+    bestPCs <- df %>%
+      filter(!! sym(column) < 1.05 | !! sym(column) == min(!! sym(column))) %>%
+      top_n(n = -1, wt = .data$NumPCs) %>%
+      select(.data$NumPCs, column) %>%
+      full_join(bestPCs, by = "NumPCs")
+  }
+
+  bestPCdf <- bestPCs %>%
+    arrange(.data$NumPCs) %>%
+    gather(key = "trait", value = "lambda_GC", 2:ncol(bestPCs)) %>%
+    filter(!is.na(.data$lambda_GC))
+
+  return(bestPCdf)
 }
 
 #' Wrapper for bigsnpr for GWAS on Panicum virgatum.
