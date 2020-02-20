@@ -157,6 +157,46 @@ pvdiv_best_PC_df <- function(df){
   return(bestPCdf)
 }
 
+#' Return best number of PCs in terms of lambda_GC following Cattrell's rule.
+#'
+#' @description Given a dataframe created using pvdiv_lambda_GC, this function
+#'     returns the lambda_GC that is closest to 1 for each column in the
+#'     dataframe.
+#'
+#' @param df Dataframe of phenotypes where the first column is NumPCs and
+#'     subsequent column contains lambda_GC values for some phenotype.
+#'
+#' @importFrom dplyr filter top_n select full_join arrange
+#' @importFrom tidyr gather
+#' @importFrom rlang .data sym !!
+#'
+#' @return A dataframe containing the best lambda_GC value and number of PCs
+#'     for each phenotype in the data frame.
+asv_best_PC_df <- function(df){
+  column <- names(df)[ncol(df)]
+  bestPCs <- df %>%
+    filter(abs(!! sym(column)-1) == min(abs(!! sym(column)-1))) %>%
+    top_n(n = -1, wt = .data$NumPCs) %>%
+    select(.data$NumPCs, column)
+
+  for(i in c((ncol(df)-2):1)){
+    column <- names(df)[i+1]
+
+    bestPCs <- df %>%
+      filter(abs(!! sym(column)-1) == min(abs(!! sym(column)-1))) %>%
+      top_n(n = -1, wt = .data$NumPCs) %>%
+      select(.data$NumPCs, column) %>%
+      full_join(bestPCs, by = "NumPCs")
+  }
+
+  bestPCdf <- bestPCs %>%
+    arrange(.data$NumPCs) %>%
+    gather(key = "trait", value = "lambda_GC", 2:ncol(bestPCs)) %>%
+    filter(!is.na(.data$lambda_GC))
+
+  return(bestPCdf)
+}
+
 #' Wrapper for bigsnpr for GWAS on Panicum virgatum.
 #'
 #' @description Given a dataframe of phenotypes associated with PLANT_IDs, this
