@@ -62,6 +62,9 @@ make_U_ed <- function(path, data_strong, numSNPs, saveoutput = FALSE){
 #' @param saveoutput Logical. Should the function's output also be saved to RDS
 #' files? Default is FALSE.
 #' @param U_ed An optional character vector
+#' @param ref the reference group. A number between 1 & R, where R is the number
+#'     of conditions, or the name of the reference group, or if there is no
+#'     reference group, it can be the string 'mean'.
 #'
 #' @return A mash result, manipulable using functions in mashr and by mash_plot
 #'     functions in the switchgrassGWAS package.
@@ -70,7 +73,7 @@ make_U_ed <- function(path, data_strong, numSNPs, saveoutput = FALSE){
 #'
 #' @export
 mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
-                              saveoutput = FALSE, U_ed = NA){
+                              saveoutput = FALSE, U_ed = NA, ref = NA){
   requireNamespace("mashr")
   if(!is.na(list_input[1])){
     list_input <- list_input
@@ -93,8 +96,15 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
 
   message(paste0("Setting up the main data objects with this correlation ",
                  "structure in place."))
-  data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
-  data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
+  if(is.na(ref[1])){
+    data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
+    data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
+  } else {
+    data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
+    data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
+    data_strong <- mashr::mash_update_data(data_strong, ref = ref)
+    data_random <- mashr::mash_update_data(data_random, ref = ref)
+  }
   U_c <- mashr::cov_canonical(data_random)
   if(is.na(U_ed[1])){
     # estimate data-driven covariance using strong dataset
@@ -109,7 +119,12 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
   # Run mash on the random dataset using the random data w/ correlation structure
   message(paste0("Fit mash to the random tests using both data-driven and ",
                  "canonical covariances."))
-  m = mashr::mash(data_random, Ulist = c(U_ed, U_c), outputlevel = 1)
+  if(is.na(ref[1])){
+    m = mashr::mash(data_random, Ulist = c(U_ed, U_c), outputlevel = 1)
+  } else {
+    m = mashr::mash(data_random, Ulist = c(U_ed, U_c), outputlevel = 1,
+                    algorithm.version = 'R')
+  }
   if(saveoutput == TRUE){
     saveRDS(m, file.path(path, paste0("Model_of_random_tests_", numSNPs,
                                       "SNPs.rds")))
@@ -119,7 +134,12 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
   message(paste0("Compute posterior matrices for the strong effects",
                  " using the mash fit from the
                  random tests."))
-  m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE)
+  if(is.na(ref[1])){
+    m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE)
+  } else {
+    m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE,
+                     algorithm.version = 'R')
+  }
   if(saveoutput == TRUE){
     saveRDS(m2, file.path(path, paste0("Strong_Effects", numSNPs, "SNPs.rds")))
   }

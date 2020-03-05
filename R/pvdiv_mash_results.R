@@ -160,11 +160,16 @@ mash_thin_named_markers <- function(m, markers, window_bp = 20000,
 get_GxE = function(m, factor = 0.4, thresh = 0.05, window_bp = 20000){
   R = get_ncond(m)                          # Effects to consider
 
-  S_all = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m), get_colnames(m)))
-  S_2_no = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m), get_colnames(m)))
-  S_CN = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m), get_colnames(m)))
-  S_AP = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m), get_colnames(m)))
-  S_DS = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m), get_colnames(m)))
+  S_all = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                         get_colnames(m)))
+  S_2_no = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                          get_colnames(m)))
+  S_CN = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                        get_colnames(m)))
+  S_AP = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                        get_colnames(m)))
+  S_DS = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                        get_colnames(m)))
 
   for(i in 1:R){
     for(j in 1:R){

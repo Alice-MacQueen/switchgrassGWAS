@@ -326,9 +326,9 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
 
 #' Create a quantile-quantile plot with ggplot2.
 #'
-#' Assumptions:
-#'   - Expected P values are uniformly distributed.
-#'   - Confidence intervals assume independence between tests.
+#' @description Assumptions for this quantile quantile plot:
+#'     Expected P values are uniformly distributed.
+#'     Confidence intervals assume independence between tests.
 #'     We expect deviations past the confidence intervals if the tests are
 #'     not independent.
 #'     For example, in a genome-wide association study, the genotype at any
@@ -336,21 +336,20 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
 #'     will result in similar test statistics.
 #'
 #' @param ps Numeric vector of p-values.
-#' @param ci Numeric. Size of the confidence interval, 95% by default.
-#' @param lambdaGC Logical. Add the Genomic Control coefficient as subtitle to the plot?
+#' @param ci Numeric. Size of the confidence interval, 0.95 by default.
+#' @param lambdaGC Logical. Add the Genomic Control coefficient as subtitle to
+#'     the plot?
 #' @param tol Numeric. Tolerance for optional Genomic Control coefficient.
 #'
+#' @import ggplot2
 #' @importFrom tibble as_tibble
 #' @importFrom rlang .data
 #' @importFrom stats qbeta median uniroot ppoints
-#' @import ggplot2
 #'
 #' @return A ggplot2 plot.
-#' @examples
-#' library(ggplot2)
-#' gg_qqplot(runif(1e2)) + theme_grey(base_size = 24)
+#'
 #' @export
-gg_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
+pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
   n  <- length(ps)
   df <- data.frame(
     observed = -log10(sort(ps)),

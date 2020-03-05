@@ -5,7 +5,7 @@
 \title{A standard run of mashr}
 \usage{
 mash_standard_run(path, list_input = NA, numSNPs = NA,
-  saveoutput = FALSE, U_ed = NA)
+  saveoutput = FALSE, U_ed = NA, ref = NA)
 }
 \arguments{
 \item{path}{File path to the rds files saved from bigsnpr, a character
@@ -23,6 +23,10 @@ mash dataframes. Defaults to 1000.}
 files? Default is FALSE.}
 
 \item{U_ed}{An optional character vector}
+
+\item{ref}{the reference group. A number between 1 & R, where R is the number
+of conditions, or the name of the reference group, or if there is no
+reference group, it can be the string 'mean'.}
 }
 \value{
 A mash result, manipulable using functions in mashr and by mash_plot
