@@ -280,3 +280,109 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
   }
   return(gwaspc)
 }
+
+
+
+#' Return a number rounded to some number of digits
+#'
+#' @description Given some x, return the number rounded to some number of digits.
+#'
+#' @param x A number or vector of numbers
+#' @param at Numeric. Rounding factor or size of the bin to round to.
+#'
+#' @return A number or vector of numbers
+round2 <- function(x, at) ceiling(x / at) * at
+
+#' Return a dataframe binned into 2-d bins by some x and y.
+#'
+#' @description Given a dataframe of x and y values (with some optional
+#'     confidence intervals surrounding the y values), return only the unique
+#'     values of x and y in some set of 2-d bins.
+#'
+#' @param x Numeric vector. The first vector for binning.
+#' @param y Numeric vector. the second vector for binning
+#' @param cl Numeric vector. Optional confidence interval for the y vector,
+#'     lower bound.
+#' @param cu Numeric vector. Optional confidence interval for the y vector,
+#'     upper bound.
+#' @param roundby Numeric. The amount to round the x and y vectors by for 2d
+#'     binning.
+#'
+#' @return A dataframe containing the 2-d binned values for x and y, and their
+#'     confidence intervals.
+round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
+  expected <- round2(x, at = roundby)
+  observed <- round2(y, at = roundby)
+  if(!is.na(cl[1]) & !is.na(cu[1])){
+    clower <- round2(cl, at = roundby)
+    cupper <- round2(cu, at = roundby)
+    tp <- cbind(expected, observed, clower, cupper)
+    return(tp[!duplicated(tp),])
+  } else {
+    tp <- cbind(expected, observed)
+    return(tp[!duplicated(tp),])
+  }
+}
+
+#' Create a quantile-quantile plot with ggplot2.
+#'
+#' Assumptions:
+#'   - Expected P values are uniformly distributed.
+#'   - Confidence intervals assume independence between tests.
+#'     We expect deviations past the confidence intervals if the tests are
+#'     not independent.
+#'     For example, in a genome-wide association study, the genotype at any
+#'     position is correlated to nearby positions. Tests of nearby genotypes
+#'     will result in similar test statistics.
+#'
+#' @param ps Numeric vector of p-values.
+#' @param ci Numeric. Size of the confidence interval, 95% by default.
+#' @param lambdaGC Logical. Add the Genomic Control coefficient as subtitle to the plot?
+#' @param tol Numeric. Tolerance for optional Genomic Control coefficient.
+#'
+#' @importFrom tibble as_tibble
+#' @importFrom rlang .data
+#' @importFrom stats qbeta median uniroot ppoints
+#' @import ggplot2
+#'
+#' @return A ggplot2 plot.
+#' @examples
+#' library(ggplot2)
+#' gg_qqplot(runif(1e2)) + theme_grey(base_size = 24)
+#' @export
+gg_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
+  n  <- length(ps)
+  df <- data.frame(
+    observed = -log10(sort(ps)),
+    expected = -log10(ppoints(n)),
+    clower   = -log10(qbeta(p = (1 - ci) / 2, shape1 = 1:n, shape2 = n:1)),
+    cupper   = -log10(qbeta(p = (1 + ci) / 2, shape1 = 1:n, shape2 = n:1))
+  )
+  df_round <- round_xy(df$expected, df$observed, cl = df$clower, cu = df$cupper)
+  log10Pe <- expression(paste("Expected -log"[10], plain("("), italic(p-value),
+                              plain(")")))
+  log10Po <- expression(paste("Observed -log"[10], plain("("), italic(p-value),
+                              plain(")")))
+  p1 <- ggplot(as_tibble(df_round)) +
+    geom_point(aes(.data$expected, .data$observed), shape = 1, size = 1) +
+    geom_abline(intercept = 0, slope = 1, size = 1.5, color = "red") +
+    geom_line(aes(.data$expected, .data$cupper), linetype = 2) +
+    geom_line(aes(.data$expected, .data$clower), linetype = 2) +
+    xlab(log10Pe) +
+    ylab(log10Po)
+
+  if (lambdaGC) {
+    xtr <- log10(ps)
+    MEDIAN <- log10(0.5)
+    f.opt <- function(x) (x - MEDIAN)
+    xtr_p <- stats::median(xtr) / stats::uniroot(f.opt, interval = range(xtr),
+                                                 check.conv = TRUE,
+                                                 tol = tol)$root
+    lamGC <- signif(xtr_p)
+    expr <- substitute(expression(lambda[GC] == l), list(l = lamGC))
+    p1 + labs(subtitle = eval(expr))
+  } else {
+    p1
+  }
+}
+
