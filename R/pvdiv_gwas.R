@@ -350,6 +350,7 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
 #'
 #' @export
 pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
+  ps <- ps[which(!is.na(ps))]
   n  <- length(ps)
   df <- data.frame(
     observed = -log10(sort(ps)),
