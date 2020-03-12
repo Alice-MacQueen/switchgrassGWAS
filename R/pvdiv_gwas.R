@@ -374,9 +374,9 @@ pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
     xtr <- log10(ps)
     MEDIAN <- log10(0.5)
     f.opt <- function(x) (x - MEDIAN)
-    xtr_p <- stats::median(xtr) / stats::uniroot(f.opt, interval = range(xtr),
-                                                 check.conv = TRUE,
-                                                 tol = tol)$root
+    xtr_p <- median(xtr) / uniroot(f.opt, interval = range(xtr),
+                                   check.conv = TRUE,
+                                   tol = tol)$root
     lamGC <- signif(xtr_p)
     expr <- substitute(expression(lambda[GC] == l), list(l = lamGC))
     p1 + labs(subtitle = eval(expr))
