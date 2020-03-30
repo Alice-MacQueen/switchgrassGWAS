@@ -83,16 +83,29 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
     dplyr::rename("NumPCs" = .data$PLANT_ID)
 
   for(i in seq_along(names(df))[-1]){
-    y1 <- as_vector(df[!is.na(df[,i]), i])
+    y1 <- as_vector(df[which(!is.na(df[,i])), i])
     ind_y <- which(!is.na(df[,i]))
+
     for(k in c(1:length(npcs))){
-      if(npcs[k] == 0){
-        gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
-                                 ncores = ncores)
-      } else {
-        ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs[k]], ncol = npcs[k])
-        gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
-                                 ind.train = ind_y, ncores = ncores)
+      if(type == "linear"){
+        if(npcs[k] == 0){
+          gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
+                                   ncores = ncores)
+        } else {
+          ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs[k]],
+                          ncol = npcs[k])
+          gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
+                                   ind.train = ind_y, ncores = ncores)
+        }
+    } else if(type == "logistic"){
+        if(npcs[k] == 0){
+          gwaspc <- big_univLogReg(G, y01.train = y1, ind.train = ind_y,
+                                   ncores = ncores)
+        } else {
+          ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
+          gwaspc <- big_univLogReg(G, y01.train = y1, covar.train = ind_u,
+                                   ind.train = ind_y, ncores = ncores)
+        }
       }
       gwas2 <- gwaspc[which(!is.na(gwaspc$score)),]
       LambdaGC[k,i] <- bigsnpr:::getLambdaGC(gwas = gwas2)
@@ -216,7 +229,7 @@ asv_best_PC_df <- function(df){
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
 #' @param npcs Number of principle components to use. Default is 10.
-#' @param saveoutput Logical. Should output be saved as a rdsvto the working directory?
+#' @param saveoutput Logical. Should output be saved as a rds to the working directory?
 #'
 #' @import bigsnpr
 #' @import bigstatsr
@@ -232,7 +245,7 @@ asv_best_PC_df <- function(df){
 #' @export
 pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                        covar = NA, ncores = 1, npcs = 10, saveoutput = FALSE){
-
+  stopifnot(type %in% c("linear", "logistic"))
   G <- snp$genotypes
   CHR <- snp$map$chromosome
   POS <- snp$map$physical.pos
@@ -263,9 +276,12 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                             .data$CHR == "Chr09N" ~ 18,
                             TRUE ~ 19
     ))
+  if(length(which(CHRN$CHRN == 19)) > 0){
+    stop("SNP dataframe has scaffolds or chromosomes not labeled Chr01K to Chr09N; pvdiv_gwas() is not suitable for this dataframe.")
+  }
 
   for(i in seq_along(names(df))[-1]){
-    y1 <- as_vector(df[!is.na(df[,i]), i])
+    y1 <- as_vector(df[which(!is.na(df[,i])), i])
     ind_y <- which(!is.na(df[,i]))
 
     if(type == "linear"){
@@ -277,7 +293,7 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
         gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
                                  ncores = ncores)
       }
-    } else {
+    } else if(type == "logistic"){
       if(!is.na(covar[1])){
         ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
         gwaspc <- big_univLogReg(G, y01.train = y1, covar.train = ind_u,
@@ -286,11 +302,15 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
         gwaspc <- big_univLogReg(G, y01.train = y1, ind.train = ind_y,
                                  ncores = ncores)
       }
+    } else {
+      stop("Type of GWAS not recognized: please choose one of 'linear' or 'logistic'")
     }
 
     if(saveoutput){
       saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i], ".rds"))
-    }
+    } else {
+        print("saveoutput is FALSE so GWAS object will not be saved to disk.")
+      }
 
   }
   return(gwaspc)

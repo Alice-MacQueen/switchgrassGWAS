@@ -23,7 +23,7 @@ can generate these using \code{bigsnpr::snp_autoSVD()}.}
 
 \item{npcs}{Number of principle components to use. Default is 10.}
 
-\item{saveoutput}{Logical. Should output be saved as a rdsvto the working directory?}
+\item{saveoutput}{Logical. Should output be saved as a rds to the working directory?}
 }
 \value{
 The gwas results for the last phenotype in the dataframe. That
