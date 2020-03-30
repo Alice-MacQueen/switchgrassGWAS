@@ -241,7 +241,8 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
   if(type == "table"){
     topsnp_inputlist[[1]] <- df %>%
       mutate(start = as.integer(.data$start),
-             end = as.integer(.data$end))
+             end = as.integer(.data$end),
+             POS = (end + start)/2)
   }
   if(type %in% c("bigsnp", "mash")){
     ## Now make multiple dataframes for different categories of top SNPs.

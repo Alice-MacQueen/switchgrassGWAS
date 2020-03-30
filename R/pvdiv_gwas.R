@@ -216,6 +216,7 @@ asv_best_PC_df <- function(df){
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
 #' @param npcs Number of principle components to use. Default is 10.
+#' @param saveoutput Logical. Should output be saved as a rdsvto the working directory?
 #'
 #' @import bigsnpr
 #' @import bigstatsr
@@ -230,7 +231,7 @@ asv_best_PC_df <- function(df){
 #'
 #' @export
 pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
-                       covar = NA, ncores = 1, npcs = 10){
+                       covar = NA, ncores = 1, npcs = 10, saveoutput = FALSE){
 
   G <- snp$genotypes
   CHR <- snp$map$chromosome
@@ -266,16 +267,30 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
   for(i in seq_along(names(df))[-1]){
     y1 <- as_vector(df[!is.na(df[,i]), i])
     ind_y <- which(!is.na(df[,i]))
-    if(!is.na(covar[1])){
-      ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
-      gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
-                               ind.train = ind_y, ncores = ncores)
+
+    if(type == "linear"){
+      if(!is.na(covar[1])){
+        ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
+        gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
+                                 ind.train = ind_y, ncores = ncores)
+      } else {
+        gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
+                                 ncores = ncores)
+      }
     } else {
-      gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
-                               ncores = ncores)
+      if(!is.na(covar[1])){
+        ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
+        gwaspc <- big_univLogReg(G, y01.train = y1, covar.train = ind_u,
+                                 ind.train = ind_y, ncores = ncores)
+      } else {
+        gwaspc <- big_univLogReg(G, y01.train = y1, ind.train = ind_y,
+                                 ncores = ncores)
+      }
     }
 
-    saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i], ".rds"))
+    if(saveoutput){
+      saveRDS(gwaspc, file = paste0("GWAS_object_", names(df)[i], ".rds"))
+    }
 
   }
   return(gwaspc)
