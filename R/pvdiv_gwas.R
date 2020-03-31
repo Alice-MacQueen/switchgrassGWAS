@@ -22,7 +22,7 @@
 #'
 #' @import bigsnpr
 #' @import bigstatsr
-#' @importFrom dplyr mutate rename case_when
+#' @importFrom dplyr mutate rename case_when mutate_if
 #' @importFrom purrr as_vector
 #' @importFrom tibble as_tibble enframe
 #' @importFrom rlang .data
@@ -80,24 +80,32 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                                nrow = length(npcs), ncol = ncol(df),
                                dimnames = list(npcs, colnames(df))))
   LambdaGC <- LambdaGC %>%
-    dplyr::rename("NumPCs" = .data$PLANT_ID)
+    dplyr::rename("NumPCs" = .data$PLANT_ID) %>%
+    mutate_if(is.integer, as.numeric)
 
   for(i in seq_along(names(df))[-1]){
-    y1 <- as_vector(df[which(!is.na(df[,i])), i])
-    ind_y <- which(!is.na(df[,i]))
 
     for(k in c(1:length(npcs))){
+
       if(type == "linear"){
+
+        y1 <- as_vector(df[which(!is.na(df[,i])), i])
+        ind_y <- which(!is.na(df[,i]))
+
         if(npcs[k] == 0){
+
           gwaspc <- big_univLinReg(G, y.train = y1, ind.train = ind_y,
                                    ncores = ncores)
         } else {
+
           ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs[k]],
                           ncol = npcs[k])
           gwaspc <- big_univLinReg(G, y.train = y1, covar.train = ind_u,
                                    ind.train = ind_y, ncores = ncores)
         }
     } else if(type == "logistic"){
+      y1 <- as_vector(df[which(!is.na(df[,i])), i])
+      ind_y <- which(!is.na(df[,i]))
         if(npcs[k] == 0){
           gwaspc <- big_univLogReg(G, y01.train = y1, ind.train = ind_y,
                                    ncores = ncores)
@@ -106,11 +114,12 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
           gwaspc <- big_univLogReg(G, y01.train = y1, covar.train = ind_u,
                                    ind.train = ind_y, ncores = ncores)
         }
-      }
-      gwas2 <- gwaspc[which(!is.na(gwaspc$score)),]
-      LambdaGC[k,i] <- bigsnpr:::getLambdaGC(gwas = gwas2)
+    }
+      ps <- predict(gwaspc, log10 = FALSE)
+      LambdaGC[k,i] <- get_lambdagc(ps = ps)
       message(paste0("Finished Lambda_GC calculation for ", names(df)[i], " using ", npcs[k], " PCs."))
     }
+
     if(saveoutput == TRUE){
       write_csv(LambdaGC, path = paste0("Lambda_GC_", names(df)[i], ".csv"))
     }
@@ -374,12 +383,12 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
 #' @param ci Numeric. Size of the confidence interval, 0.95 by default.
 #' @param lambdaGC Logical. Add the Genomic Control coefficient as subtitle to
 #'     the plot?
-#' @param tol Numeric. Tolerance for optional Genomic Control coefficient.
 #'
 #' @import ggplot2
 #' @importFrom tibble as_tibble
 #' @importFrom rlang .data
-#' @importFrom stats qbeta median uniroot ppoints
+#' @importFrom stats qbeta ppoints
+#' @param tol Numeric. Tolerance for optional Genomic Control coefficient.
 #'
 #' @return A ggplot2 plot.
 #'
@@ -407,13 +416,7 @@ pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
     ylab(log10Po)
 
   if (lambdaGC) {
-    xtr <- log10(ps)
-    MEDIAN <- log10(0.5)
-    f.opt <- function(x) (x - MEDIAN)
-    xtr_p <- median(xtr) / uniroot(f.opt, interval = range(xtr),
-                                   check.conv = TRUE,
-                                   tol = tol)$root
-    lamGC <- signif(xtr_p)
+    lamGC <- get_lambdagc(ps = ps, tol = tol)
     expr <- substitute(expression(lambda[GC] == l), list(l = lamGC))
     p1 + labs(subtitle = eval(expr))
   } else {
@@ -421,3 +424,26 @@ pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
   }
 }
 
+#' Find lambda_GC value for non-NA p-values
+#'
+#' @description Finds the lambda GC value for some vector of p-values.
+#'
+#' @param ps Numeric vector of p-values. Can have NA's.
+#' @param tol Numeric. Tolerance for optional Genomic Control coefficient.
+#'
+#' @importFrom stats median uniroot
+#'
+#' @return A lambda GC value (some positive number, ideally ~1)
+#'
+#' @export
+get_lambdagc <- function(ps, tol = 1e-8){
+  ps <- ps[which(!is.na(ps))]
+  xtr <- log10(ps)
+  MEDIAN <- log10(0.5)
+  f.opt <- function(x) (x - MEDIAN)
+  xtr_p <- median(xtr) / uniroot(f.opt, interval = range(xtr),
+                                 check.conv = TRUE,
+                                 tol = tol)$root
+  lamGC <- signif(xtr_p)
+  return(lamGC)
+}
