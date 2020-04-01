@@ -48,32 +48,6 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
   }
 
   G <- snp$genotypes
-  CHR <- snp$map$chromosome
-  POS <- snp$map$physical.pos
-
-  # Make the switchgrass chromosome names numeric, which bigsnpr requires.
-  CHRN <- enframe(CHR, name = NULL) %>%
-    dplyr::rename(CHR = .data$value) %>%
-    mutate(CHRN = case_when(.data$CHR == "Chr01K" ~ 1,
-                            .data$CHR == "Chr01N" ~ 2,
-                            .data$CHR == "Chr02K" ~ 3,
-                            .data$CHR == "Chr02N" ~ 4,
-                            .data$CHR == "Chr03K" ~ 5,
-                            .data$CHR == "Chr03N" ~ 6,
-                            .data$CHR == "Chr04K" ~ 7,
-                            .data$CHR == "Chr04N" ~ 8,
-                            .data$CHR == "Chr05K" ~ 9,
-                            .data$CHR == "Chr05N" ~ 10,
-                            .data$CHR == "Chr06K" ~ 11,
-                            .data$CHR == "Chr06N" ~ 12,
-                            .data$CHR == "Chr07K" ~ 13,
-                            .data$CHR == "Chr07N" ~ 14,
-                            .data$CHR == "Chr08K" ~ 15,
-                            .data$CHR == "Chr08N" ~ 16,
-                            .data$CHR == "Chr09K" ~ 17,
-                            .data$CHR == "Chr09N" ~ 18,
-                            TRUE ~ 19
-    ))
 
   LambdaGC <- as_tibble(matrix(data =
                                  c(npcs, rep(NA, (ncol(df) - 1)*length(npcs))),
@@ -104,15 +78,23 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                                    ind.train = ind_y, ncores = ncores)
         }
     } else if(type == "logistic"){
+      message(paste0("For logistic models, if convergence is not reached by ",
+      "the main algorithm for some SNPs, the corresponding `niter` element ",
+      "is set to NA, and glm is used instead. If glm can't ",
+      "converge either, those SNP estimations are set to NA."))
       y1 <- as_vector(df[which(!is.na(df[,i])), i])
       ind_y <- which(!is.na(df[,i]))
         if(npcs[k] == 0){
-          gwaspc <- big_univLogReg(G, y01.train = y1, ind.train = ind_y,
-                                   ncores = ncores)
+          gwaspc <- suppressMessages(big_univLogReg(G, y01.train = y1,
+                                                    ind.train = ind_y,
+                                                    ncores = ncores))
         } else {
-          ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
-          gwaspc <- big_univLogReg(G, y01.train = y1, covar.train = ind_u,
-                                   ind.train = ind_y, ncores = ncores)
+          ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs[k]],
+                          ncol = npcs[k])
+          gwaspc <- suppressMessages(big_univLogReg(G, y01.train = y1,
+                                                    covar.train = ind_u,
+                                                    ind.train = ind_y,
+                                                    ncores = ncores))
         }
     }
       ps <- predict(gwaspc, log10 = FALSE)
@@ -256,38 +238,6 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                        covar = NA, ncores = 1, npcs = 10, saveoutput = FALSE){
   stopifnot(type %in% c("linear", "logistic"))
   G <- snp$genotypes
-  CHR <- snp$map$chromosome
-  POS <- snp$map$physical.pos
-  #NCORES <- nb_cores()
-
-  # Make the switchgrass chromosome names numeric, which bigsnpr requires.
-  # Scaffolds that remain will be called 19, but note for some analyses that
-  # they need to be ordered (so two scaffolds can't have the same number)
-  CHRN <- enframe(CHR, name = NULL) %>%
-    dplyr::rename(CHR = .data$value) %>%
-    mutate(CHRN = case_when(.data$CHR == "Chr01K" ~ 1,
-                            .data$CHR == "Chr01N" ~ 2,
-                            .data$CHR == "Chr02K" ~ 3,
-                            .data$CHR == "Chr02N" ~ 4,
-                            .data$CHR == "Chr03K" ~ 5,
-                            .data$CHR == "Chr03N" ~ 6,
-                            .data$CHR == "Chr04K" ~ 7,
-                            .data$CHR == "Chr04N" ~ 8,
-                            .data$CHR == "Chr05K" ~ 9,
-                            .data$CHR == "Chr05N" ~ 10,
-                            .data$CHR == "Chr06K" ~ 11,
-                            .data$CHR == "Chr06N" ~ 12,
-                            .data$CHR == "Chr07K" ~ 13,
-                            .data$CHR == "Chr07N" ~ 14,
-                            .data$CHR == "Chr08K" ~ 15,
-                            .data$CHR == "Chr08N" ~ 16,
-                            .data$CHR == "Chr09K" ~ 17,
-                            .data$CHR == "Chr09N" ~ 18,
-                            TRUE ~ 19
-    ))
-  if(length(which(CHRN$CHRN == 19)) > 0){
-    stop("SNP dataframe has scaffolds or chromosomes not labeled Chr01K to Chr09N; pvdiv_gwas() is not suitable for this dataframe.")
-  }
 
   for(i in seq_along(names(df))[-1]){
     y1 <- as_vector(df[which(!is.na(df[,i])), i])
@@ -303,13 +253,20 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                                  ncores = ncores)
       }
     } else if(type == "logistic"){
+      message(paste0("For logistic models, if convergence is not reached by ",
+        "the main algorithm for any SNP, the corresponding `niter` element ",
+        "is set to NA, and glm is used instead. If glm can't ",
+        "converge either, those SNP estimations are set to NA."))
       if(!is.na(covar[1])){
         ind_u <- matrix(covar$u[which(!is.na(df[,i])),1:npcs], ncol = npcs)
-        gwaspc <- big_univLogReg(G, y01.train = y1, covar.train = ind_u,
-                                 ind.train = ind_y, ncores = ncores)
+        gwaspc <- suppressMessages(big_univLogReg(G, y01.train = y1,
+                                                  covar.train = ind_u,
+                                                  ind.train = ind_y,
+                                                  ncores = ncores))
       } else {
-        gwaspc <- big_univLogReg(G, y01.train = y1, ind.train = ind_y,
-                                 ncores = ncores)
+        gwaspc <- suppressMessages(big_univLogReg(G, y01.train = y1,
+                                                  ind.train = ind_y,
+                                                  ncores = ncores))
       }
     } else {
       stop("Type of GWAS not recognized: please choose one of 'linear' or 'logistic'")
