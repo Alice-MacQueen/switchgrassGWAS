@@ -155,6 +155,7 @@ get_marker_df <- function(m){
 #' @export
 pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
                                 pos1, pos2){
+  stopifnot(attr(snp, "class") == "bigSNP")
   if(type == "anno"){
     stopifnot("CHR" %in% names(anno_df) & "POS" %in% names(anno_df))
     anno_df <- anno_df %>%
@@ -204,6 +205,7 @@ pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
 #'
 #' @export
 pvdiv_bigsnp2tibble <- function(snp){
+  stopifnot(attr(snp, "class") == "bigSNP")
   subset_df <- snp$genotypes[rows_along(snp$genotypes),
                              cols_along(snp$genotypes)]
   colnames(subset_df) <- snp$map$marker.ID

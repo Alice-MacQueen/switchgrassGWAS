@@ -36,6 +36,7 @@
 pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                        covar = NA, ncores = 1, npcs = c(0:10),
                        saveoutput = FALSE){
+  stopifnot(attr(snp, "class") == "bigSNP")
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
     }
@@ -237,6 +238,10 @@ asv_best_PC_df <- function(df){
 pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                        covar = NA, ncores = 1, npcs = 10, saveoutput = FALSE){
   stopifnot(type %in% c("linear", "logistic"))
+  stopifnot(attr(snp, "class") == "bigSNP")
+  if(colnames(df)[1] != "PLANT_ID"){
+    stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
+  }
   G <- snp$genotypes
 
   for(i in seq_along(names(df))[-1]){
