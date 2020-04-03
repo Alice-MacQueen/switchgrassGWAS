@@ -60,7 +60,8 @@ get_ncond = function(m){
 
 #' Return the Bayes Factor for each effect
 #'
-#' @param m the mash result (from joint or 1by1 analysis); must have been computed using usepointmass=TRUE
+#' @param m the mash result (from joint or 1by1 analysis); must have been
+#'     computed using usepointmass=TRUE
 #'
 #' @return if m was fitted using usepointmass=TRUE then returns a vector of
 #'     the log10(bf) values for each effect. That is, the jth element
@@ -76,14 +77,18 @@ get_log10bf = function(m) {
 }
 
 
-#' From a mash result, get effects that are significant in at least one condition
+#' From a mash result, get effects that are significant in at least
+#'     one condition.
 #'
 #' @param m the mash result (from joint or 1by1 analysis)
 #' @param thresh indicates the threshold below which to call signals significant
 #' @param conditions which conditions to include in check (default to all)
-#' @param sig_fn the significance function used to extract significance from mash object; eg could be ashr::get_lfsr or ashr::get_lfdr. (Small values must indicate significant.)
+#' @param sig_fn the significance function used to extract significance from
+#'     mash object; eg could be ashr::get_lfsr or ashr::get_lfdr. (Small values
+#'     must indicate significant.)
 #'
-#' @return a vector containing the indices of the significant effects, by order of most significant to least
+#' @return a vector containing the indices of the significant effects, by
+#'     order of most significant to least
 #'
 #' @importFrom ashr get_lfsr
 #'
@@ -93,7 +98,8 @@ get_significant_results = function(m, thresh = 0.05, conditions = NULL,
   if (is.null(conditions)) {
     conditions = 1:get_ncond(m)
   }
-  top = apply(sig_fn(m)[,conditions,drop=FALSE],1,min) # find top effect in each condition
+  top = apply(sig_fn(m)[,conditions,drop=FALSE],1,min) # find top effect
+  # in each condition
   sig = which(top < thresh)
   ord = order(top[sig],decreasing=FALSE)
   sig[ord]
@@ -155,7 +161,9 @@ get_marker_df <- function(m){
 #' @export
 pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
                                 pos1, pos2){
-  stopifnot(attr(snp, "class") == "bigSNP")
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
   if(type == "anno"){
     stopifnot("CHR" %in% names(anno_df) & "POS" %in% names(anno_df))
     anno_df <- anno_df %>%
@@ -163,10 +171,11 @@ pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
     pos_subset <- which(snp$map$marker.ID %in% anno_df$marker_ID)
   } else if(type == "range"){
     stopifnot(is.character(chr) & is.numeric(pos1) & is.numeric(pos2) & pos2 > pos1)
-    stopifnot(chr %in% c("Chr01K", "Chr01N", "Chr02K", "Chr02N", "Chr03K",
-                         "Chr03N", "Chr04K", "Chr04N", "Chr05K", "Chr05N",
-                         "Chr06K", "Chr06N", "Chr07K", "Chr07N", "Chr08K",
-                         "Chr08N", "Chr09K", "Chr09N"))
+    if(length(which(!(chr %in% paste0("Chr0", rep(1:9, times = 2),
+                                      rep(c("K", "N"), 9))))) > 0){
+      stop(paste0("This function does not work on files with scaffolds; it ",
+                  "needs chromosomes in the range of Chr01K to Chr09N."))
+    }
     pos_df <- which(between(snp$map$physical.pos, pos1, pos2))
     chr_df <- which(snp$map$chromosome %in% chr)
     pos_subset <- pos_df[which(pos_df %in% chr_df)]

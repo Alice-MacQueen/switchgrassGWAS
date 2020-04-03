@@ -12,13 +12,15 @@
 #' @param type Character string. Type of univarate regression to run for GWAS.
 #'     Options are "linear" or "logistic".
 #' @param snp Genomic information to include for Panicum virgatum. Contact
-#'     tjuenger <at> utexas <dot> edu to obtain this information pre-publication.
+#'     tjuenger <at> utexas <dot> edu to obtain this information
+#'     pre-publication.
 #' @param covar Covariance matrix to include in the regression. You
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
 #' @param npcs Integer vector of principle components to use.
 #'     Defaults to c(0:10).
-#' @param saveoutput Logical. Should output be saved as a csv to the working directory?
+#' @param saveoutput Logical. Should output be saved as a csv to the
+#'     working directory?
 #'
 #' @import bigsnpr
 #' @import bigstatsr
@@ -36,7 +38,9 @@
 pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                        covar = NA, ncores = 1, npcs = c(0:10),
                        saveoutput = FALSE){
-  stopifnot(attr(snp, "class") == "bigSNP")
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
     }
@@ -100,7 +104,8 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
     }
       ps <- predict(gwaspc, log10 = FALSE)
       LambdaGC[k,i] <- get_lambdagc(ps = ps)
-      message(paste0("Finished Lambda_GC calculation for ", names(df)[i], " using ", npcs[k], " PCs."))
+      message(paste0("Finished Lambda_GC calculation for ", names(df)[i],
+                     " using ", npcs[k], " PCs."))
     }
 
     if(saveoutput == TRUE){
@@ -114,10 +119,10 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                                       npcs[1], "_to_", tail(npcs, n = 1),
                                       "_PCs.csv"))
     best_LambdaGC <- pvdiv_best_PC_df(df = LambdaGC)
-    write_csv(best_LambdaGC, path = paste0("Best_Lambda_GC_", names(df)[2], "_to_",
-                                           tail(names(df), n = 1), "_Phenotypes_",
-                                           npcs[1], "_to_", tail(npcs, n = 1),
-                                           "_PCs.csv"))
+    write_csv(best_LambdaGC, path = paste0("Best_Lambda_GC_", names(df)[2],
+                                           "_to_", tail(names(df), n = 1),
+                                           "_Phenotypes_", npcs[1], "_to_",
+                                           tail(npcs, n = 1), "_PCs.csv"))
   }
   return(LambdaGC)
 }
@@ -216,12 +221,14 @@ asv_best_PC_df <- function(df){
 #' @param type Character string. Type of univarate regression to run for GWAS.
 #'     Options are "linear" or "logistic".
 #' @param snp Genomic information to include for Panicum virgatum. Contact
-#'     tjuenger <at> utexas <dot> edu to obtain this information pre-publication.
+#'     tjuenger <at> utexas <dot> edu to obtain this information
+#'     pre-publication.
 #' @param covar Optional covariance matrix to include in the regression. You
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
 #' @param npcs Number of principle components to use. Default is 10.
-#' @param saveoutput Logical. Should output be saved as a rds to the working directory?
+#' @param saveoutput Logical. Should output be saved as a rds to the
+#'     working directory?
 #'
 #' @import bigsnpr
 #' @import bigstatsr
@@ -238,7 +245,9 @@ asv_best_PC_df <- function(df){
 pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                        covar = NA, ncores = 1, npcs = 10, saveoutput = FALSE){
   stopifnot(type %in% c("linear", "logistic"))
-  stopifnot(attr(snp, "class") == "bigSNP")
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
   }
@@ -274,7 +283,8 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
                                                   ncores = ncores))
       }
     } else {
-      stop("Type of GWAS not recognized: please choose one of 'linear' or 'logistic'")
+      stop(paste0("Type of GWAS not recognized: please choose one of 'linear'",
+                  " or 'logistic'"))
     }
 
     if(saveoutput){
@@ -291,7 +301,8 @@ pvdiv_gwas <- function(df, type = c("linear", "logistic"), snp,
 
 #' Return a number rounded to some number of digits
 #'
-#' @description Given some x, return the number rounded to some number of digits.
+#' @description Given some x, return the number rounded to some number of
+#'     digits.
 #'
 #' @param x A number or vector of numbers
 #' @param at Numeric. Rounding factor or size of the bin to round to.

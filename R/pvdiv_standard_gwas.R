@@ -54,7 +54,9 @@ pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
   verbose <- dots::dots(name = 'verbose', value = FALSE, ...)
 
   # Argument error checks; Set up numeric chromosome data frame.
-  stopifnot(attr(snp, "class") == "bigSNP")
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
   G <- snp$genotypes
   CHR <- snp$map$chromosome
   POS <- snp$map$physical.pos
@@ -128,7 +130,9 @@ pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
 #'
 #' @export
 pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
-  stopifnot(attr(snp, "class") == "bigSNP")
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
   if(saveoutput == FALSE){
     message(paste0("'saveoutput' is FALSE, so the kinship matrix will not ",
                    "be saved to the working directory."))
@@ -139,6 +143,7 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
     nInd <- length(ind.row)
   } else {
     nInd <- snp$genotypes$nrow
+    ind.row <- 1:nInd
   }
   # Centered (mean of rows subtracted) transposed crossproduct of snp file.
   K <- big_tcrossprodSelf(G, ind.row = ind.row,
@@ -223,6 +228,7 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 #' @importFrom readr write_rds
 #' @importFrom stats p.adjust
 #' @importFrom tidyselect all_of
+#' @importFrom cowplot save_plot
 #'
 #' @examples
 #' \dontrun{
@@ -238,13 +244,16 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                 savegwas = FALSE, saveplots = TRUE,
                                 saveannos = FALSE, txdb = NULL, ...){
 
-  stopifnot(attr(snp, "class") == "bigSNP")
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
   }
   stopifnot(type %in% c("linear", "logistic"))
   if(is.null(covar)){
-    stop(paste0("Need to specify covariance matrix (covar) - you can generate this using pvdiv_autoSVD()."))
+    stop(paste0("Need to specify covariance matrix (covar) - you can generate",
+                " this using pvdiv_autoSVD()."))
   }
   if(saveannos == TRUE & is.null(txdb)){
     stop(paste0("Need to specify a txdb object created using AnnotationDbi ",
@@ -252,10 +261,18 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                 "SNPs. If you don't have this, set saveannos = FALSE."))
   }
   if(lambdagc == TRUE){
-    message("'lambdagc' is TRUE, so lambda_GC will be used to find the best population structure correction using the covariance matrix.")
+    message(paste0("'lambdagc' is TRUE, so lambda_GC will be used to find ",
+                   "the best population structure correction using the ",
+                   "covariance matrix."))
+  } else if(!(colnames(lambdagc) %in% c("NumPCs", colnames(df)))){
+    stop(paste0("If lambdagc is a dataframe, the column names must include",
+                " NumPCs and the names of the phenotypes to run GWAS on ",
+                "(the names of 'df'). You can generate this data frame with ",
+                "pvdiv_lambda_GC()."))
   }
   if(savegwas == FALSE){
-    message("'savegwas' is FALSE, so the gwas results will not be saved to disk.")
+    message(paste0("'savegwas' is FALSE, so the gwas results will not be ",
+                   "saved to disk."))
   }
 
   plants <- snp$fam$sample.ID
@@ -264,28 +281,32 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
 
   for(i in 2:nrow(df)){
 
-# ------- Choose best pop structure correction --------------------------
-
     df1 <- df %>%
       dplyr::select(.data$PLANT_ID, all_of(i))
+    phename <- names(df1)[2]
+    message(paste0("Now starting GWAS pipeline for ", phename, "."))
 
-    lambdagc <- pvdiv_lambda_GC(df = df1, type = "linear", snp = snp,
-                                covar = svd, ncores = ncores,
-                                npcs = c(0:20), saveoutput = TRUE)
-
-
-    # ------ Run GWAS with best pop structure correction -----
-    # Use a new function asr_best_PC_df(df) to find the NumPCs where lambda_GC
-    # is closest to one.
-
-    PCdf <- pvdiv_best_PC_df(lambdagc) # asv_best_PC_df(lambdagc)
-    PCdf1 <- PCdf[1,]
-    # PCdf1 <- data.frame(NumPCs = 20)
-
-    if(PCdf1$NumPCs == 0){
-      gwas <- pvdiv_gwas(df = df1, type = "linear", snp = snp, ncores = ncores)
+    if(lambdagc == TRUE){
+      pc_max = ncol(covar$u)
+      message(paste0("Now determining lambda_GC for GWAS models with",
+                     pc_max+1, "sets of PCs. This will take some time."))
+      lambdagc <- pvdiv_lambda_GC(df = df, type = type, snp = snp,
+                                  covar = covar, ncores = ncores,
+                                  npcs = c(0:pc_max), saveoutput = TRUE)
+      PCdf <- pvdiv_best_PC_df(lambdagc) # asv_best_PC_df(lambdagc)
     } else {
-      gwas <- pvdiv_gwas(df = df1, type = "linear", snp = snp, covar = svd,
+      PC1 <- lambdagc %>%
+        dplyr::select(.data$NumPCs, phename)
+      PCdf <- pvdiv_best_PC_df(PC1) # asv_best_PC_df(lambdagc)
+    }
+    PCdf1 <- PCdf[1,]
+
+# ------ Run GWAS with best pop structure correction -----
+  message("Now running GWAS with the best population structure correction.")
+    if(PCdf1$NumPCs == 0){
+      gwas <- pvdiv_gwas(df = df1, type = type, snp = snp, ncores = ncores)
+    } else {
+      gwas <- pvdiv_gwas(df = df1, type = type, snp = snp, covar = covar,
                          ncores = ncores, npcs = PCdf1$NumPCs)
     }
 
@@ -297,20 +318,21 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     gwas_data[,.data$log10p := -log10(.data$pvalue)]
     gwas_data[,.data$FDR_adj := p.adjust(.data$pvalue, method = "BH")]
     if(savegwas == TRUE){
-      write_rds(gwas_data, path = paste0("GWAS_datatable_", names(df1)[2], "_",
+      write_rds(gwas_data, path = paste0("GWAS_datatable_", phename, "_",
                                          PCdf1$NumPCs, "_PCs", "_.rds"),
                 compress = "gz")
     }
 
     if(saveplots == TRUE){
+      message("Now generating and saving Manhattan and QQ plots.")
       # Find 10% FDR threshold
       FDRthreshhi <- gwas_data %>%
         as_tibble() %>%
-        filter(between(.data$FDR_adj, 0.10001, 1)) %>%  # 10% FDR threshold currently.
+        filter(between(.data$FDR_adj, 0.10001, 1)) %>%  # 10% FDR threshold
         summarise(thresh = max(.data$log10p))
       FDRthreshlo <- gwas_data %>%
         as_tibble() %>%
-        filter(between(.data$FDR_adj, 0, 0.09999)) %>%  # 10% FDR threshold currently.
+        filter(between(.data$FDR_adj, 0, 0.09999)) %>%  # 10% FDR threshold
         summarise(thresh = min(.data$log10p))
       if(FDRthreshhi$thresh[1] > 0 & FDRthreshlo$thresh[1] > 0){
         FDRthreshold = (FDRthreshhi$thresh[1] + FDRthreshlo$thresh[1])/2
@@ -331,22 +353,27 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                    size = 1) +
         facet_wrap(~ .data$CHR, nrow = 1, scales = "free_x",
                    strip.position = "bottom") +
-        scale_color_viridis(option = "B", end = 0.8, discrete = TRUE) +
-        scale_fill_viridis(option = "B", end = 0.8, discrete = TRUE) +
+        scale_color_manual(values = rep(c("#1B0C42FF", "grey"), 9),
+                           guide = FALSE) +
         theme(axis.text.x = element_blank(),
               axis.ticks.x = element_blank(),
-              panel.background = element_rect(fill=NA), legend.position = "none") +
+              panel.background = element_rect(fill=NA),
+              legend.position = "none") +
         labs(x = "Chromosome", y = "-log10(p value)") +
         scale_x_continuous(expand = c(0.18, 0.18))
 
-      save_plot(paste0("Manhattan_", names(df1)[2], "_", PCdf1$NumPCs, "_PCs_",
-                       "10percent_FDR_", get_date_filename(),
-                       ".png"), plot = ggmanobject1, base_asp = 4, base_height = 4)
+      save_plot(filename = file.path(outputdir,
+                                     paste0("Manhattan_", phename, "_",
+                                            PCdf1$NumPCs, "_PCs_10percent_FDR_",
+                                            get_date_filename(), ".png")),
+                plot = ggmanobject1, base_asp = 4, base_height = 4)
 
       # Save a QQplot
       ggqqplot <- pvdiv_qqplot(ps = gwas_data$pvalue, lambdaGC = TRUE)
-      save_plot(paste0("QQplot_", names(df1)[2], "_", PCdf1$NumPCs, "_PCs_FDR_",
-                       get_date_filename(), ".png"),
+      save_plot(filename = file.path(outputdir,
+                                     paste0("QQplot_", phename, "_",
+                                            PCdf1$NumPCs, "_PCs_FDR_",
+                                            get_date_filename(), ".png")),
                 plot = ggqqplot, base_asp = 1, base_height = 4)
 
       # Save a Manhattan plot with Bonferroni
@@ -359,31 +386,34 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                    size = 1) +
         facet_wrap(~ .data$CHR, nrow = 1, scales = "free_x",
                    strip.position = "bottom") +
-        scale_color_viridis(option = "B", end = 0.8, discrete = TRUE) +
-        scale_fill_viridis(option = "B", end = 0.8, discrete = TRUE) +
+        scale_color_manual(values = rep(c("#1B0C42FF", "grey"), 9),
+                           guide = FALSE) +
         theme(axis.text.x = element_blank(),
               axis.ticks.x = element_blank(),
-              panel.background = element_rect(fill=NA), legend.position = "none") +
+              panel.background = element_rect(fill=NA),
+              legend.position = "none") +
         labs(x = "Chromosome", y = "-log10(p value)") +
         scale_x_continuous(expand = c(0.18, 0.18))
 
-      save_plot(paste0("Manhattan_", names(df1)[2], "_", PCdf1$NumPCs,
-                       "_PCs_Bonferroni_", get_date_filename(),
-                       ".png"), plot = ggmanobject2, base_asp = 4, base_height = 4)
+      save_plot(filename = file.path(outputdir,
+                                     paste0("Manhattan_", phename, "_",
+                                            PCdf1$NumPCs, "_PCs_Bonferroni_",
+                                            get_date_filename(), ".png")),
+                plot = ggmanobject2, base_asp = 4, base_height = 4)
     }
 
     if(saveannos == TRUE){
+      message(paste0("Now creating annotation data frames for the top 10 & ",
+                     "top 500 SNPs by p-value, and for SNPs above a 10% FDR."))
       ## Save annotation tables for the top associations
-      anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp", n = c(10,100),
-                                         FDRalpha = 0.1,
-                                         rangevector = c(0, 20000, 100000),
+      anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp",
+                                         n = c(10,500), FDRalpha = 0.1,
+                                         rangevector = c(0, 50000),
                                          markers = markers,
                                          anno_info = switchgrassGWAS::gff_gene,
                                          txdb = txdb)
-      saveRDS(anno_tables, file.path("/", "home", "alice", "Github",
-                                     "pvdiv-phenology-gxe", "analysis",
-                                     "all-phenotypes-two-years",
-                                     paste0("Annotation_tables_", names(df1)[2],
+      saveRDS(anno_tables, file.path(outputdir,
+                                     paste0("Annotation_tables_", phename,
                                             "_", PCdf1$NumPCs, "_PCs", ".rds")))
     }
   }
