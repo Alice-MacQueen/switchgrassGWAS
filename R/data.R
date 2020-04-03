@@ -57,3 +57,39 @@ NULL
 #' @usage data(gff_metadata)
 #' @format A data frame with 3 rows and 1 variable.
 NULL
+
+#' Annotation information from Pvirgatum_516_v5.1.annotation_info
+#'
+#' A dataset containing the v5.1 annotation information for Panicum virgatum.
+#'     The variables are as follows:
+#'
+#' \itemize{
+#'   \item pacID ID of the Panicum virgatum gene from the annotation file.
+#'   \item locusName The gene name from Panicum virgatum. Only distinct locus
+#'       names are included in this dataset.
+#'   \item transcriptName The transcript name from P. virgatum. Only the first
+#'       transcript variant is included in this dataset.
+#'   \item peptideName The protein name for the variant. Only the first protein
+#'       variant is included in this dataset.
+#'   \item Pfam
+#'   \item Panther Panther categories associated with this locus.
+#'   \item KOG assignments from the euKaryotic Orthologous Groups (KOG) database
+#'   \item ec EC numbers in Enzyme Nomenclature.
+#'   \item KO KEGG Orthology (KO) numbers associated with this locusName.
+#'   \item GO Gene ontology entries associated with this locusName.
+#'   \item Best-hit-arabi-name Best Arabidopsis thaliana homolog locus name.
+#'   \item arabi-symbol Best A. thaliana homolog gene name.
+#'   \item arabi-defline Best A. thaliana homolog gene annotation.
+#'   \item Best-hit-rice-name Best rice homolog locus name.
+#'   \item rice-symbol Best rice homolog gene name.
+#'   \item rice-defline Best rice homolog gene annotation.
+#' }
+#'
+#' @name anno_info
+#' @docType data
+#' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
+#' @references \url{data_blah.com}
+#' @keywords data
+#' @usage data(anno_info)
+#' @format A data frame with 80278 rows and 16 variables.
+NULL

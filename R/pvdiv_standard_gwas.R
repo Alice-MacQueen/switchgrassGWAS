@@ -238,47 +238,57 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 #'
 #' @export
 pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
-                                type = c("linear", "logistic"), covar = NULL,
-                                ncores = 1, lambdagc = TRUE, outputdir = ".",
+                                type = c("linear", "logistic"), ncores = 1,
+                                outputdir = ".", covar = NULL, lambdagc = TRUE,
                                 savegwas = FALSE, saveplots = TRUE,
                                 saveannos = FALSE, txdb = NULL, ...){
 
   if(attr(snp, "class") != "bigSNP"){
     stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
-  }
+    }
   if(colnames(df)[1] != "PLANT_ID"){
     stop("First column of phenotype dataframe (df) must be 'PLANT_ID'.")
-  }
+    }
   stopifnot(type %in% c("linear", "logistic"))
-  if(is.null(covar)){
-    stop(paste0("Need to specify covariance matrix (covar) - you can generate",
-                " this using pvdiv_autoSVD()."))
-  }
   if(saveannos == TRUE & is.null(txdb)){
     stop(paste0("Need to specify a txdb object created using AnnotationDbi ",
                 "in order to generate data frames containing annotated top ",
                 "SNPs. If you don't have this, set saveannos = FALSE."))
-  }
+    }
   if(lambdagc == TRUE){
     message(paste0("'lambdagc' is TRUE, so lambda_GC will be used to find ",
                    "the best population structure correction using the ",
                    "covariance matrix."))
-  } else if(!(colnames(lambdagc) %in% c("NumPCs", colnames(df)))){
+    } else if(!(colnames(lambdagc) %in% c("NumPCs", colnames(df)))){
     stop(paste0("If lambdagc is a dataframe, the column names must include",
                 " NumPCs and the names of the phenotypes to run GWAS on ",
                 "(the names of 'df'). You can generate this data frame with ",
                 "pvdiv_lambda_GC()."))
-  }
+      }
   if(savegwas == FALSE){
     message(paste0("'savegwas' is FALSE, so the gwas results will not be ",
                    "saved to disk."))
-  }
+    }
 
   plants <- snp$fam$sample.ID
+  if(is.null(covar)){
+    message(paste0("Covariance matrix (covar) was not supplied - this will be ",
+                   " generated using pvdiv_autoSVD()."))
+    requireNamespace("dots")
+    k <- dots::dots(name = 'k', value = 15, ...)
+    covar <- pvdiv_autoSVD(snp, k = k, ncores = ncores, saveoutput = FALSE)
+    if(savegwas == TRUE){
+      saveRDS(covar, file = file.path(outputdir, paste0("SVD_", length(plants),
+                                                        "g_", k, "PCs.rds")))
+      }
+    } else {
+      stopifnot(attr(covar, "class") == "big_SVD")
+      }
+
   bonferroni <- -log10(0.05/length(snp$map$physical.pos))
   markers <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos)
   df <- plants %>%
-    enframe(name= NULL, value = "PLANT_ID") %>%
+    enframe(name = NULL, value = "PLANT_ID") %>%
     left_join(df, by = "PLANT_ID")
 
   for(i in 2:ncol(df)){
@@ -292,25 +302,25 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       pc_max = ncol(covar$u)
       message(paste0("Now determining lambda_GC for GWAS models with ",
                      pc_max+1, " sets of PCs. This will take some time."))
-      lambdagc <- pvdiv_lambda_GC(df = df1, type = type, snp = snp,
+      lambdagc_df <- pvdiv_lambda_GC(df = df1, type = type, snp = snp,
                                   covar = covar, ncores = ncores,
                                   npcs = c(0:pc_max), saveoutput = TRUE)
-      PCdf <- pvdiv_best_PC_df(lambdagc) # asv_best_PC_df(lambdagc)
+      PCdf <- pvdiv_best_PC_df(lambdagc_df) # asv_best_PC_df(lambdagc_df)
     } else {
       PC1 <- lambdagc %>%
         dplyr::select(.data$NumPCs, phename)
-      PCdf <- pvdiv_best_PC_df(PC1) # asv_best_PC_df(lambdagc)
+      PCdf <- pvdiv_best_PC_df(PC1) # asv_best_PC_df(PC1)
     }
     PCdf1 <- PCdf[1,]
 
-# ------ Run GWAS with best pop structure correction -----
+  # ------ Run GWAS with best pop structure correction -----
   message("Now running GWAS with the best population structure correction.")
     if(PCdf1$NumPCs == 0){
       gwas <- pvdiv_gwas(df = df1, type = type, snp = snp, ncores = ncores)
-    } else {
+      } else {
       gwas <- pvdiv_gwas(df = df1, type = type, snp = snp, covar = covar,
                          ncores = ncores, npcs = PCdf1$NumPCs)
-    }
+      }
 
     gwas_data <- tibble(CHR = markers$CHR, POS = markers$POS,
                         estim = gwas$estim, std_err = gwas$std.err,
@@ -324,8 +334,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       write_rds(gwas_data, path = paste0("GWAS_datatable_", phename, "_",
                                          PCdf1$NumPCs, "_PCs", "_.rds"),
                 compress = "gz")
-    }
-
+      }
     if(saveplots == TRUE){
       message("Now generating and saving Manhattan and QQ plots.")
       # ggplot settings for Manhattans and QQ plots.
@@ -355,13 +364,13 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
         summarise(thresh = min(.data$log10p))
       if(FDRthreshhi$thresh[1] > 0 & FDRthreshlo$thresh[1] > 0){
         FDRthreshold = (FDRthreshhi$thresh[1] + FDRthreshlo$thresh[1])/2
-      } else if(FDRthreshhi$thresh[1] > 0){
+        } else if(FDRthreshhi$thresh[1] > 0){
         FDRthreshold = FDRthreshhi$thresh[1]
-      } else if(FDRthreshlo$thresh[1] > 0){
+        } else if(FDRthreshlo$thresh[1] > 0){
         FDRthreshold = FDRthreshlo$thresh[1]
-      } else {
+        } else {
         FDRthreshold = NA
-      }
+        }
       # Save a Manhattan plot with 10% FDR
       ggmanobject1 <- gwas_data %>%
         filter(.data$log10p > 1) %>%
@@ -421,7 +430,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                             PCdf1$NumPCs, "_PCs_Bonferroni_",
                                             get_date_filename(), ".png")),
                 plot = ggmanobject2, base_asp = 4, base_height = 4)
-    }
+      }
 
     if(saveannos == TRUE){
       message(paste0("Now creating annotation data frames for the top 10 & ",
@@ -431,11 +440,11 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                          n = c(10,500), FDRalpha = 0.1,
                                          rangevector = c(0, 50000),
                                          markers = markers,
-                                         anno_info = switchgrassGWAS::gff_gene,
+                                         anno_info = switchgrassGWAS::anno_info,
                                          txdb = txdb)
       saveRDS(anno_tables, file.path(outputdir,
                                      paste0("Annotation_tables_", phename,
                                             "_", PCdf1$NumPCs, "_PCs", ".rds")))
+      }
     }
   }
-}
