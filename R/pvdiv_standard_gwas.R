@@ -258,7 +258,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                 "in order to generate data frames containing annotated top ",
                 "SNPs. If you don't have this, set saveannos = FALSE."))
     }
-  if(lambdagc[1] == TRUE){
+  if(is.null(colnames(lambdagc))){
     message(paste0("'lambdagc' is TRUE, so lambda_GC will be used to find ",
                    "the best population structure correction using the ",
                    "covariance matrix."))
@@ -307,7 +307,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     } else {
     message(paste0("Now starting GWAS pipeline for ", phename, "."))
 
-    if(lambdagc == TRUE){
+    if(is.null(colnames(lambdagc))){
       pc_max = ncol(covar$u)
       message(paste0("Now determining lambda_GC for GWAS models with ",
                      pc_max+1, " sets of PCs. This will take some time."))
