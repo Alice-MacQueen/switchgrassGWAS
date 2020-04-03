@@ -212,6 +212,8 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 #'     AnnotationDbi.
 #' @param txdb A txdb object such as 'Pvirgatum_516_v5.1.gene.txdb.sqlite'.
 #'     Load this into your environment with AnnotationDbi::loadDb.
+#' @param minphe Integer. What's the minimum number of phenotyped individuals
+#'     to conduct a GWAS on? Default is 200. Use lower values with caution.
 #' @param ... Other arguments to \code{\link{pvdiv_lambda_GC}} or
 #'     \code{\link{pvdiv_table_topsnps}}.
 #'
@@ -241,7 +243,8 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                 type = c("linear", "logistic"), ncores = 1,
                                 outputdir = ".", covar = NULL, lambdagc = TRUE,
                                 savegwas = FALSE, saveplots = TRUE,
-                                saveannos = FALSE, txdb = NULL, ...){
+                                saveannos = FALSE, txdb = NULL, minphe = 200,
+                                ...){
 
   if(attr(snp, "class") != "bigSNP"){
     stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
@@ -255,7 +258,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                 "in order to generate data frames containing annotated top ",
                 "SNPs. If you don't have this, set saveannos = FALSE."))
     }
-  if(lambdagc == TRUE){
+  if(lambdagc[1] == TRUE){
     message(paste0("'lambdagc' is TRUE, so lambda_GC will be used to find ",
                    "the best population structure correction using the ",
                    "covariance matrix."))
@@ -296,6 +299,12 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     df1 <- df %>%
       dplyr::select(.data$PLANT_ID, all_of(i))
     phename <- names(df1)[2]
+    if(length(which(!is.na(df1[,2]))) < minphe){
+      message(paste0("The phenotype ", phename, " does not have the minimum ",
+                     "number of phenotyped PLANT_ID's, (", minphe, ") and so ",
+                     "will not be used for GWAS."))
+      next
+    } else {
     message(paste0("Now starting GWAS pipeline for ", phename, "."))
 
     if(lambdagc == TRUE){
@@ -446,5 +455,6 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                      paste0("Annotation_tables_", phename,
                                             "_", PCdf1$NumPCs, "_PCs", ".rds")))
       }
+    }
     }
   }

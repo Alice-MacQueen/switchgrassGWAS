@@ -7,7 +7,8 @@
 pvdiv_standard_gwas(snp, df = switchgrassGWAS::phenotypes,
   type = c("linear", "logistic"), ncores = 1, outputdir = ".",
   covar = NULL, lambdagc = TRUE, savegwas = FALSE,
-  saveplots = TRUE, saveannos = FALSE, txdb = NULL, ...)
+  saveplots = TRUE, saveannos = FALSE, txdb = NULL, minphe = 200,
+  ...)
 }
 \arguments{
 \item{snp}{A "bigSNP" object; load with bigsnpr::snp_attach(). Here, genomic
@@ -47,6 +48,9 @@ AnnotationDbi.}
 
 \item{txdb}{A txdb object such as 'Pvirgatum_516_v5.1.gene.txdb.sqlite'.
 Load this into your environment with AnnotationDbi::loadDb.}
+
+\item{minphe}{Integer. What's the minimum number of phenotyped individuals
+to conduct a GWAS on? Default is 200. Use lower values with caution.}
 
 \item{...}{Other arguments to \code{\link{pvdiv_lambda_GC}} or
 \code{\link{pvdiv_table_topsnps}}.}
