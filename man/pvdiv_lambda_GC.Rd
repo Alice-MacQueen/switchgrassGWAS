@@ -15,7 +15,8 @@ PLANT_ID occurs only once in the dataframe.}
 Options are "linear" or "logistic".}
 
 \item{snp}{Genomic information to include for Panicum virgatum. Contact
-tjuenger <at> utexas <dot> edu to obtain this information pre-publication.}
+tjuenger <at> utexas <dot> edu to obtain this information
+pre-publication.}
 
 \item{covar}{Covariance matrix to include in the regression. You
 can generate these using \code{bigsnpr::snp_autoSVD()}.}
@@ -25,7 +26,8 @@ can generate these using \code{bigsnpr::snp_autoSVD()}.}
 \item{npcs}{Integer vector of principle components to use.
 Defaults to c(0:10).}
 
-\item{saveoutput}{Logical. Should output be saved as a csv to the working directory?}
+\item{saveoutput}{Logical. Should output be saved as a csv to the
+working directory?}
 }
 \value{
 A dataframe containing the lambda_GC values for each number of PCs

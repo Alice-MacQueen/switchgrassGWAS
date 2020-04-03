@@ -7,7 +7,8 @@
 get_log10bf(m)
 }
 \arguments{
-\item{m}{the mash result (from joint or 1by1 analysis); must have been computed using usepointmass=TRUE}
+\item{m}{the mash result (from joint or 1by1 analysis); must have been
+computed using usepointmass=TRUE}
 }
 \value{
 if m was fitted using usepointmass=TRUE then returns a vector of

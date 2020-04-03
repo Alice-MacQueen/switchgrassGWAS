@@ -14,7 +14,8 @@ pvdiv_gwas(df, type = c("linear", "logistic"), snp, covar = NA,
 Options are "linear" or "logistic".}
 
 \item{snp}{Genomic information to include for Panicum virgatum. Contact
-tjuenger <at> utexas <dot> edu to obtain this information pre-publication.}
+tjuenger <at> utexas <dot> edu to obtain this information
+pre-publication.}
 
 \item{covar}{Optional covariance matrix to include in the regression. You
 can generate these using \code{bigsnpr::snp_autoSVD()}.}
@@ -23,7 +24,8 @@ can generate these using \code{bigsnpr::snp_autoSVD()}.}
 
 \item{npcs}{Number of principle components to use. Default is 10.}
 
-\item{saveoutput}{Logical. Should output be saved as a rds to the working directory?}
+\item{saveoutput}{Logical. Should output be saved as a rds to the
+working directory?}
 }
 \value{
 The gwas results for the last phenotype in the dataframe. That

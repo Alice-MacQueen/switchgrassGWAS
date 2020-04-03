@@ -139,6 +139,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
 #' @importFrom dplyr filter top_n select full_join arrange
 #' @importFrom tidyr gather
 #' @importFrom rlang .data sym !!
+#' @importFrom tidyselect all_of
 #'
 #' @return A dataframe containing the best lambda_GC value and number of PCs
 #'     for each phenotype in the data frame.
@@ -147,7 +148,7 @@ pvdiv_best_PC_df <- function(df){
   bestPCs <- df %>%
     filter(!! sym(column) < 1.05) %>%
     top_n(n = -1, wt = .data$NumPCs) %>%
-    select(.data$NumPCs, column)
+    select(.data$NumPCs, all_of(column))
 
   for(i in c((ncol(df)-2):1)){
     column <- names(df)[i+1]
@@ -155,8 +156,8 @@ pvdiv_best_PC_df <- function(df){
     bestPCs <- df %>%
       filter(!! sym(column) < 1.05 | !! sym(column) == min(!! sym(column))) %>%
       top_n(n = -1, wt = .data$NumPCs) %>%
-      select(.data$NumPCs, column) %>%
-      full_join(bestPCs, by = "NumPCs")
+      select(.data$NumPCs, all_of(column)) %>%
+      full_join(bestPCs, by = c("NumPCs", (column)))
   }
 
   bestPCdf <- bestPCs %>%

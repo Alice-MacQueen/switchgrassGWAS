@@ -15,5 +15,6 @@ round2(x, at)
 A number or vector of numbers
 }
 \description{
-Given some x, return the number rounded to some number of digits.
+Given some x, return the number rounded to some number of
+digits.
 }

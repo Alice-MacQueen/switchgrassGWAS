@@ -24,7 +24,6 @@ Imports:
     bigstatsr,
     cluster,
     cowplot,
-    data.table,
     dplyr,
     GGally,
     ggplot2,

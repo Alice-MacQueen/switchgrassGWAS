@@ -60,7 +60,7 @@ This is a wrapper to
 \examples{
 \dontrun{
 pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", covar = svd,
-    ncores = NCORES, lambdaGC = TRUE, savegwas = TRUE, saveplots = TRUE,
+    ncores = nb_cores(), lambdagc = TRUE, savegwas = TRUE, saveplots = TRUE,
     saveannos = TRUE, txdb = txdb)
 }
 

@@ -220,7 +220,6 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 #' @import bigsnpr
 #' @import bigstatsr
 #' @import ggplot2
-#' @importFrom data.table := data.table
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate case_when
 #' @importFrom tibble enframe as_tibble tibble
@@ -233,7 +232,7 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 #' @examples
 #' \dontrun{
 #' pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", covar = svd,
-#'     ncores = NCORES, lambdaGC = TRUE, savegwas = TRUE, saveplots = TRUE,
+#'     ncores = nb_cores(), lambdagc = TRUE, savegwas = TRUE, saveplots = TRUE,
 #'     saveannos = TRUE, txdb = txdb)
 #' }
 #'
@@ -278,8 +277,11 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
   plants <- snp$fam$sample.ID
   bonferroni <- -log10(0.05/length(snp$map$physical.pos))
   markers <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos)
+  df <- plants %>%
+    enframe(name= NULL, value = "PLANT_ID") %>%
+    left_join(df, by = "PLANT_ID")
 
-  for(i in 2:nrow(df)){
+  for(i in 2:ncol(df)){
 
     df1 <- df %>%
       dplyr::select(.data$PLANT_ID, all_of(i))
@@ -288,9 +290,9 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
 
     if(lambdagc == TRUE){
       pc_max = ncol(covar$u)
-      message(paste0("Now determining lambda_GC for GWAS models with",
-                     pc_max+1, "sets of PCs. This will take some time."))
-      lambdagc <- pvdiv_lambda_GC(df = df, type = type, snp = snp,
+      message(paste0("Now determining lambda_GC for GWAS models with ",
+                     pc_max+1, " sets of PCs. This will take some time."))
+      lambdagc <- pvdiv_lambda_GC(df = df1, type = type, snp = snp,
                                   covar = covar, ncores = ncores,
                                   npcs = c(0:pc_max), saveoutput = TRUE)
       PCdf <- pvdiv_best_PC_df(lambdagc) # asv_best_PC_df(lambdagc)
@@ -310,14 +312,15 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                          ncores = ncores, npcs = PCdf1$NumPCs)
     }
 
-    # Save a data.table object with the GWAS results
-    gwas_data <- data.table(CHR = markers$CHR, POS = markers$POS,
-                            estim = gwas$estim, std_err = gwas$std.err,
-                            bigsnpscore = gwas$score)
-    gwas_data[,.data$pvalue := predict(gwas, log10 = FALSE)]
-    gwas_data[,.data$log10p := -log10(.data$pvalue)]
-    gwas_data[,.data$FDR_adj := p.adjust(.data$pvalue, method = "BH")]
+    gwas_data <- tibble(CHR = markers$CHR, POS = markers$POS,
+                        estim = gwas$estim, std_err = gwas$std.err,
+                        bigsnpscore = gwas$score,
+                        pvalue = predict(gwas, log10 = FALSE))
+    gwas_data <- gwas_data %>%
+      mutate(log10p = -log10(.data$pvalue))
+    gwas_data$FDR_adj <- p.adjust(gwas_data$pvalue, method = "BH")
     if(savegwas == TRUE){
+      # Save a data.table object with the GWAS results
       write_rds(gwas_data, path = paste0("GWAS_datatable_", phename, "_",
                                          PCdf1$NumPCs, "_PCs", "_.rds"),
                 compress = "gz")
@@ -325,6 +328,22 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
 
     if(saveplots == TRUE){
       message("Now generating and saving Manhattan and QQ plots.")
+      # ggplot settings for Manhattans and QQ plots.
+      theme_oeco <- theme_classic() +
+        theme(axis.title = element_text(size = 10),
+              axis.text = element_text(size = 10),
+              axis.line.x = element_line(size = 0.35, colour = 'grey50'),
+              axis.line.y = element_line(size = 0.35, colour = 'grey50'),
+              axis.ticks = element_line(size = 0.25, colour = 'grey50'),
+              legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
+              legend.key.size = unit(0.35, 'cm'),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 9),
+              legend.text.align = 0, legend.background = element_blank(),
+              plot.subtitle = element_text(size = 10, vjust = 0),
+              strip.background = element_blank(),
+              strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
+              strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
       # Find 10% FDR threshold
       FDRthreshhi <- gwas_data %>%
         as_tibble() %>%
@@ -347,6 +366,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       ggmanobject1 <- gwas_data %>%
         filter(.data$log10p > 1) %>%
         ggplot(aes(x = .data$POS, y = .data$log10p)) +
+        theme_oeco +
         geom_hline(yintercept = c(5, 10), color = "lightgrey") +
         geom_point(aes(color = .data$CHR, fill = .data$CHR)) +
         geom_hline(yintercept = FDRthreshold, color = "black", linetype = 2,
@@ -374,12 +394,13 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                      paste0("QQplot_", phename, "_",
                                             PCdf1$NumPCs, "_PCs_FDR_",
                                             get_date_filename(), ".png")),
-                plot = ggqqplot, base_asp = 1, base_height = 4)
+                plot = ggqqplot + theme_oeco, base_asp = 1, base_height = 4)
 
       # Save a Manhattan plot with Bonferroni
       ggmanobject2 <- gwas_data %>%
         filter(.data$log10p > 1) %>%
         ggplot(aes(x = .data$POS, y = .data$log10p)) +
+        theme_oeco +
         geom_hline(yintercept = c(5, 10), color = "lightgrey") +
         geom_point(aes(color = .data$CHR, fill = .data$CHR)) +
         geom_hline(yintercept = bonferroni, color = "black", linetype = 2,

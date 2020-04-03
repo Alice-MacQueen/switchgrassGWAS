@@ -2,7 +2,8 @@
 % Please edit documentation in R/pvdiv_gwas_results.R
 \name{get_significant_results}
 \alias{get_significant_results}
-\title{From a mash result, get effects that are significant in at least one condition}
+\title{From a mash result, get effects that are significant in at least
+one condition.}
 \usage{
 get_significant_results(m, thresh = 0.05, conditions = NULL,
   sig_fn = ashr::get_lfsr)
@@ -14,11 +15,15 @@ get_significant_results(m, thresh = 0.05, conditions = NULL,
 
 \item{conditions}{which conditions to include in check (default to all)}
 
-\item{sig_fn}{the significance function used to extract significance from mash object; eg could be ashr::get_lfsr or ashr::get_lfdr. (Small values must indicate significant.)}
+\item{sig_fn}{the significance function used to extract significance from
+mash object; eg could be ashr::get_lfsr or ashr::get_lfdr. (Small values
+must indicate significant.)}
 }
 \value{
-a vector containing the indices of the significant effects, by order of most significant to least
+a vector containing the indices of the significant effects, by
+order of most significant to least
 }
 \description{
-From a mash result, get effects that are significant in at least one condition
+From a mash result, get effects that are significant in at least
+one condition.
 }
