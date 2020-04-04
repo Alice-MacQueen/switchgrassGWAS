@@ -43,7 +43,8 @@ get_date_filename <- function(){
 #' @export
 pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
   requireNamespace("dots")
-  fun.scaling <- dots::dots(name = 'fun.scaling', value = snp_scaleBinom(), ...)
+  fun.scaling <- dots::dots(name = 'fun.scaling', value = snp_scaleBinom(),
+                            ...)
   thr.r2 <- dots::dots(name = 'thr.r2', value = 0.2, ...)
   size <- dots::dots(name = 'size', value = 100/thr.r2, ...)
   roll.size <- dots::dots(name = 'roll.size', value = 50, ...)
@@ -67,7 +68,8 @@ pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
     "needs chromosomes in the range of Chr01K to Chr09N."))
   }
   if(saveoutput == FALSE){
-    message("'saveoutput' is FALSE, so the svd will not be saved to the working directory.")
+    message(paste0("'saveoutput' is FALSE, so the svd will not be saved to ",
+                   "the working directory."))
   }
   CHRN <- enframe(CHR, name = NULL, value = "CHR") %>%
     mutate(CHRN = case_when(.data$CHR == "Chr01K" ~ 1,
@@ -240,7 +242,8 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 #'
 #' @export
 pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
-                                type = c("linear", "logistic"), ncores = 1,
+                                type = c("linear", "logistic"),
+                                ncores = nb_cores(),
                                 outputdir = ".", covar = NULL, lambdagc = TRUE,
                                 savegwas = FALSE, saveplots = TRUE,
                                 saveannos = FALSE, txdb = NULL, minphe = 200,
@@ -262,7 +265,8 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     message(paste0("'lambdagc' is TRUE, so lambda_GC will be used to find ",
                    "the best population structure correction using the ",
                    "covariance matrix."))
-    } else if(!(colnames(lambdagc) %in% c("NumPCs", colnames(df)))){
+    } else if(!(colnames(lambdagc)[1] == "NumPCs" &
+                colnames(lambdagc)[2] %in% colnames(df))){
     stop(paste0("If lambdagc is a dataframe, the column names must include",
                 " NumPCs and the names of the phenotypes to run GWAS on ",
                 "(the names of 'df'). You can generate this data frame with ",
@@ -273,21 +277,24 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                    "saved to disk."))
     }
 
-  plants <- snp$fam$sample.ID
+  nSNP_M <- round(snp$genotypes$ncol/1000000, digits = 1)
+  nInd <- snp$genotypes$nrow
   if(is.null(covar)){
-    message(paste0("Covariance matrix (covar) was not supplied - this will be ",
+    message(paste0("Covariance matrix (covar) was not supplied - this will be",
                    " generated using pvdiv_autoSVD()."))
     requireNamespace("dots")
     k <- dots::dots(name = 'k', value = 15, ...)
     covar <- pvdiv_autoSVD(snp, k = k, ncores = ncores, saveoutput = FALSE)
     if(savegwas == TRUE){
-      saveRDS(covar, file = file.path(outputdir, paste0("SVD_", length(plants),
-                                                        "g_", k, "PCs.rds")))
+      saveRDS(covar, file = file.path(outputdir, paste0("SVD_", nInd, "g_",
+                                                        nSNP_M, "M_SNPs_",
+                                                        k, "PCs.rds")))
       }
     } else {
       stopifnot(attr(covar, "class") == "big_SVD")
       }
 
+  plants <- snp$fam$sample.ID
   bonferroni <- -log10(0.05/length(snp$map$physical.pos))
   markers <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos)
   df <- plants %>%
@@ -299,7 +306,8 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     df1 <- df %>%
       dplyr::select(.data$PLANT_ID, all_of(i))
     phename <- names(df1)[2]
-    if(length(which(!is.na(df1[,2]))) < minphe){
+    nPhe <- length(which(!is.na(df1[,2])))
+    if(nPhe < minphe){
       message(paste0("The phenotype ", phename, " does not have the minimum ",
                      "number of phenotyped PLANT_ID's, (", minphe, ") and so ",
                      "will not be used for GWAS."))
@@ -340,9 +348,10 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     gwas_data$FDR_adj <- p.adjust(gwas_data$pvalue, method = "BH")
     if(savegwas == TRUE){
       # Save a data.table object with the GWAS results
-      write_rds(gwas_data, path = paste0("GWAS_datatable_", phename, "_",
-                                         PCdf1$NumPCs, "_PCs", "_.rds"),
-                compress = "gz")
+      write_rds(gwas_data, path = paste0("GWAS_datatable_", phename, "_", type,
+                                         "_model", nPhe, "g_", nSNP_M,
+                                         "M_SNPs_", PCdf1$NumPCs, "_PCs_",
+                                         "_.rds"), compress = "gz")
       }
     if(saveplots == TRUE){
       message("Now generating and saving Manhattan and QQ plots.")
@@ -401,16 +410,20 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
         scale_x_continuous(expand = c(0.18, 0.18))
 
       save_plot(filename = file.path(outputdir,
-                                     paste0("Manhattan_", phename, "_",
-                                            PCdf1$NumPCs, "_PCs_10percent_FDR_",
+                                     paste0("Manhattan_", phename, "_", type,
+                                            "_model", nPhe, "g_", nSNP_M,
+                                            "M_SNPs_", PCdf1$NumPCs,
+                                            "_PCs_10percent_FDR_",
                                             get_date_filename(), ".png")),
                 plot = ggmanobject1, base_asp = 4, base_height = 4)
 
       # Save a QQplot
       ggqqplot <- pvdiv_qqplot(ps = gwas_data$pvalue, lambdaGC = TRUE)
       save_plot(filename = file.path(outputdir,
-                                     paste0("QQplot_", phename, "_",
-                                            PCdf1$NumPCs, "_PCs_FDR_",
+                                     paste0("QQplot_", phename, "_", type,
+                                            "_model", nPhe, "g_", nSNP_M,
+                                            "M_SNPs_", PCdf1$NumPCs,
+                                            "_PCs_FDR_",
                                             get_date_filename(), ".png")),
                 plot = ggqqplot + theme_oeco, base_asp = 1, base_height = 4)
 
@@ -435,8 +448,10 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
         scale_x_continuous(expand = c(0.18, 0.18))
 
       save_plot(filename = file.path(outputdir,
-                                     paste0("Manhattan_", phename, "_",
-                                            PCdf1$NumPCs, "_PCs_Bonferroni_",
+                                     paste0("Manhattan_", phename, "_", type,
+                                            "_model", nPhe, "g_", nSNP_M,
+                                            "M_SNPs_", PCdf1$NumPCs,
+                                            "_PCs_Bonferroni_",
                                             get_date_filename(), ".png")),
                 plot = ggmanobject2, base_asp = 4, base_height = 4)
       }
@@ -449,11 +464,13 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                          n = c(10,500), FDRalpha = 0.1,
                                          rangevector = c(0, 50000),
                                          markers = markers,
-                                         anno_info = switchgrassGWAS::anno_info,
+                                         anno_info=switchgrassGWAS::anno_info,
                                          txdb = txdb)
       saveRDS(anno_tables, file.path(outputdir,
                                      paste0("Annotation_tables_", phename,
-                                            "_", PCdf1$NumPCs, "_PCs", ".rds")))
+                                            "_", type, "_model", nPhe, "g_",
+                                            nSNP_M, "M_SNPs_",PCdf1$NumPCs,
+                                            "_PCs", ".rds")))
       }
     }
     }
