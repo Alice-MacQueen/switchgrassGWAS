@@ -5,8 +5,8 @@
 \title{Wrapper for Juenger lab standard GWAS functions for switchgrass.}
 \usage{
 pvdiv_standard_gwas(snp, df = switchgrassGWAS::phenotypes,
-  type = c("linear", "logistic"), ncores = 1, outputdir = ".",
-  covar = NULL, lambdagc = TRUE, savegwas = FALSE,
+  type = c("linear", "logistic"), ncores = nb_cores(),
+  outputdir = ".", covar = NULL, lambdagc = TRUE, savegwas = FALSE,
   saveplots = TRUE, saveannos = FALSE, txdb = NULL, minphe = 200,
   ...)
 }

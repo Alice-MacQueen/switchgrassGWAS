@@ -117,6 +117,8 @@ pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
 #' @param snp A "bigSNP" object; load with bigsnpr::snp_attach().
 #' @param ind.row An integer vector of the rows (individuals) to find a
 #'     kinship matrix for. Defaults to all rows.
+#' @param hasInbred Logical. Does the SNP file contain inbred individuals or
+#'     closely related individuals, like siblings?
 #' @param saveoutput Logical. Should the output be saved to the working
 #'     directory?
 #'
@@ -131,7 +133,8 @@ pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
 #' }
 #'
 #' @export
-pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
+pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
+                          saveoutput = FALSE){
   if(attr(snp, "class") != "bigSNP"){
     stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
   }
@@ -174,6 +177,10 @@ pvdiv_kinship <- function(snp, ind.row = NA, saveoutput = FALSE){
 
   if(MD > 2){
     K[index] <- K[index]/(MD-1)+1
+  }
+  #Handler of inbred
+  if(MD < 2 & hasInbred){
+    K = 2*K / ((DU - floor) / (DL - floor))
   }
 
   if(saveoutput){
@@ -307,13 +314,36 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       dplyr::select(.data$PLANT_ID, all_of(i))
     phename <- names(df1)[2]
     nPhe <- length(which(!is.na(df1[,2])))
+    nLev <- nrow(unique(df1[which(!is.na(df1[,2])),2]))
+    # Checks for correct combinations of phenotypes and GWAS types.
     if(nPhe < minphe){
       message(paste0("The phenotype ", phename, " does not have the minimum ",
                      "number of phenotyped PLANT_ID's, (", minphe, ") and so ",
                      "will not be used for GWAS."))
       next
+    } else if(nLev < 2){
+      message(paste0("The phenotype ", phename, " does not have two or more ",
+                     "distinct non-NA values and will not be used for GWAS."))
+      next
+    } else if(nLev > 2 & type == "logistic"){
+      message(paste0("The phenotype ", phename, " has more than two distinct ",
+                     "non-NA values and will not be used for GWAS with 'type=",
+                     "logistic'."))
+      next
+    } else if(!(unique(df1[which(!is.na(df1[,2])),2])[1,1] %in% c(0,1)) &
+              !(unique(df1[which(!is.na(df1[,2])),2])[2,1] %in% c(0,1)) & type == "logistic"){
+      message(paste0("The phenotype ", phename, " has non-NA values that are ",
+                     "not 0 or 1 and will not be used for GWAS with 'type=",
+                     "logistic'."))
+      next
     } else {
     message(paste0("Now starting GWAS pipeline for ", phename, "."))
+
+      if(nLev == 2 & type == "linear"){
+        message(paste0("The phenotype ", phename, " has only two distinct non-",
+                       "NA values; consider using a logistic model instead.",
+                       "(Set type = 'logistic')."))
+      }
 
     if(is.null(colnames(lambdagc))){
       pc_max = ncol(covar$u)
@@ -321,7 +351,15 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                      pc_max+1, " sets of PCs. This will take some time."))
       lambdagc_df <- pvdiv_lambda_GC(df = df1, type = type, snp = snp,
                                   covar = covar, ncores = ncores,
-                                  npcs = c(0:pc_max), saveoutput = TRUE)
+                                  npcs = c(0:pc_max), saveoutput = FALSE)
+      if(saveplots == TRUE){
+        write_csv(lambdagc_df, path = file.path(outputdir,
+                                                paste0("Lambda_GCs_by_PC_Num_",
+                                                       phename, "_", type,
+                                                       "_model_", nPhe, "g_",
+                                                       nSNP_M, "M_SNPs",
+                                                       ".csv")))
+      }
       PCdf <- pvdiv_best_PC_df(lambdagc_df) # asv_best_PC_df(lambdagc_df)
     } else {
       PC1 <- lambdagc %>%
@@ -348,10 +386,12 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     gwas_data$FDR_adj <- p.adjust(gwas_data$pvalue, method = "BH")
     if(savegwas == TRUE){
       # Save a data.table object with the GWAS results
-      write_rds(gwas_data, path = paste0("GWAS_datatable_", phename, "_", type,
-                                         "_model", nPhe, "g_", nSNP_M,
-                                         "M_SNPs_", PCdf1$NumPCs, "_PCs_",
-                                         "_.rds"), compress = "gz")
+      write_rds(gwas_data, path = file.path(outputdir,
+                                            paste0("GWAS_datatable_", phename,
+                                                   "_", type, "_model_", nPhe,
+                                                   "g_", nSNP_M, "M_SNPs_",
+                                                   PCdf1$NumPCs, "_PCs_",
+                                                   "_.rds")), compress = "gz")
       }
     if(saveplots == TRUE){
       message("Now generating and saving Manhattan and QQ plots.")
@@ -411,7 +451,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
 
       save_plot(filename = file.path(outputdir,
                                      paste0("Manhattan_", phename, "_", type,
-                                            "_model", nPhe, "g_", nSNP_M,
+                                            "_model_", nPhe, "g_", nSNP_M,
                                             "M_SNPs_", PCdf1$NumPCs,
                                             "_PCs_10percent_FDR_",
                                             get_date_filename(), ".png")),
@@ -421,7 +461,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       ggqqplot <- pvdiv_qqplot(ps = gwas_data$pvalue, lambdaGC = TRUE)
       save_plot(filename = file.path(outputdir,
                                      paste0("QQplot_", phename, "_", type,
-                                            "_model", nPhe, "g_", nSNP_M,
+                                            "_model_", nPhe, "g_", nSNP_M,
                                             "M_SNPs_", PCdf1$NumPCs,
                                             "_PCs_FDR_",
                                             get_date_filename(), ".png")),
@@ -449,7 +489,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
 
       save_plot(filename = file.path(outputdir,
                                      paste0("Manhattan_", phename, "_", type,
-                                            "_model", nPhe, "g_", nSNP_M,
+                                            "_model_", nPhe, "g_", nSNP_M,
                                             "M_SNPs_", PCdf1$NumPCs,
                                             "_PCs_Bonferroni_",
                                             get_date_filename(), ".png")),
@@ -461,14 +501,14 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                      "top 500 SNPs by p-value, and for SNPs above a 10% FDR."))
       ## Save annotation tables for the top associations
       anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp",
-                                         n = c(10,500), FDRalpha = 0.1,
+                                         n = c(10, 500), FDRalpha = 0.1,
                                          rangevector = c(0, 50000),
                                          markers = markers,
                                          anno_info=switchgrassGWAS::anno_info,
                                          txdb = txdb)
       saveRDS(anno_tables, file.path(outputdir,
                                      paste0("Annotation_tables_", phename,
-                                            "_", type, "_model", nPhe, "g_",
+                                            "_", type, "_model_", nPhe, "g_",
                                             nSNP_M, "M_SNPs_",PCdf1$NumPCs,
                                             "_PCs", ".rds")))
       }

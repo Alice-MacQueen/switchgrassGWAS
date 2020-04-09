@@ -4,13 +4,17 @@
 \alias{pvdiv_kinship}
 \title{Find a kinship matrix using the van Raden method.}
 \usage{
-pvdiv_kinship(snp, ind.row = NA, saveoutput = FALSE)
+pvdiv_kinship(snp, ind.row = NA, hasInbred = TRUE,
+  saveoutput = FALSE)
 }
 \arguments{
 \item{snp}{A "bigSNP" object; load with bigsnpr::snp_attach().}
 
 \item{ind.row}{An integer vector of the rows (individuals) to find a
 kinship matrix for. Defaults to all rows.}
+
+\item{hasInbred}{Logical. Does the SNP file contain inbred individuals or
+closely related individuals, like siblings?}
 
 \item{saveoutput}{Logical. Should the output be saved to the working
 directory?}
