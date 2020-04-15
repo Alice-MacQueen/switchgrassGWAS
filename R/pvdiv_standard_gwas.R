@@ -500,9 +500,13 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       message(paste0("Now creating annotation data frames for the top 10 & ",
                      "top 500 SNPs by p-value, and for SNPs above a 10% FDR."))
       ## Save annotation tables for the top associations
+      requireNamespace("dots")
+      n <- dots::dots(name = 'n', value = c(10, 500), ...)
+      FDRalpha <- dots::dots(name = 'FDRalpha', value = 0.1, ...)
+      rangevector <- dots::dots(name = 'rangevector', value = c(0, 50000), ...)
       anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp",
-                                         n = c(10, 500), FDRalpha = 0.1,
-                                         rangevector = c(0, 50000),
+                                         n = n, FDRalpha = FDRalpha,
+                                         rangevector = rangevector,
                                          markers = markers,
                                          anno_info=switchgrassGWAS::anno_info,
                                          txdb = txdb)
