@@ -469,7 +469,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
 
   for(i in seq_along(phe_col)[-1]){
     message(paste0("Determining standardized B_hat and S_hat values for ",
-                   nrow(top_clumps), " SNPs in GWAS for ", phenotypes[i]," (",
+                   nrow(top_set), " SNPs in GWAS for ", phenotypes[i]," (",
                    i, " of ", length(phe_col), ")."))
     mash_list_1 <- s_hat_bigsnp(path = path, gwas_rds = phe_col[i],
                                 phenotype = phenotypes[i],
