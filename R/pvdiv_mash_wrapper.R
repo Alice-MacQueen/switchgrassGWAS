@@ -103,7 +103,7 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
     data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
     data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
     data_strong <- mashr::mash_update_data(data_strong, ref = ref)
-    data_random <- mashr::mash_update_data(data_random, ref = ref)
+    data_random <- mashr::mash_update_data(data_random, ref = ref, V = V2)
   }
   U_c <- mashr::cov_canonical(data_random)
   if(is.na(U_ed[1])){

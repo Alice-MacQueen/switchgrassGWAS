@@ -73,7 +73,7 @@ pvdiv_top_effects_log10p <- function(path, gwas_rds, phenotype, numSNPs,
     if(gwas_obj$log10p[1] > 0){
         top_set <- pre_mash_1 %>%
           top_n(numSNPs, .data$log10p) %>%
-          mutate(score_log10p = log10p) %>%
+          mutate(score_log10p = .data$log10p) %>%
           dplyr::select(.data$CHR, .data$POS, .data$score_log10p)
         names(top_set)[3] <- paste0(phenotype, "_score_log10p")
         # name top_set columns appropriately so that the joined file will have
@@ -81,7 +81,7 @@ pvdiv_top_effects_log10p <- function(path, gwas_rds, phenotype, numSNPs,
     } else {
         top_set <- pre_mash_1 %>%
           top_n(-numSNPs, .data$log10p) %>%
-          mutate(score_log10p = -log10p) %>%
+          mutate(score_log10p = -.data$log10p) %>%
           dplyr::select(.data$CHR, .data$POS, .data$score_log10p)
         names(top_set)[3] <- paste0(phenotype, "_score_log10p")
     }
