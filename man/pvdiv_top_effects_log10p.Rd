@@ -4,8 +4,7 @@
 \alias{pvdiv_top_effects_log10p}
 \title{Step One of bigsnp2mashr}
 \usage{
-pvdiv_top_effects_log10p(path, gwas_rds, phenotype, numSNPs,
-  model = c("linear", "logistic"), keep_score = FALSE, markers)
+pvdiv_top_effects_log10p(path, gwas_rds, phenotype, numSNPs, markers)
 }
 \arguments{
 \item{path}{Path}
@@ -16,11 +15,7 @@ pvdiv_top_effects_log10p(path, gwas_rds, phenotype, numSNPs,
 
 \item{numSNPs}{Integer. Number of top SNPs to choose.}
 
-\item{model}{One of linear or logistic. Type of GWAS model.}
-
-\item{keep_score}{Logical. Keep p-values for clumping?}
-
-\item{markers}{Marker names for the GWAS you ran}
+\item{markers}{Marker CHR & POS for the GWAS you ran}
 }
 \description{
 Step One of bigsnp2mashr

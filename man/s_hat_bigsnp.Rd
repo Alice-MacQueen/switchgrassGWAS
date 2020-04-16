@@ -5,9 +5,8 @@
 \title{Step Two of bigsnp2mashr}
 \usage{
 s_hat_bigsnp(path, gwas_rds, phenotype, top_set, random_sample,
-  markers = switchgrassGWAS::markers,
-  markers2 = switchgrassGWAS::markers2, model = c("linear",
-  "logistic"), clumped = FALSE)
+  scale = TRUE, markers = NULL, markers2 = NULL,
+  model = c("linear", "logistic"), clump = TRUE)
 }
 \arguments{
 \item{path}{Path}
@@ -20,13 +19,15 @@ s_hat_bigsnp(path, gwas_rds, phenotype, top_set, random_sample,
 
 \item{random_sample}{Numeric vector. Random sample of SNPs}
 
+\item{scale}{Logical. Should effect sizes and std errors be scaled?}
+
 \item{markers}{Marker names for the GWAS you ran}
 
 \item{markers2}{Markers to include if SNPs are LD clumped.}
 
 \item{model}{One of linear or logistic. Type of GWAS model.}
 
-\item{clumped}{Logical. Clump SNPs?}
+\item{clump}{Logical. Clump SNPs?}
 }
 \description{
 Step Two of bigsnp2mashr

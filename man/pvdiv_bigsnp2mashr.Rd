@@ -4,14 +4,16 @@
 \alias{pvdiv_bigsnp2mashr}
 \title{Convert bigsnpr output to mashr input dataframes.}
 \usage{
-pvdiv_bigsnp2mashr(path = ".", gwas_rds = NA, phenotypes = NA,
-  clumping = TRUE, standardization = TRUE, G, markers = NULL,
-  markers2 = NULL, numSNPs = 1000, model = c("linear", "logistic"),
-  saveoutput = FALSE)
+pvdiv_bigsnp2mashr(path = ".", snp = NULL, gwas_rds = NA,
+  phenotypes = NA, clump = TRUE, scale = TRUE, numSNPs = 1000,
+  model = c("linear", "logistic"), saveoutput = FALSE)
 }
 \arguments{
 \item{path}{File path to the rds files saved from bigsnpr, a character
 string. Defaults to the working directory.}
+
+\item{snp}{The "bigSNP" object used to run the gwas; needed if clump is
+TRUE. Load with bigsnpr::snp_attach().}
 
 \item{gwas_rds}{A character vector of saved gwas rds objects from bigsnpr. If NA, all *.rds files in the path will be used.}
 
@@ -19,19 +21,11 @@ string. Defaults to the working directory.}
 objects. Must be the same length as gwas_rds, or NA. If NA, these will be
 the rds file names.}
 
-\item{clumping}{Logical. Should SNPs be clumped by LD & p-value to
+\item{clump}{Logical. Should SNPs be clumped by LD & p-value to
 standardize signal strength across different LD blocks? Default is TRUE.}
 
-\item{standardization}{Logical. Should marker effects in each condition be
-standardized to fall between -1 and 1? Default is TRUE.}
-
-\item{G}{snp$genotypes from a FBS object read in by \code{snp_attach().}}
-
-\item{markers}{A dataframe containing two columns: CHR & POS. POS should be
-an integer vector with marker positions. CHR contains marker chromosomes.}
-
-\item{markers2}{A dataframe of SNPs clumped by LD & MAF containing two
-columns, as for markers. Used when clumping = TRUE.}
+\item{scale}{Logical. Should marker effects in each condition be
+scaled to fall between -1 and 1? Default is TRUE.}
 
 \item{numSNPs}{The number of most significant SNPs selected from each GWAS.
 Ideally this will give 1 million or fewer total cells in the resultant
