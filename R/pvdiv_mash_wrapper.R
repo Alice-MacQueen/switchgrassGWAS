@@ -64,7 +64,7 @@ make_U_ed <- function(path, data_strong, numSNPs, saveoutput = FALSE){
 #' @param U_ed An optional character vector
 #' @param ref the reference group. A number between 1 & R, where R is the number
 #'     of conditions, or the name of the reference group, or if there is no
-#'     reference group, it can be the string 'mean'.
+#'     reference group, it can be the string 'mean'. Default is 'mean'.
 #'
 #' @return A mash result, manipulable using functions in mashr and by mash_plot
 #'     functions in the switchgrassGWAS package.
@@ -73,7 +73,7 @@ make_U_ed <- function(path, data_strong, numSNPs, saveoutput = FALSE){
 #'
 #' @export
 mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
-                              saveoutput = FALSE, U_ed = NA, ref = NA){
+                              saveoutput = FALSE, U_ed = NA, ref = "mean"){
   requireNamespace("mashr")
   if(!is.na(list_input[1])){
     list_input <- list_input
@@ -119,12 +119,8 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
   # Run mash on the random dataset using the random data w/ correlation structure
   message(paste0("Fit mash to the random tests using both data-driven and ",
                  "canonical covariances."))
-  if(is.na(ref[1])){
-    m = mashr::mash(data_random, Ulist = c(U_ed, U_c), outputlevel = 1)
-  } else {
-    m = mashr::mash(data_random, Ulist = c(U_ed, U_c), outputlevel = 1,
-                    algorithm.version = 'R')
-  }
+  m = mashr::mash(data_random, Ulist = c(U_ed, U_c), outputlevel = 1)
+
   if(saveoutput == TRUE){
     saveRDS(m, file.path(path, paste0("Model_of_random_tests_", numSNPs,
                                       "SNPs.rds")))
@@ -134,12 +130,8 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
   message(paste0("Compute posterior matrices for the strong effects",
                  " using the mash fit from the
                  random tests."))
-  if(is.na(ref[1])){
-    m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE)
-  } else {
-    m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE,
-                     algorithm.version = 'R')
-  }
+  m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE)
+
   if(saveoutput == TRUE){
     saveRDS(m2, file.path(path, paste0("Strong_Effects", numSNPs, "SNPs.rds")))
   }

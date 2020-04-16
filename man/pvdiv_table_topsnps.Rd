@@ -5,8 +5,8 @@
 \title{Create a Table of Annotated Top SNPs for Panicum virgatum}
 \usage{
 pvdiv_table_topsnps(df, type = c("bigsnp", "mash", "rqtl2", "table"),
-  n = 10, FDRalpha = 0.1, rangevector = c(0, 10000),
-  markers = NULL, anno_info = NULL, txdb = NULL)
+  n = 10, FDRalpha = 0.1, rangevector = c(0, 10000), snp = NULL,
+  txdb = NULL, anno_info = switchgrassGWAS::anno_info)
 }
 \arguments{
 \item{df}{a data frame or tbl_df. Can be bigsnpr output, mashr output
@@ -28,13 +28,13 @@ numbers between 0 and 1. Set to NA to omit this table. Default is 0.1.}
 pulled? Can be an integer or a vector of integers. Default is 0 (the SNP
 itself) and a 10 kbp window around the SNP.}
 
-\item{markers}{For data frames of type "mash" or "bigsnp", the same set of
-markers (with CHR and POS columns) as your df object.}
+\item{snp}{For data frames of type "mash" or "bigsnp", the bigSNP object used
+to create your data. Load into R with bigsnpr::snp_attach().}
+
+\item{txdb}{Annotation information from Pvirgatum_516_v5.1.gene.txdb.sqlite}
 
 \item{anno_info}{Gene information from
 Pvirgatum_516_v5.1.annotation_info.txt}
-
-\item{txdb}{Annotation information from Pvirgatum_516_v5.1.gene.txdb.sqlite}
 }
 \value{
 A list containing dataframes of SNPs. If more than one dataframe is

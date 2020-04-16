@@ -187,8 +187,8 @@ get_tidy_annos <- function(df, input, anno_info, txdb){
 #' @param rangevector How far from the significant SNP should annotations be
 #'    pulled? Can be an integer or a vector of integers. Default is 0 (the SNP
 #'    itself) and a 10 kbp window around the SNP.
-#' @param markers For data frames of type "mash" or "bigsnp", the same set of
-#'    markers (with CHR and POS columns) as your df object.
+#' @param snp For data frames of type "mash" or "bigsnp", the bigSNP object used
+#'    to create your data. Load into R with bigsnpr::snp_attach().
 #' @param anno_info Gene information from
 #'    Pvirgatum_516_v5.1.annotation_info.txt
 #' @param txdb Annotation information from Pvirgatum_516_v5.1.gene.txdb.sqlite
@@ -205,9 +205,11 @@ get_tidy_annos <- function(df, input, anno_info, txdb){
 #' @export
 pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table"),
                                 n = 10, FDRalpha = 0.1,
-                                rangevector = c(0, 10000), markers = NULL,
-                                anno_info = NULL, txdb = NULL){
+                                rangevector = c(0, 10000), snp = NULL,
+                                txdb = NULL,
+                                anno_info = switchgrassGWAS::anno_info){
   requireNamespace("VariantAnnotation")
+
 
   n <- as.integer(n)
   FDRalpha <- as.numeric(FDRalpha)
@@ -223,9 +225,11 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
     stop(paste0("For 'mash' and 'bigsnp' types, need to specify at least one",
                 "of n (as an integer) or FDR (between 0 and 1)."))
   }
-  if(type %in% c("bigsnp", "mash")){
-    stopifnot(!is_null(markers[1]))
+  if(type %in% c("bigsnp", "mash") & attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
   }
+  markers <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos)
+
   topsnp_inputlist <- list()
   topsnp_outputlist <- list()
   ## Prepare a dataframe for each type for further analysis.
