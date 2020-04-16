@@ -474,10 +474,10 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
     # make Bhat only and Shat only tables for both strong and random sets.
   }
   log10p_strong <- mash_df_strong %>%
-    unite(col = "SNP", .data$CHR, .data$POS) %>%
+    unite(col = "SNP", .data$CHR, .data$POS, remove = FALSE) %>%
     dplyr::select(.data$SNP, .data$CHR, .data$POS, tidyselect::ends_with("_log10p"))
   log10p_random <- mash_df_random %>%
-    unite(col = "SNP", .data$CHR, .data$POS) %>%
+    unite(col = "SNP", .data$CHR, .data$POS, remove = FALSE) %>%
     dplyr::select(.data$SNP, .data$CHR, .data$POS, tidyselect::ends_with("_log10p"))
   B_hat_random <- data.frame(bhat_random, row.names = "SNP")
   S_hat_random <- data.frame(shat_random, row.names = "SNP")
