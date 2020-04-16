@@ -65,15 +65,15 @@ pvdiv_top_effects_log10p <- function(path, gwas_rds, phenotype, numSNPs,
             "estim" %in% names(gwas_obj) &
             "std_err" %in% names(gwas_obj)){
 
-    message(paste0("Finding top SNPs for bigsnpr output saved by ",
-            "'pvdiv_standard_gwas()'."))
+    #message(paste0("Finding top SNPs for bigsnpr output saved by ",
+    #        "'pvdiv_standard_gwas()'."))
     pre_mash_1 <- tibble(CHR = gwas_obj$CHR, POS = gwas_obj$POS,
                          bigsnpscore = gwas_obj$bigsnpscore,
                          log10p = gwas_obj$log10p)
     if(gwas_obj$log10p[1] > 0){
         top_set <- pre_mash_1 %>%
           top_n(numSNPs, .data$log10p) %>%
-          mutate(score_log10p = -log10p) %>%
+          mutate(score_log10p = log10p) %>%
           dplyr::select(.data$CHR, .data$POS, .data$score_log10p)
         names(top_set)[3] <- paste0(phenotype, "_score_log10p")
         # name top_set columns appropriately so that the joined file will have
