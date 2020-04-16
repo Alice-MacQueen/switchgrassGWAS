@@ -507,9 +507,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
       anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp",
                                          n = n, FDRalpha = FDRalpha,
                                          rangevector = rangevector,
-                                         markers = markers,
-                                         anno_info=switchgrassGWAS::anno_info,
-                                         txdb = txdb)
+                                         snp = snp, txdb = txdb)
       saveRDS(anno_tables, file.path(outputdir,
                                      paste0("Annotation_tables_", phename,
                                             "_", type, "_model_", nPhe, "g_",
