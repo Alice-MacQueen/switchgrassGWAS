@@ -491,6 +491,8 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
                                                         numSNPs, "topSNPs.rds")))
     saveRDS(B_hat_random, file = file.path(path, paste0("B_hat_random_df_",
                                                         numSNPs, "topSNPs.rds")))
+    saveRDS(S_hat_random, file = file.path(path, paste0("S_hat_random_df_",
+                                                        numSNPs, "topSNPs.rds")))
     saveRDS(log10p_strong, file = file.path(path, paste0("log10p_strong_df_",
                                                         numSNPs, "topSNPs.rds")))
     saveRDS(log10p_random, file = file.path(path, paste0("log10p_random_df_",
