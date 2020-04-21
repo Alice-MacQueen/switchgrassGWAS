@@ -164,6 +164,8 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
                                         0,
                                         .data$effect_d))
     } else {
+      markers2 <- markers2 %>%
+        dplyr::select(.data$CHR, .data$POS)
       pre_mash_random <- markers2 %>%
         left_join(pre_mash_1, by = c("CHR", "POS"))
       pre_mash_random <- pre_mash_random[random_sample,] %>%
@@ -334,7 +336,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
   }
 
   message(paste0("Starting part one: Making a data frame of all SNPs ",
-                 " in the top ", numSNPs, " SNPs
+                 "in the top ", numSNPs, " SNPs
                  by maximum -log10(p-values) for at least one phenotype."))
 
   top_set <- pvdiv_top_effects_log10p(path = path, gwas_rds = phe_col[1],
