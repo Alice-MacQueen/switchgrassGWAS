@@ -520,7 +520,7 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
 #'
 #' @note Specify only one of n or i.
 #'
-#' @importFrom ashr get_psd
+#' @importFrom ashr get_psd get_pm
 #' @importFrom cowplot save_plot
 #' @importFrom tibble enframe
 #' @importFrom dplyr mutate
@@ -535,18 +535,19 @@ mash_plot_effects <- function(m, n = NA, i = NA, saveoutput = FALSE){
   }
 
   effectplot <- get_colnames(m) %>%
-    enframe(name = "Conditions") %>%
-    mutate(mn = get_pm(m)[i,],
+    enframe(name = NULL, value = "Conditions") %>%
+    mutate(Conditions = str_sub(.data$Conditions, start = 6),
+           mn = get_pm(m)[i,],
            se = get_psd(m)[i,])
 
   ggobject <- ggplot(data = effectplot) +
-    geom_point(mapping = aes(x = as.factor(.data$value), y = .data$mn)) +
+    geom_point(mapping = aes(x = as.factor(.data$Conditions), y = .data$mn)) +
     geom_errorbar(mapping = aes(ymin = .data$mn - .data$se,
                                 ymax = .data$mn + .data$se,
                                 x = .data$Conditions), width = 0.3) +
     geom_hline(yintercept = 0, lty = 2) +
     labs(x = "Conditions", y = "Effect Size") +
-    scale_x_discrete(labels = as_vector(.data$value)) +
+    scale_x_discrete(labels = as_vector(.data$Conditions)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
   if(saveoutput == TRUE){
