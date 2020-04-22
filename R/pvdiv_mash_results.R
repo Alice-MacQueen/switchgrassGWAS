@@ -528,9 +528,12 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
 #' @importFrom purrr as_vector
 #'
 #' @export
-mash_plot_effects <- function(m, n = NA, i = NA, saveoutput = FALSE){
-  stopifnot((!is.na(n[1]) | !is.na(i[1])))
-  if(is.na(i[1])){
+mash_plot_effects <- function(m, n = NULL, i = NULL, saveoutput = FALSE){
+  if(is.null(n) & is.null(i)){
+    stop(paste0("Need to specify one of n, the nth most signficant result, or ",
+                "i, the row of the mash object to plot."))
+  }
+  if(is.null(i)){
   i <- get_significant_results(m)[n]
   }
 
@@ -551,7 +554,7 @@ mash_plot_effects <- function(m, n = NA, i = NA, saveoutput = FALSE){
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
   if(saveoutput == TRUE){
-    if(is.na(n[1])){
+    if(is.null(i)){
       save_plot(filename = paste0("Effect_plot_",
                                   names(get_significant_results(m))[n], ".png"),
                 plot = ggobject, base_aspect_ratio = 0.8, base_height = 4.5)

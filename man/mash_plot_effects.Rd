@@ -4,7 +4,7 @@
 \alias{mash_plot_effects}
 \title{ggplot of single mash effect}
 \usage{
-mash_plot_effects(m, n = NA, i = NA, saveoutput = FALSE)
+mash_plot_effects(m, n = NULL, i = NULL, saveoutput = FALSE)
 }
 \arguments{
 \item{m}{An object of type mash}

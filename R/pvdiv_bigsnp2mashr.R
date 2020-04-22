@@ -147,22 +147,22 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
     dplyr::left_join(pre_mash_1, by = c("CHR", "POS")) %>%
     dplyr::mutate(stderr_d = .data$std_err / standardization,
                   effect_d = .data$estim / standardization,
-                  stderr_d = ifelse(is.na(.data$stderr_d),
-                                    10,
-                                    .data$stderr_d),
-                  effect_d = ifelse(is.na(.data$effect_d),
-                                    0,
-                                    .data$effect_d))
+                  stderr_d = case_when(is.na(.data$stderr_d) ~ 10,
+                                       is.nan(.data$stderr_d) ~ 10,
+                                       TRUE ~ .data$stderr_d),
+                  effect_d = case_when(is.na(.data$effect_d) ~ 0,
+                                       is.nan(.data$effect_d) ~ 0,
+                                       TRUE ~ .data$effect_d))
     if(clump == FALSE){
       pre_mash_random <- pre_mash_1[random_sample,] %>%
         dplyr::mutate(stderr_d = .data$std_err / standardization,
                       effect_d = .data$estim / standardization,
-                      stderr_d = ifelse(is.na(.data$stderr_d),
-                                        10,
-                                        .data$stderr_d),
-                      effect_d = ifelse(is.na(.data$effect_d),
-                                        0,
-                                        .data$effect_d))
+                      stderr_d = case_when(is.na(.data$stderr_d) ~ 10,
+                                           is.nan(.data$stderr_d) ~ 10,
+                                           TRUE ~ .data$stderr_d),
+                      effect_d = case_when(is.na(.data$effect_d) ~ 0,
+                                           is.nan(.data$effect_d) ~ 0,
+                                           TRUE ~ .data$effect_d))
     } else {
       markers2 <- markers2 %>%
         dplyr::select(.data$CHR, .data$POS)
@@ -171,12 +171,12 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
       pre_mash_random <- pre_mash_random[random_sample,] %>%
         dplyr::mutate(stderr_d = .data$std_err / standardization,
                       effect_d = .data$estim / standardization,
-                      stderr_d = ifelse(is.na(.data$stderr_d),
-                                        10,
-                                        .data$stderr_d),
-                      effect_d = ifelse(is.na(.data$effect_d),
-                                        0,
-                                        .data$effect_d))
+                      stderr_d = case_when(is.na(.data$stderr_d) ~ 10,
+                                           is.nan(.data$stderr_d) ~ 10,
+                                           TRUE ~ .data$stderr_d),
+                      effect_d = case_when(is.na(.data$effect_d) ~ 0,
+                                           is.nan(.data$effect_d) ~ 0,
+                                           TRUE ~ .data$effect_d))
     }
 
   if((model == "linear" & attr(gwas_obj, "class")[1] == "mhtest") |
@@ -431,9 +431,15 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
   mash_df_random <- mash_list_1$random_df_1
 
   for(i in seq_along(phe_col)[-1]){
-    message(paste0("Determining standardized B_hat and S_hat values for ",
-                   nrow(top_set), " SNPs in GWAS for ", phenotypes[i]," (",
-                   i, " of ", length(phe_col), ")."))
+    if(scale){
+      message(paste0("Determining standardized B_hat and S_hat values for ",
+                     nrow(top_set), " SNPs in GWAS for ", phenotypes[i]," (",
+                     i, " of ", length(phe_col), ")."))
+    } else {
+      message(paste0("Determining unscaled B_hat and S_hat values for ",
+                     nrow(top_set), " SNPs in GWAS for ", phenotypes[i]," (",
+                     i, " of ", length(phe_col), ")."))
+    }
     mash_list_1 <- s_hat_bigsnp(path = path, gwas_rds = phe_col[i],
                                 phenotype = phenotypes[i],
                                 top_set = top_set,
