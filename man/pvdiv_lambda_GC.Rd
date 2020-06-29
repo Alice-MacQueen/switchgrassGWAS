@@ -4,8 +4,15 @@
 \alias{pvdiv_lambda_GC}
 \title{Return lambda_GC for different numbers of PCs for GWAS on Panicum virgatum.}
 \usage{
-pvdiv_lambda_GC(df, type = c("linear", "logistic"), snp, covar = NA,
-  ncores = 1, npcs = c(0:10), saveoutput = FALSE)
+pvdiv_lambda_GC(
+  df,
+  type = c("linear", "logistic"),
+  snp,
+  covar = NA,
+  ncores = 1,
+  npcs = c(0:10),
+  saveoutput = FALSE
+)
 }
 \arguments{
 \item{df}{Dataframe of phenotypes where the first column is PLANT_ID and each

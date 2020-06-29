@@ -4,7 +4,9 @@
 \name{gff_gene}
 \alias{gff_gene}
 \title{GFF3 Gene information}
-\format{A data frame with 1236881 rows and 9 variables}
+\format{
+A data frame with 1236881 rows and 9 variables
+}
 \usage{
 data(gff_gene)
 }

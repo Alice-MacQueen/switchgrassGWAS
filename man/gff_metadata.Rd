@@ -4,7 +4,9 @@
 \name{gff_metadata}
 \alias{gff_metadata}
 \title{Metadata lines for the gene GFF3}
-\format{A data frame with 3 rows and 1 variable.}
+\format{
+A data frame with 3 rows and 1 variable.
+}
 \usage{
 data(gff_metadata)
 }

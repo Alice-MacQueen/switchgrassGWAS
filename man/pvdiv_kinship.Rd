@@ -4,8 +4,7 @@
 \alias{pvdiv_kinship}
 \title{Find a kinship matrix using the van Raden method.}
 \usage{
-pvdiv_kinship(snp, ind.row = NA, hasInbred = TRUE,
-  saveoutput = FALSE)
+pvdiv_kinship(snp, ind.row = NA, hasInbred = TRUE, saveoutput = FALSE)
 }
 \arguments{
 \item{snp}{A "bigSNP" object; load with bigsnpr::snp_attach().}

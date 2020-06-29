@@ -4,8 +4,16 @@
 \alias{mash_standard_run}
 \title{A standard run of mashr}
 \usage{
-mash_standard_run(path, list_input = NA, numSNPs = NA,
-  saveoutput = FALSE, U_ed = NA, ref = "mean")
+mash_standard_run(
+  path,
+  list_input = NA,
+  numSNPs = NA,
+  saveoutput = FALSE,
+  suffix = "",
+  U_ed = NA,
+  U_hyp = NA,
+  ref = "mean"
+)
 }
 \arguments{
 \item{path}{File path to the rds files saved from bigsnpr, a character
@@ -22,7 +30,14 @@ mash dataframes. Defaults to 1000.}
 \item{saveoutput}{Logical. Should the function's output also be saved to RDS
 files? Default is FALSE.}
 
-\item{U_ed}{An optional character vector}
+\item{suffix}{Character. Optional. Should be the unique suffix used to
+save \code{cdbn_bigsnp2mashr} output as RDS files, if it was used.}
+
+\item{U_ed}{An optional list of data-driven covariance matrices, or a
+character vector containing the complete path to a .rds containing these
+matrices.}
+
+\item{U_hyp}{An optional list of covariance matrices specified by the user.}
 
 \item{ref}{the reference group. A number between 1 & R, where R is the number
 of conditions, or the name of the reference group, or if there is no

@@ -194,9 +194,9 @@ pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
 #'
 #' @description This is a wrapper to
 #'
-#' @param snp A "bigSNP" object; load with bigsnpr::snp_attach(). Here, genomic
-#'     information for Panicum virgatum. Contact tjuenger <at> utexas <dot> edu
-#'     to obtain this information pre-publication.
+#' @param snp A "bigSNP" object; load with \code{bigsnpr::snp_attach()}.
+#'     Here, genomic information for Panicum virgatum. Contact tjuenger <at>
+#'     utexas <dot> edu to obtain this information pre-publication.
 #' @param df Dataframe of phenotypes where the first column is PLANT_ID.
 #' @param type Character string. Type of univarate regression to run for GWAS.
 #'     Options are "linear" or "logistic".

@@ -4,8 +4,7 @@
 \alias{pvdiv_bigsnp_subset}
 \title{Make a SNP dataframe subset from annotation table or a genomic range.}
 \usage{
-pvdiv_bigsnp_subset(snp, type = c("anno", "range"), anno_df, chr, pos1,
-  pos2)
+pvdiv_bigsnp_subset(snp, type = c("anno", "range"), anno_df, chr, pos1, pos2)
 }
 \arguments{
 \item{snp}{A \code{FBM.code256} object. Genomic information for Panicum virgatum.

@@ -4,8 +4,15 @@
 \alias{pvdiv_gwas}
 \title{Wrapper for bigsnpr for GWAS on Panicum virgatum.}
 \usage{
-pvdiv_gwas(df, type = c("linear", "logistic"), snp, covar = NA,
-  ncores = 1, npcs = 10, saveoutput = FALSE)
+pvdiv_gwas(
+  df,
+  type = c("linear", "logistic"),
+  snp,
+  covar = NA,
+  ncores = 1,
+  npcs = 10,
+  saveoutput = FALSE
+)
 }
 \arguments{
 \item{df}{Dataframe of phenotypes where the first column is PLANT_ID.}

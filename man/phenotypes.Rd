@@ -4,7 +4,9 @@
 \name{phenotypes}
 \alias{phenotypes}
 \title{Phenotypes available for the Panicum virgatum diversity panel.}
-\format{A data frame with 785 rows and 4 variables}
+\format{
+A data frame with 785 rows and 4 variables
+}
 \usage{
 data(phenotypes)
 }

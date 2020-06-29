@@ -4,9 +4,18 @@
 \alias{s_hat_bigsnp}
 \title{Step Two of bigsnp2mashr}
 \usage{
-s_hat_bigsnp(path, gwas_rds, phenotype, top_set, random_sample,
-  scale = TRUE, markers = NULL, markers2 = NULL,
-  model = c("linear", "logistic"), clump = TRUE)
+s_hat_bigsnp(
+  path,
+  gwas_rds,
+  phenotype,
+  top_set,
+  random_sample,
+  scale = TRUE,
+  markers = NULL,
+  markers2 = NULL,
+  model = c("linear", "logistic"),
+  clump = TRUE
+)
 }
 \arguments{
 \item{path}{Path}

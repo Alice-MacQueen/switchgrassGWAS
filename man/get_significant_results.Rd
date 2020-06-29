@@ -5,8 +5,12 @@
 \title{From a mash result, get effects that are significant in at least
 one condition.}
 \usage{
-get_significant_results(m, thresh = 0.05, conditions = NULL,
-  sig_fn = ashr::get_lfsr)
+get_significant_results(
+  m,
+  thresh = 0.05,
+  conditions = NULL,
+  sig_fn = ashr::get_lfsr
+)
 }
 \arguments{
 \item{m}{the mash result (from joint or 1by1 analysis)}

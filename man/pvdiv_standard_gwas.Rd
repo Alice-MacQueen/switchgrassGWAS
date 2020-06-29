@@ -4,16 +4,26 @@
 \alias{pvdiv_standard_gwas}
 \title{Wrapper for Juenger lab standard GWAS functions for switchgrass.}
 \usage{
-pvdiv_standard_gwas(snp, df = switchgrassGWAS::phenotypes,
-  type = c("linear", "logistic"), ncores = nb_cores(),
-  outputdir = ".", covar = NULL, lambdagc = TRUE, savegwas = FALSE,
-  saveplots = TRUE, saveannos = FALSE, txdb = NULL, minphe = 200,
-  ...)
+pvdiv_standard_gwas(
+  snp,
+  df = switchgrassGWAS::phenotypes,
+  type = c("linear", "logistic"),
+  ncores = nb_cores(),
+  outputdir = ".",
+  covar = NULL,
+  lambdagc = TRUE,
+  savegwas = FALSE,
+  saveplots = TRUE,
+  saveannos = FALSE,
+  txdb = NULL,
+  minphe = 200,
+  ...
+)
 }
 \arguments{
-\item{snp}{A "bigSNP" object; load with bigsnpr::snp_attach(). Here, genomic
-information for Panicum virgatum. Contact tjuenger <at> utexas <dot> edu
-to obtain this information pre-publication.}
+\item{snp}{A "bigSNP" object; load with \code{bigsnpr::snp_attach()}.
+Here, genomic information for Panicum virgatum. Contact tjuenger <at>
+utexas <dot> edu to obtain this information pre-publication.}
 
 \item{df}{Dataframe of phenotypes where the first column is PLANT_ID.}
 

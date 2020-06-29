@@ -4,9 +4,18 @@
 \alias{pvdiv_bigsnp2mashr}
 \title{Convert bigsnpr output to mashr input dataframes.}
 \usage{
-pvdiv_bigsnp2mashr(path = ".", snp = NULL, gwas_rds = NA,
-  phenotypes = NA, clump = TRUE, scale = TRUE, numSNPs = 1000,
-  model = c("linear", "logistic"), saveoutput = FALSE)
+pvdiv_bigsnp2mashr(
+  path = ".",
+  snp = NULL,
+  gwas_rds = NA,
+  phenotypes = NA,
+  clump = TRUE,
+  scale = TRUE,
+  numSNPs = 1000,
+  model = c("linear", "logistic"),
+  saveoutput = FALSE,
+  suffix = ""
+)
 }
 \arguments{
 \item{path}{File path to the rds files saved from bigsnpr, a character
@@ -36,6 +45,9 @@ Default is "linear".}
 
 \item{saveoutput}{Logical. Should the function's output also be saved to RDS
 files? Default is FALSE.}
+
+\item{suffix}{Character. Optional. If the function's output is saved to RDS
+files, what unique suffix should be used?}
 }
 \value{
 A list containing five data frames: the SNPs selected, the B_hat

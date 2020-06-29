@@ -1,3 +1,124 @@
+# --- Get Results from Mash Object with mashr get functions ---------
+
+#' @title Return the estimated mixture proportions. Use get_estimated_pi to
+#'     extract the estimates of the mixture proportions for different types of
+#'     covariance matrix. This tells you which covariance matrices have most of
+#'     the mass.
+#'
+#' @param m the mash result
+#' @param dimension indicates whether you want the mixture proportions for the
+#'     covariances, grid, or all
+#'
+#' @return a named vector containing the estimated mixture proportions.
+#'
+#' @details If the fit was done with `usepointmass=TRUE` then the first
+#'     element of the returned vector will correspond to the null, and the
+#'     remaining elements to the non-null covariance matrices. Suppose the fit
+#'     was done with $K$ covariances and a grid of length $L$. If
+#'     `dimension=cov` then the returned vector will be of length $K$
+#'     (or $K+1$ if `usepointmass=TRUE`).  If `dimension=grid` then
+#'     the returned vector will be of length $L$ (or $L+1$).  If
+#'     `dimension=all` then the returned vector will be of length $LK$ (or
+#'     $LK+1$). The names of the vector will be informative for which
+#'     combination each element corresponds to.
+#'
+#' @importFrom ashr get_fitted_g
+#'
+get_estimated_pi = function(m, dimension = c("cov","grid","all")){
+  dimension = match.arg(dimension)
+  if(dimension=="all"){
+    get_estimated_pi_no_collapse(m)
+  } else {
+    g = get_fitted_g(m)
+    pihat = g$pi
+    pihat_names = NULL
+    pi_null = NULL
+
+    if(g$usepointmass){
+      pihat_names=c("null",pihat_names)
+      pi_null = pihat[1]
+      pihat = pihat[-1]
+    }
+
+    pihat = matrix(pihat,nrow=length(g$Ulist))
+    if(dimension=="cov"){
+      pihat = rowSums(pihat)
+      pihat_names = c(pihat_names,names(g$Ulist))
+    } else if(dimension=="grid"){
+      pihat = colSums(pihat)
+      pihat_names = c(pihat_names,1:length(g$grid))
+    }
+
+    pihat = c(pi_null,pihat)
+    names(pihat) = pihat_names
+    return(pihat)
+  }
+}
+
+get_estimated_pi_no_collapse = function(m){
+  g = get_fitted_g(m)
+  pihat = g$pi
+  names(pihat) = names(expand_cov(g$Ulist, g$grid, g$usepointmass))
+  pihat
+}
+
+#' @title Create expanded list of covariance matrices expanded by
+#'   grid, Sigma_{lk} = omega_l U_k
+#'
+#' @description This is an internal (non-exported) function. This help
+#'   page provides additional documentation mainly intended for
+#'   developers and expert users.
+#'
+#' @param Ulist a list of covarance matrices
+#'
+#' @param grid a grid of scalar values by which the covariance
+#'   matrices are to be sc
+#'
+#' @param usepointmass if TRUE adds a point mass at 0 (null component)
+#'   to the list
+#'
+#' @return This takes the covariance matrices in Ulist and multiplies
+#' them by the grid values If usepointmass is TRUE then it adds a null
+#' component.
+#'
+#' @keywords internal
+#'
+expand_cov = function(Ulist,grid,usepointmass=TRUE){
+  scaled_Ulist = scale_cov(Ulist, grid)
+  R = nrow(Ulist[[1]])
+  if(usepointmass){
+    scaled_Ulist = c(list(null=matrix(0,nrow=R,ncol=R)),scaled_Ulist)
+  }
+  return(scaled_Ulist)
+}
+
+#' @title Scale each covariance matrix in list Ulist by a scalar in
+#' vector grid
+#'
+#' @description This is an internal (non-exported) function. This help
+#'   page provides additional documentation mainly intended for
+#'   developers and expert users.
+#'
+#' @param Ulist a list of matrices
+#'
+#' @param grid a vector of scaling factors (standard deviaions)
+#'
+#' @return a list with length length(Ulist)*length(grid)
+#'
+#' @keywords internal
+#'
+scale_cov = function(Ulist, grid){
+  orig_names = names(Ulist)
+  Ulist = unlist( lapply(grid^2, function(x){multiply_list(Ulist,x)}), recursive=FALSE)
+  names(Ulist) = unlist( lapply(1:length(grid), function(x){paste0(orig_names,".",x)}), recursive=FALSE)
+  return(Ulist)
+}
+
+# Multiply each element of a list by scalar. (In our application each
+# element of the list is a matrix.)
+multiply_list = function(Ulist, x){lapply(Ulist, function(U){x*U})}
+
+
 #' @title Get column names from a mash object
 #'
 #' @description This function extracts the column names from the local false
@@ -314,6 +435,22 @@ mash_plot_sig_by_condition <- function(m, conditions = NA, saveoutput = FALSE,
     summarise(Significant_SNPs = n()) %>%
     filter(.data$Number_of_Conditions != 0)
 
+  theme_oeco <- theme_classic() +
+    theme(axis.title = element_text(size = 10),
+          axis.text = element_text(size = 10),
+          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
+          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
+          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
+          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
+          legend.key.size = unit(0.35, 'cm'),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 9),
+          legend.text.align = 0, legend.background = element_blank(),
+          plot.subtitle = element_text(size = 10, vjust = 0),
+          strip.background = element_blank(),
+          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
+          strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
+
   vis <- ggplot(SigHist, aes(x = .data$Number_of_Conditions, y = .data$Significant_SNPs)) +
     geom_line() +
     geom_point() +
@@ -389,6 +526,21 @@ mash_plot_manhattan_by_condition <- function(m, cond = NA,
     arrange(.data$Chr, .data$Pos)
 
   log10BF <- expression(paste("log"[10], plain("(Bayes Factor)")))
+  theme_oeco <- theme_classic() +
+    theme(axis.title = element_text(size = 10),
+          axis.text = element_text(size = 10),
+          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
+          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
+          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
+          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
+          legend.key.size = unit(0.35, 'cm'),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 9),
+          legend.text.align = 0, legend.background = element_blank(),
+          plot.subtitle = element_text(size = 10, vjust = 0),
+          strip.background = element_blank(),
+          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
+          strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
 
   ggmanobject <- ggplot(data = ggman_df, aes(x = .data$Pos, y = .data$log10BayesFactor)) +
     geom_point(aes(color = .data$Num_Sig_Conditions, fill = .data$Num_Sig_Conditions,
@@ -542,6 +694,21 @@ mash_plot_effects <- function(m, n = NULL, i = NULL, saveoutput = FALSE){
     mutate(Conditions = str_sub(.data$Conditions, start = 6),
            mn = get_pm(m)[i,],
            se = get_psd(m)[i,])
+  theme_oeco <- theme_classic() +
+    theme(axis.title = element_text(size = 10),
+          axis.text = element_text(size = 10),
+          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
+          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
+          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
+          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
+          legend.key.size = unit(0.35, 'cm'),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 9),
+          legend.text.align = 0, legend.background = element_blank(),
+          plot.subtitle = element_text(size = 10, vjust = 0),
+          strip.background = element_blank(),
+          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
+          strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
 
   ggobject <- ggplot(data = effectplot) +
     geom_point(mapping = aes(x = as.factor(.data$Conditions), y = .data$mn)) +

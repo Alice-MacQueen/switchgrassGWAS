@@ -4,9 +4,16 @@
 \alias{pvdiv_table_topsnps}
 \title{Create a Table of Annotated Top SNPs for Panicum virgatum}
 \usage{
-pvdiv_table_topsnps(df, type = c("bigsnp", "mash", "rqtl2", "table"),
-  n = 10, FDRalpha = 0.1, rangevector = c(0, 10000), snp = NULL,
-  txdb = NULL, anno_info = switchgrassGWAS::anno_info)
+pvdiv_table_topsnps(
+  df,
+  type = c("bigsnp", "mash", "rqtl2", "table"),
+  n = 10,
+  FDRalpha = 0.1,
+  rangevector = c(0, 10000),
+  snp = NULL,
+  txdb = NULL,
+  anno_info = switchgrassGWAS::anno_info
+)
 }
 \arguments{
 \item{df}{a data frame or tbl_df. Can be bigsnpr output, mashr output

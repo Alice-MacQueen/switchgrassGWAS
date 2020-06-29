@@ -253,6 +253,8 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
 #'     Default is "linear".
 #' @param saveoutput Logical. Should the function's output also be saved to RDS
 #' files? Default is FALSE.
+#' @param suffix Character. Optional. If the function's output is saved to RDS
+#'     files, what unique suffix should be used?
 #'
 #' @return A list containing five data frames: the SNPs selected, the B_hat
 #'    and S_hat matrices for the strong SNP set and for a random SNP set that
@@ -283,7 +285,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
  pvdiv_bigsnp2mashr <- function(path = ".", snp = NULL, gwas_rds = NA,
                                 phenotypes = NA, clump = TRUE, scale = TRUE,
                                 numSNPs = 1000, model = c("linear", "logistic"),
-                                saveoutput = FALSE){
+                                saveoutput = FALSE, suffix = ""){
   match.arg(model, c("linear", "logistic"))
   if(is.null(snp)){
     stop(paste0("The bigSNP object that was used to run the GWAS should be ",
@@ -401,9 +403,11 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
       dplyr::select(.data$CHR, .data$POS, .data$max_score_log10p)
   }
   if(saveoutput == TRUE){
+    if(!(str_sub(suffix, end = 1) %in% c("", "_")))
+    { suffix <- paste0("_", suffix) }
     saveRDS(top_set, file = file.path(path, paste0("Part-One-Output_",
                                                    "Top-Effects-", numSNPs,
-                                                   "-SNPs.rds")))
+                                                   "-SNPs", suffix, ".rds")))
   }
 
   message(paste0("Part One: data frame of SNPs to keep complete.
@@ -493,18 +497,26 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
   S_hat_strong <- data.frame(shat_strong, row.names = "SNP")
 
   if(saveoutput == TRUE){
+    if(!(str_sub(suffix, end = 1) %in% c("", "_")))
+    { suffix <- paste0("_", suffix) }
     saveRDS(B_hat_strong, file = file.path(path, paste0("B_hat_strong_df_",
-                                                        numSNPs, "topSNPs.rds")))
+                                                        numSNPs, "topSNPs",
+                                                        suffix, ".rds")))
     saveRDS(S_hat_strong, file = file.path(path, paste0("S_hat_strong_df_",
-                                                        numSNPs, "topSNPs.rds")))
+                                                        numSNPs, "topSNPs",
+                                                        suffix, ".rds")))
     saveRDS(B_hat_random, file = file.path(path, paste0("B_hat_random_df_",
-                                                        numSNPs, "topSNPs.rds")))
+                                                        numSNPs, "topSNPs",
+                                                        suffix, ".rds")))
     saveRDS(S_hat_random, file = file.path(path, paste0("S_hat_random_df_",
-                                                        numSNPs, "topSNPs.rds")))
+                                                        numSNPs, "topSNPs",
+                                                        suffix, ".rds")))
     saveRDS(log10p_strong, file = file.path(path, paste0("log10p_strong_df_",
-                                                        numSNPs, "topSNPs.rds")))
+                                                        numSNPs, "topSNPs",
+                                                        suffix, ".rds")))
     saveRDS(log10p_random, file = file.path(path, paste0("log10p_random_df_",
-                                                        numSNPs, "topSNPs.rds")))
+                                                        numSNPs, "topSNPs",
+                                                        suffix, ".rds")))
   }
   return(list(top_set = top_set,
               random_sample = random_sample,

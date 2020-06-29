@@ -4,7 +4,9 @@
 \name{anno_info}
 \alias{anno_info}
 \title{Annotation information from Pvirgatum_516_v5.1.annotation_info}
-\format{A data frame with 80278 rows and 16 variables.}
+\format{
+A data frame with 80278 rows and 16 variables.
+}
 \usage{
 data(anno_info)
 }
