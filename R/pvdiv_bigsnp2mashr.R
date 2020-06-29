@@ -104,7 +104,7 @@ pvdiv_top_effects_log10p <- function(path, gwas_rds, phenotype, numSNPs,
 #' @param phenotype Character vector. Single phenotype name
 #' @param top_set Top markers chosen
 #' @param random_sample Numeric vector. Random sample of SNPs
-#' @param scale Logical. Should effect sizes and std errors be scaled?
+#' @param scaled Logical. Should effect sizes and std errors be scaled?
 #' @param markers Marker names for the GWAS you ran
 #' @param markers2 Markers to include if SNPs are LD clumped.
 #' @param model One of linear or logistic. Type of GWAS model.
@@ -114,7 +114,7 @@ pvdiv_top_effects_log10p <- function(path, gwas_rds, phenotype, numSNPs,
 #' @importFrom stats predict
 #' @importFrom dplyr left_join mutate
 s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
-                         scale = TRUE, markers = NULL, markers2 = NULL,
+                         scaled = TRUE, markers = NULL, markers2 = NULL,
                          model = c("linear", "logistic"), clump = TRUE){
 
   gwas_obj <- readRDS(file = file.path(path, gwas_rds))
@@ -144,6 +144,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
   standardization <- max(abs(pre_mash_1$estim), na.rm = TRUE)
 
   pre_mash_strong <- top_set %>%
+    dplyr::select(.data$CHR, .data$POS, .data$max_score_log10p) %>%
     dplyr::left_join(pre_mash_1, by = c("CHR", "POS")) %>%
     dplyr::mutate(stderr_d = .data$std_err / standardization,
                   effect_d = .data$estim / standardization,
@@ -242,7 +243,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
 #'    the rds file names.
 #' @param clump Logical. Should SNPs be clumped by LD & p-value to
 #'    standardize signal strength across different LD blocks? Default is TRUE.
-#' @param scale Logical. Should marker effects in each condition be
+#' @param scaled Logical. Should marker effects in each condition be
 #'    scaled to fall between -1 and 1? Default is TRUE.
 #' @param snp The "bigSNP" object used to run the gwas; needed if clump is
 #'    TRUE. Load with bigsnpr::snp_attach().
@@ -275,7 +276,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
 #' model = "linear", saveoutput = TRUE)}
 #'
 #' @import bigsnpr
-#' @importFrom dplyr full_join left_join case_when arrange mutate select slice filter group_by n
+#' @importFrom dplyr full_join left_join case_when arrange mutate select slice filter group_by n add_tally
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_sub
 #' @importFrom tidyr gather unite
@@ -283,10 +284,11 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
 #'
 #' @export
  pvdiv_bigsnp2mashr <- function(path = ".", snp = NULL, gwas_rds = NA,
-                                phenotypes = NA, clump = TRUE, scale = TRUE,
+                                phenotypes = NA, clump = TRUE, scaled = TRUE,
                                 numSNPs = 1000, model = c("linear", "logistic"),
                                 saveoutput = FALSE, suffix = ""){
   match.arg(model, c("linear", "logistic"))
+  model <- model[1]
   if(is.null(snp)){
     stop(paste0("The bigSNP object that was used to run the GWAS should be ",
                 "provided - load this in to R using 'bigsnpr::snp_attach()', ",
@@ -360,9 +362,10 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
     gather(key = "Condition", value = "score_log10p", -(1:2)) %>%
     group_by(.data$CHR, .data$POS) %>%
     filter(!is.na(.data$score_log10p)) %>%
-    mutate(max_score_log10p = max(.data$score_log10p)*n()) %>%
+    mutate(max_score_log10p = max(.data$score_log10p)) %>%
+    add_tally(name = "n_cond_in_top_set") %>%
     slice(which.max(.data$max_score_log10p)) %>%
-    dplyr::select(-.data$Condition, -.data$score_log10p) %>%
+    dplyr::select(-.data$score_log10p) %>%
     arrange(.data$CHR, .data$POS) %>%
     mutate(marker = paste(.data$CHR, .data$POS, sep = "_"),
            CHRN = case_when(.data$CHR == "Chr01K" ~ 1,
@@ -435,7 +438,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
   mash_df_random <- mash_list_1$random_df_1
 
   for(i in seq_along(phe_col)[-1]){
-    if(scale){
+    if(scaled){
       message(paste0("Determining standardized B_hat and S_hat values for ",
                      nrow(top_set), " SNPs in GWAS for ", phenotypes[i]," (",
                      i, " of ", length(phe_col), ")."))
@@ -456,7 +459,7 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
     mash_df_random <- mash_df_random %>%
       dplyr::left_join(mash_list_1$random_df_1, by = c("CHR", "POS"))
   }
-  if(scale == TRUE){
+  if(scaled == TRUE){
     bhat_strong <- mash_df_strong %>%
       unite(col = "SNP", .data$CHR, .data$POS) %>%
       dplyr::select(.data$SNP, tidyselect::starts_with("Stand_Bhat"))

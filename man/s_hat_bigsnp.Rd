@@ -10,7 +10,7 @@ s_hat_bigsnp(
   phenotype,
   top_set,
   random_sample,
-  scale = TRUE,
+  scaled = TRUE,
   markers = NULL,
   markers2 = NULL,
   model = c("linear", "logistic"),
@@ -28,7 +28,7 @@ s_hat_bigsnp(
 
 \item{random_sample}{Numeric vector. Random sample of SNPs}
 
-\item{scale}{Logical. Should effect sizes and std errors be scaled?}
+\item{scaled}{Logical. Should effect sizes and std errors be scaled?}
 
 \item{markers}{Marker names for the GWAS you ran}
 
