@@ -399,11 +399,11 @@ s_hat_bigsnp <- function(path, gwas_rds, phenotype, top_set, random_sample,
                                S = top_set$max_score_log10p,
                                ncores = nb_cores(), infos.pos = top_set$POS)
     # Outputs a numeric vector corresponding to clumped rows w/ the best p-value
-    top_set <- top_set[top_clumps,] %>%
-      dplyr::select(.data$CHR, .data$POS, .data$max_score_log10p)
+    top_set <- top_set[top_clumps,] #%>%
+      #dplyr::select(.data$CHR, .data$POS, .data$max_score_log10p)
   } else {
-    top_set <- top_set %>%
-      dplyr::select(.data$CHR, .data$POS, .data$max_score_log10p)
+    top_set <- top_set #%>%
+      #dplyr::select(.data$CHR, .data$POS, .data$max_score_log10p)
   }
   if(saveoutput == TRUE){
     if(!(str_sub(suffix, end = 1) %in% c("", "_")))

@@ -18,26 +18,27 @@
 load_mash_df <- function(path, numSNPs, suffix){
   if(!(str_sub(suffix, end = 1) %in% c("", "_")))
   { suffix <- paste0("_", suffix) }
-  top_set <- readRDS(file.path(path, paste0("Part-One-Output_Top-Effects-",
-                                            numSNPs, "-SNPs", suffix, ".rds")))
+  top_set <- readRDS(file.path(path, paste0("Part-One-Output_",
+                                            "Top-Effects-", numSNPs,
+                                            "-SNPs", suffix, ".rds")))
   B_hat_random <- readRDS(file.path(path, paste0("B_hat_random_df_",
-                                                 numSNPs, "topSNPs", suffix,
-                                                 ".rds")))
+                                                 numSNPs, "topSNPs",
+                                                 suffix, ".rds")))
   S_hat_random <- readRDS(file.path(path, paste0("S_hat_random_df_",
-                                                 numSNPs, "topSNPs", suffix,
-                                                 ".rds")))
+                                                 numSNPs, "topSNPs",
+                                                 suffix, ".rds")))
   B_hat_strong <- readRDS(file.path(path, paste0("B_hat_strong_df_",
-                                                 numSNPs, "topSNPs", suffix,
-                                                 ".rds")))
+                                                 numSNPs, "topSNPs",
+                                                 suffix, ".rds")))
   S_hat_strong <- readRDS(file.path(path, paste0("S_hat_strong_df_",
-                                                 numSNPs, "topSNPs", suffix,
-                                                 ".rds")))
+                                                 numSNPs, "topSNPs",
+                                                 suffix, ".rds")))
   return(list(top_set = top_set, B_hat_strong = B_hat_strong,
               S_hat_strong = S_hat_strong, B_hat_random = B_hat_random,
               S_hat_random = S_hat_random))
 }
 
-make_U_ed <- function(path, data_strong, numSNPs, suffix, saveoutput = FALSE){
+make_U_ed <- function(path, data_strong, numSNPs, saveoutput = FALSE, suffix){
   requireNamespace("mashr")
   if(ncol(data_strong$Bhat < 6)){
     U_pca = mashr::cov_pca(data_strong, (ncol(data_strong$Bhat)-1))
@@ -59,52 +60,53 @@ get_loglik=function(a){a$loglik}
 
 #' A standard run of mashr
 #'
-#' @description If you have prepared mash input using the function
-#'     \code{\link{pvdiv_bigsnp2mashr}}, use this function on the output to
-#'     run mash as recommended by vignettes in the mashr package.
+#' @description If you have prepared mash input using the bigsnp2mashr function
+#'     or the gapit2mashr R package, use this function on the output to run mash
+#'     as recommended by vignettes in the mashr package.
 #'
-#' @param path File path to the rds files saved from bigsnpr, a character
-#'     string. Defaults to the working directory.
+#' @param path File path to the rds files saved from gapit2mashr, or
+#'     bigsnpr2mashr, as a character string. Defaults to the working directory.
 #' @param list_input A list containing five data frames: the SNPs selected, the
 #'     B_hat and S_hat matrices for the strong SNP set and for a random SNP set
-#'     that is twice the size.
+#'     chosen in gapit2mashr.
 #' @param numSNPs The number of most significant SNPs selected from each GWAS.
 #'     Ideally this will give 1 million or fewer total cells in the resultant
 #'     mash dataframes. Defaults to 1000.
-#' @param saveoutput Logical. Should the function's output also be saved to RDS
-#' files? Default is FALSE.
 #' @param suffix Character. Optional. Should be the unique suffix used to
 #'     save \code{cdbn_bigsnp2mashr} output as RDS files, if it was used.
+#' @param saveoutput Logical. Should the function's output also be saved to RDS
+#' files? Default is FALSE.
 #' @param U_ed An optional list of data-driven covariance matrices, or a
 #'     character vector containing the complete path to a .rds containing these
 #'     matrices.
 #' @param U_hyp An optional list of covariance matrices specified by the user.
-#' @param ref the reference group. A number between 1 & R, where R is the number
-#'     of conditions, or the name of the reference group, or if there is no
-#'     reference group, it can be the string 'mean'. Default is 'mean'.
 #'
 #' @return A mash result, manipulable using functions in mashr and by mash_plot
-#'     functions in the switchgrassGWAS package.
+#'     functions in the CDBNgenomics package.
+#'
+#' @note This is a convenience function for users who have prepared their data
+#'     using gapit2mashr or bigsnp2mashr. If you have not used these functions
+#'     to make your mash input, you should not use this function - instead,
+#'     follow the recommendations of the vignettes in the mashr package itself.
 #'
 #' @importFrom ashr get_fitted_g
 #'
 #' @export
-mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
-                              saveoutput = FALSE, suffix = "", U_ed = NA,
-                              U_hyp = NA, ref = "mean"){
+mash_standard_run <- function(path = ".", list_input = NA, numSNPs = NA,
+                              suffix = "", saveoutput = FALSE, U_ed = NA,
+                              U_hyp = NA){
   requireNamespace("mashr")
   if(!(str_sub(suffix, end = 1) %in% c("", "_")))
   { suffix <- paste0("_", suffix) }
   if(!(typeof(list_input) %in% c("list", "logical"))){
     stop("list_input needs to be a list object with at least four matrices:
     B_hat_strong, S_hat_strong, B_hat_random, S_hat_random. Make this using gapit2mashr or bigsnpr2mashr.")
-  } else if(!is.na(list_input[1])){
+  } else if (!is.na(list_input[1])){
     list_input <- list_input
     numSNPs <- nrow(list_input$B_hat_strong)
   } else if (is.na(list_input[1]) & !is.na(numSNPs)){
-    list_input <- load_mash_df(path = path, numSNPs = numSNPs,
-                               suffix = suffix)
-  } else stop("One of either 1) a bigsnpr2mashr//gapit2mashr output as 'list_input', or 2) 'numSNPs' and 'suffix', the number of SNPs used in gapit2mashr//bigsnp2mashr and an optional suffix used in bigsnp2mashr, need to be specified to load the data frames needed for mash.")
+    list_input <- load_mash_df(path = path, numSNPs = numSNPs, suffix = suffix)
+  } else stop("A bigsnpr2mashr//gapit2mashr output as 'list_input', or 'numSNPs' and 'suffix', the number of SNPs used in gapit2mashr//bigsnp2mashr and an optional suffix used in bigsnp2mashr, need to be specified to load the data frames needed for mash.")
 
   Bhat_strong <- as.matrix(list_input$B_hat_strong)
   Shat_strong <- as.matrix(list_input$S_hat_strong)
@@ -124,15 +126,8 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
 
   message(paste0("Setting up the main data objects with this correlation ",
                  "structure in place."))
-  if(is.na(ref[1])){
-    data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
-    data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
-  } else {
-    data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
-    data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
-    data_strong <- mashr::mash_update_data(data_strong, ref = ref)
-    data_random <- mashr::mash_update_data(data_random, ref = ref)
-  }
+  data_strong <- mashr::mash_set_data(Bhat_strong, Shat_strong, V=Vhat)
+  data_random <- mashr::mash_set_data(Bhat_random, Shat_random, V=Vhat)
   U_c <- mashr::cov_canonical(data_random)
   if(typeof(U_ed) == "logical" & is.na(U_ed[1])){
     # estimate data-driven covariance using strong dataset
@@ -165,9 +160,9 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
                  " using the mash fit from the
                  random tests."))
   m2 = mashr::mash(data_strong, g = get_fitted_g(m), fixg = TRUE)
-
   if(saveoutput == TRUE){
-    saveRDS(m2, file.path(path, paste0("Strong_Effects", numSNPs, "SNPs", suffix, ".rds")))
+    saveRDS(m2, file.path(path, paste0("Strong_Effects", numSNPs, "SNPs",
+                                       suffix, ".rds")))
   }
   print("Log likelihood with specified covariance matrices: ")
   print(get_loglik(m2), digits = 10)
@@ -184,9 +179,6 @@ mash_standard_run <- function(path, list_input = NA, numSNPs = NA,
   }
   return(m2)
 }
-
-
-
 
 
 

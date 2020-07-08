@@ -93,3 +93,18 @@ NULL
 #' @usage data(anno_info)
 #' @format A data frame with 80278 rows and 16 variables.
 NULL
+
+#' Oeco ggplot theme
+#'
+#' A list containing the oeco ggplot2 theme for use in cdbn_standard_gwas and
+#'     mash_plot_ ... functions.
+#'
+#' @name theme_oeco
+#' @docType data
+#' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
+#' @references \url{data_blah.com}
+#' @keywords data
+#' @usage data(theme_oeco)
+#' @format A list containing ggplot2 specifications
+NULL
+

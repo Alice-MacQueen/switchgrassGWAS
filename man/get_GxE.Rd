@@ -2,9 +2,9 @@
 % Please edit documentation in R/pvdiv_mash_results.R
 \name{get_GxE}
 \alias{get_GxE}
-\title{Get dataframes of types of GxE from mash}
+\title{Get data frames of types of GxE from a mash object}
 \usage{
-get_GxE(m, factor = 0.4, thresh = 0.05, window_bp = 20000)
+get_GxE(m, factor = 0.4, thresh = 0.05)
 }
 \arguments{
 \item{m}{An object of type mash}
@@ -13,10 +13,27 @@ get_GxE(m, factor = 0.4, thresh = 0.05, window_bp = 20000)
 considered to be shared.}
 
 \item{thresh}{Numeric. The threshold for including an effect in the assessment}
-
-\item{window_bp}{The window size, in base pairs, to thin to one marker
-within.}
+}
+\value{
+A list containing eight data frames. Those with names that start
+"S_" contain significant effects of different types between pairs of
+named rows and columns. S_all_pairwise contains all significant effects;
+NS_pairwise contains all non-significant effects. S_CN contains effects
+significant in only one condition, and effects with a significantly
+different magnitude (differential sensitivity). This dataframe is not
+conservative using the local false sign rate test - we can't determine
+the sign of one of the effects for effects significant in only one
+condition - so it's not recommended to use this, but included. S_2_no
+contains effects significant in both conditions that do not differ
+significantly in magnitude. These effects do not have GxE. S_AP contains
+effects significant in both conditions that differ in their sign - and
+have antagonistic pleiotropy. S_DS contains effects significant in both
+conditions that differ in the magnitude of their effect, but not their
+sign - differentially sensitive alleles. S_1_row and S_1_col contain
+effects that are significant in just one of the two conditions - the row
+or the column, respectively.
 }
 \description{
-Get dataframes of types of GxE from mash
+Performs set operations to determine pairwise GxE for effects
+from a mash object.
 }

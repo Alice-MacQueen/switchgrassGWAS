@@ -138,6 +138,11 @@ get_colnames <- function(m){
   return(column_names)
 }
 
+get_Ulist <- function(m){
+  Ulist <- m$fitted_g$Ulist
+  return(Ulist)
+}
+
 #' Count number of conditions each effect is significant in
 #'
 #' @param m the mash result (from joint or 1by1 analysis)
@@ -200,85 +205,64 @@ get_pairwise_sharing = function(m, factor=0.5, lfsr_thresh=0.05, FUN= identity){
   return(S)
 }
 
-
-#' @title Thin significant markers using names of the markers
+#' From a mash result, get effects that are significant in at least one condition
 #'
-#' @param m An object of type mash
-#' @param markers A vector of marker names also found in the mash object.
-#' @param window_bp Numeric. The window size in base pairs, within which to
-#'     keep one significant SNP.
-#' @param thresh What is the threshold to call an effect significant? Default is
-#'     0.05.
+#' @param m the mash result (from joint or 1by1 analysis)
+#' @param thresh indicates the threshold below which to call signals significant
+#' @param conditions which conditions to include in check (default to all)
+#' @param sig_fn the significance function used to extract significance from mash object; eg could be ashr::get_lfsr or ashr::get_lfdr. (Small values must indicate significant.)
 #'
-#' @return A tbl_df of Marker, Chr, Pos, and the minimum local false sign rate
-#'     (combined across all conditions for plotting purposes using the
-#'     Bonferroni method, aka, multiplying the minimum p-value by the number
-#'     of conditions).
+#' @return a vector containing the indices of the significant effects, by order of most significant to least
 #'
-#' @importFrom dplyr left_join rename mutate select arrange filter group_by slice lead lag ungroup case_when
-#' @importFrom tibble as_tibble enframe rownames_to_column
-#' @importFrom tidyr separate
+#' @importFrom ashr get_lfsr
 #'
 #' @export
-mash_thin_named_markers <- function(m, markers, window_bp = 20000,
-                                    thresh = 0.05){
-
-  thresh <- as.numeric(thresh)
-  window_bp <- as.integer(window_bp)
-
-  dftothin <- enframe(markers, name = NULL) %>%
-    rename(Marker = .data$value) %>%
-    separate(.data$Marker, into = c("Chr", "Pos"), remove = FALSE, sep = "_",
-             extra = "merge") %>%
-    mutate(Pos = as.numeric(.data$Pos))
-
-  log10bf_df <- get_log10bf(m = m) %>%
-    as.data.frame() %>%
-    rownames_to_column(var = "value") %>%
-    mutate(value = as.integer(.data$value)) %>%
-    as_tibble() %>%
-    left_join(get_marker_df(m = m)) %>%
-    rename(log10BayesFactor = .data$V1) %>%
-    dplyr::select(-.data$value)
-
-  minBFinbin <- dftothin %>%
-    left_join(log10bf_df, by = "Marker") %>%
-    arrange(.data$Chr,.data$ Pos) %>%
-    #gather(key = "Condition", value = "lfsr", -(1:3)) %>%
-    #group_by(Marker) %>%
-    #filter(lfsr != 0) %>%
-    mutate(Posbin = ceiling(.data$Pos / window_bp)) %>%
-    filter(.data$log10BayesFactor < thresh) %>%
-    group_by(.data$Chr, .data$Posbin) %>%
-    slice(which.max(.data$log10BayesFactor)) %>%
-    ungroup() %>%
-    mutate(Poslag = abs(lead(.data$Pos) - .data$Pos),
-           bestBF = case_when(
-             .data$Poslag < window_bp & .data$log10BayesFactor >= lead(.data$log10BayesFactor) ~ "keep1",
-             lag(.data$Poslag) < window_bp & .data$log10BayesFactor >= lag(.data$log10BayesFactor) ~ "keep2",
-             .data$Poslag > window_bp & (lag(.data$Poslag) > window_bp | is.na(lag(.data$Poslag))) ~ "keep3"
-           )
-    ) %>%
-    filter(!is.na(.data$bestBF)) %>%
-    dplyr::select(-.data$Posbin, -.data$Poslag, -.data$bestBF)
-
-  return(minBFinbin)
+get_significant_results = function(m, thresh = 0.05, conditions = NULL,
+                                   sig_fn = ashr::get_lfsr) {
+  if (is.null(conditions)) {
+    conditions = 1:get_ncond(m)
+  }
+  top = apply(sig_fn(m)[,conditions,drop=FALSE],1,min) # find top effect in each condition
+  sig = which(top < thresh)
+  ord = order(top[sig],decreasing=FALSE)
+  sig[ord]
 }
 
-
-#' @title Get dataframes of types of GxE from mash
+#' @title Get data frames of types of GxE from a mash object
+#'
+#' @description Performs set operations to determine pairwise GxE for effects
+#'     from a mash object.
 #'
 #' @param m An object of type mash
 #' @param thresh Numeric. The threshold for including an effect in the assessment
 #' @param factor a number between 0 and 1. The factor within which effects are
 #'     considered to be shared.
-#' @param window_bp The window size, in base pairs, to thin to one marker
-#'     within.
 #'
-#' @importFrom dplyr between setdiff
+#' @return A list containing eight data frames. Those with names that start
+#'     "S_" contain significant effects of different types between pairs of
+#'     named rows and columns. S_all_pairwise contains all significant effects;
+#'     NS_pairwise contains all non-significant effects. S_CN contains effects
+#'     significant in only one condition, and effects with a significantly
+#'     different magnitude (differential sensitivity). This dataframe is not
+#'     conservative using the local false sign rate test - we can't determine
+#'     the sign of one of the effects for effects significant in only one
+#'     condition - so it's not recommended to use this, but included. S_2_no
+#'     contains effects significant in both conditions that do not differ
+#'     significantly in magnitude. These effects do not have GxE. S_AP contains
+#'     effects significant in both conditions that differ in their sign - and
+#'     have antagonistic pleiotropy. S_DS contains effects significant in both
+#'     conditions that differ in the magnitude of their effect, but not their
+#'     sign - differentially sensitive alleles. S_1_row and S_1_col contain
+#'     effects that are significant in just one of the two conditions - the row
+#'     or the column, respectively.
+#'
+#' @importFrom dplyr between mutate filter
+#' @importFrom tibble enframe
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #'
 #' @export
-get_GxE = function(m, factor = 0.4, thresh = 0.05, window_bp = 20000){
+get_GxE = function(m, factor = 0.4, thresh = 0.05){
   R = get_ncond(m)                          # Effects to consider
 
   S_all = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
@@ -291,6 +275,12 @@ get_GxE = function(m, factor = 0.4, thresh = 0.05, window_bp = 20000){
                                                         get_colnames(m)))
   S_DS = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
                                                         get_colnames(m)))
+  NS_pair = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                           get_colnames(m)))
+  S_i = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                       get_colnames(m)))
+  S_j = matrix(NA, nrow = R, ncol = R, dimnames = list(get_colnames(m),
+                                                       get_colnames(m)))
 
   for(i in 1:R){
     for(j in 1:R){
@@ -304,6 +294,14 @@ get_GxE = function(m, factor = 0.4, thresh = 0.05, window_bp = 20000){
                                                       conditions = i))
         S_AP[i, j] = 0
         S_DS[i, j] = 0
+
+        sig_i = get_significant_results(m, thresh = thresh, conditions = i)
+        all_i = get_significant_results(m, thresh = 1, conditions = i)
+        ns_i = dplyr::setdiff(all_i, sig_i)   # effects that aren't sig in i
+        NS_pair[i, j] = length(ns_i)
+        S_i[i, j] = 0
+        S_j[i, j] = 0
+
       } else {
 
         sig_i = get_significant_results(m, thresh = thresh, conditions = i)
@@ -312,66 +310,77 @@ get_GxE = function(m, factor = 0.4, thresh = 0.05, window_bp = 20000){
         all_i = get_significant_results(m, thresh = 1, conditions = i)
         all_j = get_significant_results(m, thresh = 1, conditions = j)
 
-        ns_i = dplyr::setdiff(all_i, sig_i)   # effects that aren't sig in i
-        ns_j = dplyr::setdiff(all_j, sig_j)   # effects that aren't sig in j
+        ns_i = setdiff(all_i, sig_i)   # effects that aren't sig in i
+        ns_j = setdiff(all_j, sig_j)   # effects that aren't sig in j
 
         # Markers where we aren't sure of the sign in either condition
         # aka most of the effects
-        nogxe_ns = length(intersect(ns_i, ns_j))
+        NS_pair[i,j] <- length(intersect(ns_i, ns_j))
 
         # Markers where we are sure of the sign in just one condition
 
         # Markers significant in i but not in j
-        ms_isigi =
-          mash_thin_named_markers(m = m, thresh = 1, window_bp = window_bp,
-                                  markers = sort(names(
-                                    get_pm(m)[intersect(sig_i, ns_j), i])))
+        ms_isigi = intersect(sig_i, ns_j)
 
         # Markers significant in j but not in i
-        ms_jsigj =
-          mash_thin_named_markers(m = m, thresh = 1, window_bp = window_bp,
-                                  markers = sort(names(
-                                    get_pm(m)[intersect(sig_j, ns_i), j])))
+        ms_jsigj = intersect(sig_j, ns_i)
 
         # Markers where we are sure of the sign in both conditions
-        effi = get_pm(m)[union(sig_i, sig_j), i]
-        effj = get_pm(m)[union(sig_i, sig_j), j]
-        ratio = effi/effj     ##divide effect sizes, if this ratio is positive there is not AP
-        APratio = effi/-effj  ##divide effect sizes, if this ratio is positive there is AP
+        effects_df <- get_pm(m)[union(sig_i, sig_j), i] %>%
+          enframe(name = "Marker", value = "Effect_i") %>%
+          mutate(Effect_j = get_pm(m)[union(sig_i, sig_j), j],
+                 ratio = .data$Effect_i/.data$Effect_j,  ##divide effect sizes, if this ratio is positive there is not AP
+                 APratio = .data$Effect_i/-.data$Effect_j)  ##divide effect sizes, if this ratio is positive there is AP
 
         ## GxE: we are sure of the sign for two effects, and they are the same sign
         # No GxE in this pair - effects are same sign and same mag
-        ms_sig2_noGxE =
-          mash_thin_named_markers(m = m, thresh = 1, window_bp = window_bp,
-                                  markers = sort(names(
-                                    effi[between(ratio, factor, 1/factor)])))
+        ms_sig2_noGxE <- effects_df %>%
+          filter(between(.data$ratio, factor, 1/factor))
 
         # DS: we are sure of the sign for two effects, and they are the same sign
-        ms_sig2_DS =
-          mash_thin_named_markers(m = m, thresh = 1, window_bp = window_bp,
-                                  markers = sort(names(effi[ratio > 0 &                                                          !(between(ratio, factor, 1/factor))])))
+        ms_sig2_DS <- effects_df %>%
+          filter(.data$ratio > 0 & !between(.data$ratio, factor, 1/factor))
 
         ## GxE we are sure of the sign for two effects, and they are opposite
         # AP: we are sure of the sign for two effects, and they are opposite
-        ms_sig2_AP =
-          mash_thin_named_markers(m = m, thresh = 1, window_bp = window_bp,
-                                  markers = sort(names(
-                                    effi[between(APratio, 0, 1E10)]))) # diff sign diff mag
+        ms_sig2_AP <- effects_df %>%
+          filter(between(.data$APratio, 0, 1E10))
 
-        S_all[i, j] = sum(nrow(ms_isigi), nrow(ms_jsigj), nrow(ms_sig2_noGxE),
+        S_all[i, j] = sum(length(ms_isigi), length(ms_jsigj), nrow(ms_sig2_noGxE),
                           nrow(ms_sig2_DS), nrow(ms_sig2_AP))
-        S_CN[i, j] = sum(nrow(ms_isigi), nrow(ms_jsigj), nrow(ms_sig2_DS))
+        S_CN[i, j] = sum(length(ms_isigi), length(ms_jsigj), nrow(ms_sig2_DS))
         # Not conservative!!
         S_2_no[i, j] = sum(nrow(ms_sig2_noGxE))
         S_AP[i, j] = sum(nrow(ms_sig2_AP))
         S_DS[i, j] = sum(nrow(ms_sig2_DS))
+        S_i[i, j] = length(ms_isigi)
+        S_j[i, j] = length(ms_jsigj)
       }
     }
   }
-  return(list(S_all = S_all, S_CN = S_CN, S_2_no = S_2_no, S_AP = S_AP,
-              S_DS = S_DS))
+  return(list(S_all_pairwise = S_all, S_CN = S_CN, S_2_no = S_2_no, S_AP = S_AP,
+              S_DS = S_DS, NS_pairwise = NS_pair, S_1_row = S_i,
+              S_1_col = S_j))
 }
 
+#' @title Get the positions of objects in a mash object Ulist that are above
+#'      some mass threshold.
+#'
+#' @description Get the positions of objects in a mash object Ulist that are
+#'      above some mass threshold.
+#'
+#' @param m An object of type mash
+#' @param thresh Numeric. The mass threshold for including a covariance matrix
+#'
+#' @export
+get_U_by_mass <- function(m, thresh = 0.05){
+  umass <- mash_plot_covar(m, saveoutput = FALSE)
+  mass_thresh <-
+    umass$covar_df$`Covariance Matrix`[which(umass$covar_df$Mass >= thresh)]
+  Ulist_order <- names(get_Ulist(m))
+  range <- which(Ulist_order %in% mass_thresh)
+  return(range)
+}
 
 
 #' @title Reorder correlation matrix
@@ -394,79 +403,247 @@ reorder_cormat <- function(cormat){
 
 # --- Plot & Save Plots ---------
 
-#' @title Significant SNPs per number of conditions
+#' ggplot of single mash effect
 #'
-#' @description For some number of columns in a mash object that correspond to
-#'     conditions, find the number of SNPs that are significant for that number
-#'     of conditions.
+#' @description Creates a plot with point estimates and standard errors for
+#'     effects of a single SNP in multiple conditions.
 #'
 #' @param m An object of type mash
-#' @param conditions A vector of conditions
-#' @param saveoutput Logical. Save plot output to a file? Default is FALSE.
-#' @param thresh What is the threshold to call an effect significant? Default is
-#'     0.05.
+#' @param n Optional. Integer or integer vector. The result number to plot, in
+#'     order of significance. 1 would be the top result, for example. Find
+#'     these with \code{\link{get_significant_results}}.
+#' @param i Optional. Integer or integer vector. The result number to plot, in
+#'     the order of the mash object. 1 would be the first marker in the mash
+#'     object, for example. Find these with \code{\link{get_marker_df}}.
+#' @param marker Optional. Print the marker name on the plot?
+#' @param saveoutput Logical. Should the output be saved to the path?
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
 #'
-#' @return A list containing a dataframe of the number of SNPs significant per
-#'     number of conditions, and a ggplot object using that dataframe.
+#' @note Specify only one of n or i.
 #'
-#' @import ggplot2
+#' @importFrom ashr get_psd
+#' @importFrom cowplot save_plot
 #' @importFrom tibble enframe
-#' @importFrom dplyr rename summarise filter group_by n
-#'
-#' @examples
-#'   \dontrun{mash_plot_sig_by_condition(m = mash_obj, saveoutput = TRUE)}
+#' @importFrom dplyr mutate case_when
+#' @importFrom tidyr separate
+#' @import ggplot2
+#' @importFrom purrr as_vector
+#' @importFrom stringr str_replace str_replace_all
 #'
 #' @export
-mash_plot_sig_by_condition <- function(m, conditions = NA, saveoutput = FALSE,
-                                       thresh = 0.05){
+mash_plot_effects <- function(m, n = NA, i = NA, marker = TRUE,
+                              saveoutput = FALSE, suffix = ""){
+  stopifnot((typeof(n) %in% c("double", "integer") | typeof(i) %in% c("double", "integer")))
 
-  thresh <- as.numeric(thresh)
-  num_sig_in_cond <- c()
-
-  if(is.na(conditions)[1]){
-    cond <- get_colnames(m = m)
+  if(typeof(n) != "logical"){
+    i <- get_significant_results(m)[n]
+    marker_df <- names(i) %>%
+      enframe(name = NULL, value = "Marker") %>%
+      separate(.data$Marker, into = c("Chr", "Pos"), sep = "_", convert = TRUE) %>%
+      mutate(Mb = round(.data$Pos / 1000000, digits = 1)) %>%
+      mutate(Marker = case_when(typeof(.data$Chr) == "integer" &
+                                  .data$Chr < 10 ~
+                                  paste0("Chr0", .data$Chr, " ",
+                                         .data$Mb, " Mb"),
+                                typeof(.data$Chr) == "integer" &
+                                  .data$Chr >= 10 ~
+                                  paste0("Chr", .data$Chr, " ",
+                                         .data$Mb, " Mb"),
+                                TRUE ~ paste0(Chr, " ", .data$Mb, " Mb")
+      ))
+    marker_name <- marker_df$Marker
+  } else {
+    marker_df <- get_marker_df(m)[i,] %>%
+      separate(.data$Marker, into = c("Chr", "Pos"), sep = "_",
+               convert = TRUE) %>%
+      mutate(Mb = round(.data$Pos / 1000000, digits = 1)) %>%
+      mutate(Marker = case_when(typeof(.data$Chr) == "integer"
+                                & .data$Chr < 10 ~
+                                  paste0("Chr0", .data$Chr, " ", Mb, " Mb"),
+                                typeof(.data$Chr) == "integer" &
+                                  .data$Chr >= 10 ~
+                                  paste0("Chr", .data$Chr, " ", .data$Mb,
+                                         " Mb"),
+                                TRUE ~ paste0(.data$Chr, " ", .data$Mb, " Mb")
+      ))
+    marker_name <- marker_df$Marker
   }
+  effectplot <- get_colnames(m) %>%
+    enframe(name = NULL, value = "Conditions") %>%
+    mutate(mn = get_pm(m)[i,],
+           se = get_psd(m)[i,]) %>%
+    mutate(Conditions = str_replace(.data$Conditions,
+                                    "(Stand_)??Bhat_?",
+                                    ""),
+           Conditions = str_replace(.data$Conditions, "-mean$", "")
+    )
 
-  SigHist <- get_n_significant_conditions(m = m, thresh = thresh,
-                                          conditions = cond) %>%
-    enframe(name = "Marker") %>%
-    rename(Number_of_Conditions = .data$value) %>%
-    group_by(.data$Number_of_Conditions) %>%
-    summarise(Significant_SNPs = n()) %>%
-    filter(.data$Number_of_Conditions != 0)
-
-  theme_oeco <- theme_classic() +
-    theme(axis.title = element_text(size = 10),
-          axis.text = element_text(size = 10),
-          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
-          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
-          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
-          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
-          legend.key.size = unit(0.35, 'cm'),
-          legend.title = element_blank(),
-          legend.text = element_text(size = 9),
-          legend.text.align = 0, legend.background = element_blank(),
-          plot.subtitle = element_text(size = 10, vjust = 0),
-          strip.background = element_blank(),
-          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
-          strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
-
-  vis <- ggplot(SigHist, aes(x = .data$Number_of_Conditions, y = .data$Significant_SNPs)) +
-    geom_line() +
-    geom_point() +
+  ggobject <- ggplot(data = effectplot) +
+    geom_point(mapping = aes(x = as.factor(.data$Conditions), y = .data$mn)) +
+    switchgrassGWAS::theme_oeco +
+    geom_errorbar(mapping = aes(ymin = .data$mn - .data$se,
+                                ymax = .data$mn + .data$se,
+                                x = .data$Conditions), width = 0.3) +
     geom_hline(yintercept = 0, lty = 2) +
-    xlab(label = "Number of Conditions") +
-    ylab(label = "Number of Significant SNPs")
-
-  if(saveoutput == TRUE){
-    ggsave(paste0("SNPs with significant effects in n conditions ",
-                  str_replace_all(Sys.time(), ":", "."),
-                  ".bmp"), width = 5, height = 3, units = "in", dpi = 400)
+    labs(x = "Conditions", y = "Effect Size") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  if(marker == TRUE){
+    ggobject <- ggobject + ggtitle(label = marker_name)
   }
-
-  return(list(sighist = SigHist, ggobject = vis))
+  if(saveoutput == TRUE){
+    if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
+      suffix <- paste0("_", suffix)
+    }
+    if(str_sub(suffix, end = 1) %in% c("")){
+      suffix <- paste0("_", get_date_filename())
+    }
+    save_plot(filename = paste0("Effect_plot_", str_replace_all(marker_name,
+                                                                " ", "_"),
+                                suffix, ".png"),
+              plot = ggobject, base_aspect_ratio = 0.9, base_height = 3.5)
+  }
+  return(list(marker = marker_name, effect_df = effectplot,
+              ggobject = ggobject))
 }
 
+#' ggplot of covariance matrix masses
+#'
+#' @description Creates a bar plot using ggplot of the masses that are on each
+#'     covariance matrix specified in the mash model.
+#'
+#' @param m An object of type mash
+#' @param saveoutput Logical. Should the output be saved to the path?
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
+#'
+#' @importFrom cowplot save_plot
+#' @importFrom tibble enframe
+#' @importFrom dplyr mutate arrange desc
+#' @importFrom stringr str_replace
+#' @import ggplot2
+#'
+#' @note This plot can be useful for seeing the overall patterns of effects in
+#'     the data used in mash. Non-significant effects will add mass to the
+#'     "no_effects" covariance matrix, while significant effects will add mass
+#'     to one of the other covariance matrices. You can use mash_plot_Ulist()
+#'     to plot the covariance matrix patterns themselves.
+#'
+#' @export
+mash_plot_covar <- function(m, saveoutput = FALSE, suffix = ""){
+  df <- get_estimated_pi(m)
+  df <- enframe(df, name = "Covariance Matrix", value = "Mass") %>%
+    mutate(`Covariance Matrix` = str_replace(.data$`Covariance Matrix`,
+                                             "(Stand_)??Bhat_?",
+                                             "single_effect_"),
+           `Covariance Matrix` = str_replace(.data$`Covariance Matrix`,
+                                             "^null$", "no_effects"))
+    arrange(desc(.data$`Covariance Matrix`))
+  df$`Covariance Matrix` <- factor(df$`Covariance Matrix`,
+                                   levels = (df$`Covariance Matrix`))
+  ggobject <- ggplot(df) +
+    geom_bar(aes(x = .data$Mass, y = .data$`Covariance Matrix`),
+             stat = "identity") +
+    switchgrassGWAS::theme_oeco
+
+  if(saveoutput == TRUE){
+    if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
+      suffix <- paste0("_", suffix)
+    }
+    if(str_sub(suffix, end = 1) %in% c("")){
+      suffix <- paste0("_", get_date_filename())
+    }
+    save_plot(paste0("Covariance_matrix_mass_plot", suffix,
+                     ".png"), plot = ggobject, base_aspect_ratio = 1,
+              base_height = 4)
+  }
+  return(list(covar_df = df, ggobject = ggobject))
+}
+
+#' ggplot of specific covariance matrix patterns
+#'
+#' @description Creates a tile plot using ggplot of the covariance matrices
+#'     specified in the mash model.
+#'
+#' @param m An object of type mash
+#' @param range Numeric vector. Which covariance matrices should be plotted?
+#' @param saveoutput Logical. Should the output be saved to the path?
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
+#'
+#' @return A list of dataframes used to make the tile plots and the plots
+#'     themselves.
+#'
+#' @importFrom cowplot save_plot
+#' @importFrom tibble enframe as_tibble
+#' @importFrom dplyr mutate filter
+#' @importFrom rlist list.append
+#' @importFrom rlang .data
+#' @importFrom stringr str_replace
+#' @importFrom tidyr pivot_longer
+#' @import ggplot2
+#'
+#' @export
+mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
+  Ulist <- get_Ulist(m)
+  Ureturn <- list()
+  stopifnot(typeof(range) %in% c("double", "integer", "logical"))
+  if(typeof(range) == "logical"){
+    range <- seq_along(Ulist)
+  }
+
+  for(u in range){
+    U1 <- Ulist[[u]]
+    # Remove half the tiles if the matrix is symmetric
+    if(isSymmetric(U1)){
+      for(i in 1:nrow(U1)){
+        for(j in 1:ncol(U1)){
+          if(i < j){
+            U1[i, j] <- NA
+          }
+        }
+      }
+    }
+    colnames(U1) <- str_replace(get_colnames(m), "(Stand_)??Bhat_?", "") %>%
+      str_replace(.data, "-mean$", "")
+    U1 <- as_tibble(U1, .name_repair = "unique") %>%
+      mutate(rowU = str_replace(get_colnames(m), "(Stand_)??Bhat_?", "")) %>%
+      str_replace(.data, "-mean$", "") %>%
+      pivot_longer(cols = -.data$rowU, names_to = "colU",
+                   values_to = "covar") %>%
+      filter(!is.na(.data$covar))
+
+    U1_covar <- U1 %>%
+      ggplot(aes(x = .data$rowU, y = .data$colU)) +
+      switchgrassGWAS::theme_oeco +
+      geom_tile(aes(fill = .data$covar), na.rm = TRUE) +
+      scale_fill_gradientn(colors = c("#440154FF", "#3B528BFF", "#2C728EFF",
+                                      "white", "#27AD81FF", "#5DC863FF",
+                                      "#FDE725FF"), limits = c(-1,1)) +
+      geom_text(aes(label = round(.data$covar, 1)), color = "darkgrey") +
+      theme(legend.position = c(0.2, 0.9),
+            axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+      xlab("") + ylab("") + ggtitle(names(Ulist)[u])
+
+    Ureturn <- list.append(Ureturn, U1 = U1,
+                           ggobject = U1_covar)
+    names(Ureturn)[-2] <- paste0(names(Ulist)[u], "_df")
+    names(Ureturn)[-1] <- paste0(names(Ulist)[u], "_ggobject")
+
+    if(saveoutput == TRUE){
+      if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
+        suffix <- paste0("_", suffix)
+      }
+      if(str_sub(suffix, end = 1) %in% c("")){
+        suffix <- paste0("_", get_date_filename())
+      }
+      save_plot(paste0("Covariances_plot_", names(Ulist)[u], suffix, ".png"),
+                plot = U1_covar, base_height = 3.8, base_asp = 1.3)
+    }
+
+  }
+  return(Ureturn)
+}
 
 #' @title Manhattan plot in ggplot colored by significant conditions
 #'
@@ -480,6 +657,8 @@ mash_plot_sig_by_condition <- function(m, conditions = NA, saveoutput = FALSE,
 #' @param cond A vector of phenotypes. Defaults to the names of each
 #'     column in the mash object.
 #' @param saveoutput Logical. Should the output be saved to the path?
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
 #' @param thresh Numeric. The threshold used for the local false sign rate to
 #'     call significance in a condition.
 #'
@@ -492,14 +671,13 @@ mash_plot_sig_by_condition <- function(m, conditions = NA, saveoutput = FALSE,
 #' @importFrom tibble as_tibble rownames_to_column enframe
 #' @importFrom tidyr separate
 #' @import viridis
-#' @importFrom stringr str_replace_all
 #'
 #' @examples
 #' \dontrun{manhattan_out <- mash_ggman_by_condition(m = m, saveoutput = TRUE)}
 #'
 #' @export
-mash_plot_manhattan_by_condition <- function(m, cond = NA,
-                                             saveoutput = FALSE, thresh = 0.05){
+mash_plot_manhattan_by_condition <- function(m, cond = NA, saveoutput = FALSE,
+                                             suffix = "", thresh = 0.05){
   num_sig_in_cond <- c()
 
   if(is.na(cond)[1]){
@@ -511,53 +689,46 @@ mash_plot_manhattan_by_condition <- function(m, cond = NA,
     rownames_to_column(var = "value") %>%
     mutate(value = as.integer(.data$value)) %>%
     as_tibble() %>%
-    left_join(get_marker_df(m = m)) %>%
+    left_join(get_marker_df(m = m), by = "value") %>%
     dplyr::rename(log10BayesFactor = .data$V1) %>%
     dplyr::select(-.data$value)
 
   ggman_df <- get_n_significant_conditions(m = m, thresh = thresh,
                                            conditions = cond) %>%
-    enframe(name = "Marker") %>%
-    rename(Num_Sig_Conditions = .data$value) %>%
+    enframe(name = "Marker", value = "Num_Sig_Conditions") %>%
     separate(.data$Marker, into = c("Chr", "Pos"), remove = FALSE, sep = "_",
-             extra = "merge") %>%
-    mutate(Pos = as.numeric(.data$Pos)) %>%
+             extra = "merge", convert = TRUE) %>%
     left_join(log10bf_df, by = "Marker") %>%
     arrange(.data$Chr, .data$Pos)
 
   log10BF <- expression(paste("log"[10], plain("(Bayes Factor)")))
-  theme_oeco <- theme_classic() +
-    theme(axis.title = element_text(size = 10),
-          axis.text = element_text(size = 10),
-          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
-          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
-          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
-          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
-          legend.key.size = unit(0.35, 'cm'),
-          legend.title = element_blank(),
-          legend.text = element_text(size = 9),
-          legend.text.align = 0, legend.background = element_blank(),
-          plot.subtitle = element_text(size = 10, vjust = 0),
-          strip.background = element_blank(),
-          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
-          strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
 
   ggmanobject <- ggplot(data = ggman_df, aes(x = .data$Pos, y = .data$log10BayesFactor)) +
+    switchgrassGWAS::theme_oeco +
     geom_point(aes(color = .data$Num_Sig_Conditions, fill = .data$Num_Sig_Conditions,
                    shape = as.factor(.data$Chr))) +
     facet_wrap(~ .data$Chr, nrow = 1, scales = "free_x", strip.position = "bottom") +
-    scale_color_viridis(option = "B") + scale_fill_viridis(option = "B") +
-    theme(axis.text.x = element_blank(),
+    scale_color_viridis(option = "B", end = 0.95) + scale_fill_viridis(option = "B", end = 0.95) +
+    theme(strip.text = element_text(size = 8),
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_blank(),
+          legend.text = element_text(size = 8),
           axis.ticks.x = element_blank(),
           panel.background = element_rect(fill=NA)) +
     labs(x = "Chromosome", y = log10BF) +
-    scale_x_continuous(expand = c(0.3, 0.3)) +
+    scale_x_continuous(expand = c(0.32, 0.32)) +
     scale_shape_manual(values = rep(c(21,22),9), guide = FALSE)
 
   if(saveoutput == TRUE){
-    save_plot(paste0("Manhattan_mash_", str_replace_all(Sys.time(), ":", "."),
-                     ".png"), plot = ggmanobject, base_aspect_ratio = 2.5,
-              base_height = 4)
+    if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
+      suffix <- paste0("_", suffix)
+    }
+    if(str_sub(suffix, end = 1) %in% c("")){
+      suffix <- paste0("_", get_date_filename())
+    }
+    save_plot(paste0("Manhattan_mash", suffix,
+                     ".png"), plot = ggmanobject, base_aspect_ratio = 2.8,
+              base_height = 3.3)
   }
 
   return(list(ggman_df = ggman_df, ggmanobject = ggmanobject))
@@ -575,12 +746,16 @@ mash_plot_manhattan_by_condition <- function(m, cond = NA,
 #' @param corrmatrix A correlation matrix
 #' @param reorder Logical. Should the columns be reordered by similarity?
 #' @param saveoutput Logical. Should the output be saved to the path?
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
 #' @param filename Character string with an output filename. Optional.
 #' @param ... Other arguments to \code{\link{get_pairwise_sharing}} or
 #'      \code{\link{ggcorr}}.
 #'
 #' @importFrom GGally ggcorr
 #' @import viridis
+#' @importFrom stringr str_replace_all
+#' @importFrom rlang .data
 #'
 #' @return A list containing a dataframe containing the correlations and a
 #'     ggplot2 object containing the correlation plot.
@@ -588,7 +763,8 @@ mash_plot_manhattan_by_condition <- function(m, cond = NA,
 #' @export
 mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
                                        corrmatrix = NULL, reorder = TRUE,
-                                       saveoutput = FALSE, filename = NA, ...){
+                                       saveoutput = FALSE, filename = NA,
+                                       suffix = "", ...){
   # Additional arguments for get_pairwise_sharing, ggcorr, and save_plot
   requireNamespace("dots")
   factor <- dots::dots(name = 'factor', value = 0.5, ...)
@@ -609,8 +785,13 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
   base_aspect_ratio <- dots::dots(name = 'base_aspect_ratio', value = 1.1, ...)
 
   if(is.na(filename)[1]){
-    filename <- paste0("Mash_pairwise_shared_effects_",
-                       str_replace_all(Sys.time(), ":", "."), ".png")
+    if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
+      suffix <- paste0("_", suffix)
+    }
+    if(str_sub(suffix, end = 1) %in% c("")){
+      suffix <- paste0("_", get_date_filename())
+    }
+    filename <- paste0("Mash_pairwise_shared_effects", suffix, ".png")
   }
 
   # look for a shared effects matrix in the path, and if not, generate one
@@ -621,6 +802,12 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
   } else if(!is.null(m)){
     shared_effects <- get_pairwise_sharing(m = m, factor = factor,
                                            lfsr_thresh = lfsr_thresh, FUN = FUN)
+    rownames(shared_effects) <- str_replace_all(rownames(shared_effects),
+                                                "(Stand_)??Bhat_?", "") %>%
+      str_replace(.data, "-mean$", "")
+    colnames(shared_effects) <- str_replace_all(colnames(shared_effects),
+                                                "(Stand_)??Bhat_?", "") %>%
+      str_replace(.data, "-mean$", "")
   } else {
     stop(paste0("Please specify one of these: ",
                 "1. a mash output object (m), ",
@@ -656,81 +843,69 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
   return(list(corr_matrix = shared_effects, gg_corr = corrplot))
 }
 
-#' ggplot of single mash effect
+#' @title Significant SNPs per number of conditions
 #'
-#' @description Creates a plot with point estimates and standard errors for
-#'     effects of a single SNP in multiple conditions.
+#' @description For some number of columns in a mash object that correspond to
+#'     conditions, find the number of SNPs that are significant for that number
+#'     of conditions.
 #'
 #' @param m An object of type mash
-#' @param n Optional. Integer or integer vector. The result number to plot, in
-#'     order of significance. 1 would be the top result, for example. Find
-#'     these with \code{\link{get_significant_results}}.
-#' @param i Optional. Integer or integer vector. The result number to plot, in
-#'     the order of the mash object. 1 would be the first marker in the mash
-#'     object, for example. Find these with \code{\link{get_marker_df}}.
-#' @param saveoutput Logical. Should the output be saved to the path?
+#' @param conditions A vector of conditions. Get these with get_colnames(m).
+#' @param saveoutput Logical. Save plot output to a file? Default is FALSE.
+#' @param thresh What is the threshold to call an effect significant? Default
+#'     is 0.05.
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
 #'
-#' @note Specify only one of n or i.
+#' @return A list containing a dataframe of the number of SNPs significant per
+#'     number of conditions, and a ggplot object using that dataframe.
 #'
-#' @importFrom ashr get_psd get_pm
-#' @importFrom cowplot save_plot
-#' @importFrom tibble enframe
-#' @importFrom dplyr mutate
 #' @import ggplot2
-#' @importFrom purrr as_vector
+#' @importFrom tibble enframe
+#' @importFrom dplyr rename summarise filter group_by n
+#'
+#' @examples
+#'   \dontrun{mash_plot_sig_by_condition(m = mash_obj, saveoutput = TRUE)}
 #'
 #' @export
-mash_plot_effects <- function(m, n = NULL, i = NULL, saveoutput = FALSE){
-  if(is.null(n) & is.null(i)){
-    stop(paste0("Need to specify one of n, the nth most signficant result, or ",
-                "i, the row of the mash object to plot."))
-  }
-  if(is.null(i)){
-  i <- get_significant_results(m)[n]
+mash_plot_sig_by_condition <- function(m, conditions = NA, saveoutput = FALSE,
+                                       suffix = "", thresh = 0.05){
+
+  thresh <- as.numeric(thresh)
+  num_sig_in_cond <- c()
+
+  if(typeof(conditions) == "logical"){
+    cond <- get_colnames(m)
+  } else {
+    cond <- conditions
   }
 
-  effectplot <- get_colnames(m) %>%
-    enframe(name = NULL, value = "Conditions") %>%
-    mutate(Conditions = str_sub(.data$Conditions, start = 6),
-           mn = get_pm(m)[i,],
-           se = get_psd(m)[i,])
-  theme_oeco <- theme_classic() +
-    theme(axis.title = element_text(size = 10),
-          axis.text = element_text(size = 10),
-          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
-          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
-          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
-          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
-          legend.key.size = unit(0.35, 'cm'),
-          legend.title = element_blank(),
-          legend.text = element_text(size = 9),
-          legend.text.align = 0, legend.background = element_blank(),
-          plot.subtitle = element_text(size = 10, vjust = 0),
-          strip.background = element_blank(),
-          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
-          strip.placement = 'outside', panel.spacing.x = unit(-0.5, 'cm'))
+  SigHist <- get_n_significant_conditions(m = m, thresh = thresh,
+                                          conditions = cond) %>%
+    enframe(name = "Marker") %>%
+    rename(Number_of_Conditions = .data$value) %>%
+    group_by(.data$Number_of_Conditions) %>%
+    summarise(Significant_SNPs = n()) %>%
+    filter(.data$Number_of_Conditions != 0)
 
-  ggobject <- ggplot(data = effectplot) +
-    geom_point(mapping = aes(x = as.factor(.data$Conditions), y = .data$mn)) +
-    geom_errorbar(mapping = aes(ymin = .data$mn - .data$se,
-                                ymax = .data$mn + .data$se,
-                                x = .data$Conditions), width = 0.3) +
+  vis <- ggplot(SigHist, aes(x = .data$Number_of_Conditions, y = .data$Significant_SNPs)) +
+    switchgrassGWAS::theme_oeco +
+    geom_line() +
+    geom_point() +
     geom_hline(yintercept = 0, lty = 2) +
-    labs(x = "Conditions", y = "Effect Size") +
-    scale_x_discrete(labels = as_vector(.data$Conditions)) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    xlab(label = "Number of Conditions") +
+    ylab(label = "Number of Significant SNPs")
 
   if(saveoutput == TRUE){
-    if(is.null(i)){
-      save_plot(filename = paste0("Effect_plot_",
-                                  names(get_significant_results(m))[n], ".png"),
-                plot = ggobject, base_aspect_ratio = 0.8, base_height = 4.5)
-    } else {
-      plotname <- get_marker_df(m)[i]
-      save_plot(filename = paste0("Effect_plot_", plotname$Marker, ".png"),
-                plot = ggobject, base_aspect_ratio = 0.8, base_height = 4.5)
-
+    if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
+      suffix <- paste0("_", suffix)
     }
+    if(str_sub(suffix, end = 1) %in% c("")){
+      suffix <- paste0("_", get_date_filename())
+    }
+    ggsave(paste0("SNPs_significant_by_number_of_conditions", suffix, ".png"),
+           width = 5, height = 3, units = "in", dpi = 400)
   }
-  return(list(marker = i, effect_df = effectplot, ggobject = ggobject))
+
+  return(list(sighist = SigHist, ggobject = vis))
 }

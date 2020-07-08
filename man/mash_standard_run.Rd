@@ -5,50 +5,51 @@
 \title{A standard run of mashr}
 \usage{
 mash_standard_run(
-  path,
+  path = ".",
   list_input = NA,
   numSNPs = NA,
-  saveoutput = FALSE,
   suffix = "",
+  saveoutput = FALSE,
   U_ed = NA,
-  U_hyp = NA,
-  ref = "mean"
+  U_hyp = NA
 )
 }
 \arguments{
-\item{path}{File path to the rds files saved from bigsnpr, a character
-string. Defaults to the working directory.}
+\item{path}{File path to the rds files saved from gapit2mashr, or
+bigsnpr2mashr, as a character string. Defaults to the working directory.}
 
 \item{list_input}{A list containing five data frames: the SNPs selected, the
 B_hat and S_hat matrices for the strong SNP set and for a random SNP set
-that is twice the size.}
+chosen in gapit2mashr.}
 
 \item{numSNPs}{The number of most significant SNPs selected from each GWAS.
 Ideally this will give 1 million or fewer total cells in the resultant
 mash dataframes. Defaults to 1000.}
 
-\item{saveoutput}{Logical. Should the function's output also be saved to RDS
-files? Default is FALSE.}
-
 \item{suffix}{Character. Optional. Should be the unique suffix used to
 save \code{cdbn_bigsnp2mashr} output as RDS files, if it was used.}
+
+\item{saveoutput}{Logical. Should the function's output also be saved to RDS
+files? Default is FALSE.}
 
 \item{U_ed}{An optional list of data-driven covariance matrices, or a
 character vector containing the complete path to a .rds containing these
 matrices.}
 
 \item{U_hyp}{An optional list of covariance matrices specified by the user.}
-
-\item{ref}{the reference group. A number between 1 & R, where R is the number
-of conditions, or the name of the reference group, or if there is no
-reference group, it can be the string 'mean'. Default is 'mean'.}
 }
 \value{
 A mash result, manipulable using functions in mashr and by mash_plot
-functions in the switchgrassGWAS package.
+functions in the CDBNgenomics package.
 }
 \description{
-If you have prepared mash input using the function
-\code{\link{pvdiv_bigsnp2mashr}}, use this function on the output to
-run mash as recommended by vignettes in the mashr package.
+If you have prepared mash input using the bigsnp2mashr function
+or the gapit2mashr R package, use this function on the output to run mash
+as recommended by vignettes in the mashr package.
+}
+\note{
+This is a convenience function for users who have prepared their data
+using gapit2mashr or bigsnp2mashr. If you have not used these functions
+to make your mash input, you should not use this function - instead,
+follow the recommendations of the vignettes in the mashr package itself.
 }
