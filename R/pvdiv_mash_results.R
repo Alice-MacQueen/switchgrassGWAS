@@ -537,7 +537,7 @@ mash_plot_covar <- function(m, saveoutput = FALSE, suffix = ""){
                                              "(Stand_)??Bhat_?",
                                              "single_effect_"),
            `Covariance Matrix` = str_replace(.data$`Covariance Matrix`,
-                                             "^null$", "no_effects"))
+                                             "^null$", "no_effects")) %>%
     arrange(desc(.data$`Covariance Matrix`))
   df$`Covariance Matrix` <- factor(df$`Covariance Matrix`,
                                    levels = (df$`Covariance Matrix`))
@@ -604,14 +604,23 @@ mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
         }
       }
     }
+    if(ncol(U1) == length(get_colnames(m))){
     colnames(U1) <- str_replace(get_colnames(m), "(Stand_)??Bhat_?", "") %>%
-      str_replace(.data, "-mean$", "")
+      str_replace("-mean$", "")
     U1 <- as_tibble(U1, .name_repair = "unique") %>%
       mutate(rowU = str_replace(get_colnames(m), "(Stand_)??Bhat_?", "")) %>%
-      str_replace(.data, "-mean$", "") %>%
+      str_replace("-mean$", "") %>%
       pivot_longer(cols = -.data$rowU, names_to = "colU",
                    values_to = "covar") %>%
       filter(!is.na(.data$covar))
+    } else {
+      U1 <- as_tibble(U1, rownames = "rowU", .name_repair = "unique") %>%
+        pivot_longer(cols = -.data$rowU, names_to = "colU",
+                     values_to = "covar") %>%
+        mutate(rowU = paste0("Condition", .data$rowU),
+               colU = str_replace(.data$colU, "\\.\\.\\.", "Condition")) %>%
+        filter(!is.na(.data$covar))
+    }
 
     U1_covar <- U1 %>%
       ggplot(aes(x = .data$rowU, y = .data$colU)) +
@@ -638,7 +647,7 @@ mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
         suffix <- paste0("_", get_date_filename())
       }
       save_plot(paste0("Covariances_plot_", names(Ulist)[u], suffix, ".png"),
-                plot = U1_covar, base_height = 3.8, base_asp = 1.3)
+                plot = U1_covar, base_height = 3.8, base_asp = 1.15)
     }
 
   }
@@ -804,10 +813,10 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
                                            lfsr_thresh = lfsr_thresh, FUN = FUN)
     rownames(shared_effects) <- str_replace_all(rownames(shared_effects),
                                                 "(Stand_)??Bhat_?", "") %>%
-      str_replace(.data, "-mean$", "")
+      str_replace("-mean$", "")
     colnames(shared_effects) <- str_replace_all(colnames(shared_effects),
                                                 "(Stand_)??Bhat_?", "") %>%
-      str_replace(.data, "-mean$", "")
+      str_replace("-mean$", "")
   } else {
     stop(paste0("Please specify one of these: ",
                 "1. a mash output object (m), ",
