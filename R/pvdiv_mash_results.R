@@ -608,8 +608,8 @@ mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
     colnames(U1) <- str_replace(get_colnames(m), "(Stand_)??Bhat_?", "") %>%
       str_replace("-mean$", "")
     U1 <- as_tibble(U1, .name_repair = "unique") %>%
-      mutate(rowU = str_replace(get_colnames(m), "(Stand_)??Bhat_?", "")) %>%
-      str_replace("-mean$", "") %>%
+      mutate(rowU = str_replace(get_colnames(m), "(Stand_)??Bhat_?", ""),
+             rowU = str_replace(.data$rowU, "-mean$", "")) %>%
       pivot_longer(cols = -.data$rowU, names_to = "colU",
                    values_to = "covar") %>%
       filter(!is.na(.data$covar))
