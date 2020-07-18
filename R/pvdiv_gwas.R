@@ -118,7 +118,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
                                       tail(names(df), n = 1), "_Phenotypes_",
                                       npcs[1], "_to_", tail(npcs, n = 1),
                                       "_PCs.csv"))
-    best_LambdaGC <- pvdiv_best_PC_df(df = LambdaGC)
+    best_LambdaGC <- get_best_PC_df(df = LambdaGC)
     write_csv(best_LambdaGC, path = paste0("Best_Lambda_GC_", names(df)[2],
                                            "_to_", tail(names(df), n = 1),
                                            "_Phenotypes_", npcs[1], "_to_",
@@ -128,6 +128,7 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
 }
 
 #' Return best number of PCs in terms of lambda_GC for Panicum virgatum.
+#' Return best number of PCs in terms of lambda_GC for the CDBN.
 #'
 #' @description Given a dataframe created using pvdiv_lambda_GC, this function
 #'     returns the first lambda_GC less than 1.05, or the smallest lambda_GC,
@@ -143,21 +144,23 @@ pvdiv_lambda_GC <- function(df, type = c("linear", "logistic"), snp,
 #'
 #' @return A dataframe containing the best lambda_GC value and number of PCs
 #'     for each phenotype in the data frame.
-pvdiv_best_PC_df <- function(df){
+get_best_PC_df <- function(df){
   column <- names(df)[ncol(df)]
   bestPCs <- df %>%
-    filter(!! sym(column) < 1.05) %>%
+    filter(!! sym(column) < 1.05| !! sym(column) == min(!! sym(column))) %>%
     top_n(n = -1, wt = .data$NumPCs) %>%
     select(.data$NumPCs, all_of(column))
 
-  for(i in c((ncol(df)-2):1)){
-    column <- names(df)[i+1]
+  if(ncol(df) > 2){
+    for(i in c((ncol(df)-2):1)){
+      column <- names(df)[i+1]
 
-    bestPCs <- df %>%
-      filter(!! sym(column) < 1.05 | !! sym(column) == min(!! sym(column))) %>%
-      top_n(n = -1, wt = .data$NumPCs) %>%
-      select(.data$NumPCs, all_of(column)) %>%
-      full_join(bestPCs, by = c("NumPCs", (column)))
+      bestPCs <- df %>%
+        filter(!! sym(column) < 1.05 | !! sym(column) == min(!! sym(column))) %>%
+        top_n(n = -1, wt = .data$NumPCs) %>%
+        select(.data$NumPCs, all_of(column)) %>%
+        full_join(bestPCs, by = c("NumPCs", (column)))
+    }
   }
 
   bestPCdf <- bestPCs %>%

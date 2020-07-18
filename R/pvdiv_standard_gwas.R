@@ -360,11 +360,11 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
                                                        nSNP_M, "M_SNPs",
                                                        ".csv")))
       }
-      PCdf <- pvdiv_best_PC_df(lambdagc_df) # asv_best_PC_df(lambdagc_df)
+      PCdf <- get_best_PC_df(lambdagc_df) # asv_best_PC_df(lambdagc_df)
     } else {
       PC1 <- lambdagc %>%
         dplyr::select(.data$NumPCs, phename)
-      PCdf <- pvdiv_best_PC_df(PC1) # asv_best_PC_df(PC1)
+      PCdf <- get_best_PC_df(PC1) # asv_best_PC_df(PC1)
     }
     PCdf1 <- PCdf[1,]
 

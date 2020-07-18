@@ -570,6 +570,7 @@ mash_plot_covar <- function(m, saveoutput = FALSE, suffix = ""){
 #' @param saveoutput Logical. Should the output be saved to the path?
 #' @param suffix Character. Optional. A unique suffix used to save the files,
 #'     instead of the current date & time.
+#' @param limits should there be plot limits of -1 and 1? Default is true.
 #'
 #' @return A list of dataframes used to make the tile plots and the plots
 #'     themselves.
@@ -584,7 +585,8 @@ mash_plot_covar <- function(m, saveoutput = FALSE, suffix = ""){
 #' @import ggplot2
 #'
 #' @export
-mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
+mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = "",
+                            limits = TRUE){
   Ulist <- get_Ulist(m)
   Ureturn <- list()
   stopifnot(typeof(range) %in% c("double", "integer", "logical"))
@@ -622,6 +624,7 @@ mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
         filter(!is.na(.data$covar))
     }
 
+    if(limits == TRUE){
     U1_covar <- U1 %>%
       ggplot(aes(x = .data$rowU, y = .data$colU)) +
       switchgrassGWAS::theme_oeco +
@@ -633,6 +636,22 @@ mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = ""){
       theme(legend.position = c(0.2, 0.9),
             axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
       xlab("") + ylab("") + ggtitle(names(Ulist)[u])
+    } else {
+      lim_lower <- min(U1$covar)
+      lim_upper <- max(U1$covar) + max(U1$covar) * 0.01
+      U1_covar <- U1 %>%
+        ggplot(aes(x = .data$rowU, y = .data$colU)) +
+        switchgrassGWAS::theme_oeco +
+        geom_tile(aes(fill = .data$covar), na.rm = TRUE) +
+        scale_fill_gradientn(colors = c("#440154FF", "#472D7BFF", "#3B528BFF",
+                                        "#2C728EFF", "#21908CFF", "#27AD81FF",
+                                        "#5DC863FF", "#AADC32FF", "#FDE725FF"),
+                             limits = c(lim_lower, lim_upper)) +
+        geom_text(aes(label = round(.data$covar, 1)), color = "darkgrey") +
+        theme(legend.position = c(0.2, 0.9),
+              axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+        xlab("") + ylab("") + ggtitle(names(Ulist)[u])
+    }
 
     Ureturn <- list.append(Ureturn, U1 = U1,
                            ggobject = U1_covar)
