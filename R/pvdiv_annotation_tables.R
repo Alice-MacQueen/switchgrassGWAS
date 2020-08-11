@@ -225,10 +225,13 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
     stop(paste0("For 'mash' and 'bigsnp' types, need to specify at least one",
                 "of n (as an integer) or FDR (between 0 and 1)."))
   }
-  if(type %in% c("bigsnp", "mash") & attr(snp, "class") != "bigSNP"){
+  if(type %in% c("bigsnp", "mash")){
+    if(attr(snp, "class") != "bigSNP"){
     stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+    }
+    markers <- tibble(CHR = snp$map$chromosome,
+                      POS = snp$map$physical.pos)
   }
-  markers <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos)
 
   topsnp_inputlist <- list()
   topsnp_outputlist <- list()
