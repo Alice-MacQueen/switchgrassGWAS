@@ -210,11 +210,11 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
                                 anno_info = switchgrassGWAS::anno_info){
   requireNamespace("VariantAnnotation")
 
-
   n <- as.integer(n)
   FDRalpha <- as.numeric(FDRalpha)
   rangevector <- as.integer(rangevector)
-  stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "table"), !is_null(anno_info),
+  stopifnot(type %in% c("bigsnp", "mash", "rqtl2", "table"),
+            !is_null(anno_info),
             !is_null(txdb))
   if(type == "table" & !("CHR" %in% names(df)) & !("start" %in% names(df)) &
      !("end" %in% names(df))){
@@ -258,20 +258,15 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
   }
 
   #### Find annotations for each tbl_df found for each SNP criterion specified.
-  for(k in seq_along(rangevector)){
-    range <- rangevector[k]
-    for(i in seq_along(topsnp_inputlist)){
-      loop_input <- topsnp_inputlist[[i]]
-      if(nrow(loop_input) > 0){
-
-        if(type %in% c("bigsnp", "mash")){
-          # Prepare input dataframe
+  if(type %in% c("bigsnp", "mash")){
+    for(k in seq_along(rangevector)){
+      range <- rangevector[k]
+      for(i in seq_along(topsnp_inputlist)){
+        loop_input <- topsnp_inputlist[[i]]
+        if(nrow(loop_input) > 0){
           input <- loop_input %>%
-            mutate(start = .data$POS - (range/2),
-                   end = .data$POS + (range/2))
-        } else {
-          input <- loop_input # Other types have start and end already
-        }
+              mutate(start = .data$POS - (range/2),
+                     end = .data$POS + (range/2))
 
         ## Make input into a GRanges object for querying with locateVariants
         target <- with(input, GRanges(seqnames = Rle(CHR),
@@ -300,7 +295,38 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
           as_tibble(NA)
       }
     }
-  }
+    }
+  } else if(type %in% c("rqtl2", "table")){
+    loop_input <- topsnp_inputlist[[1]]
+      if(nrow(loop_input) > 0){
+        input <- loop_input # Other types have start and end already
+        ## Make input into a GRanges object for querying with locateVariants
+        target <- with(input, GRanges(seqnames = Rle(CHR),
+                                      ranges = IRanges(start = start,
+                                                       end = end,
+                                                       names = NULL),
+                                      strand = Rle(strand("*"))))
+
+        ### Find genes that overlap input SNPs with VariantAnnotation
+        loc <-
+          VariantAnnotation::locateVariants(target, txdb,
+                                            VariantAnnotation::AllVariants(promoter =
+                                                                             VariantAnnotation::PromoterVariants(upstream = 2000L,
+                                                                                                                 downstream = 2000L),
+                                                                           intergenic =
+                                                                             VariantAnnotation::IntergenicVariants(upstream = 20000L,
+                                                                                                                   downstream = 20000L,
+                                                                                                                   idType = "gene")))
+
+        #### Convert a GRanges object to an output data frame
+        topsnp_outputlist[[1]] <-
+          get_tidy_annos(df = loc, input = input, anno_info = anno_info,
+                         txdb = txdb)
+      } else {
+        topsnp_outputlist[[1]] <-
+          as_tibble(NA)
+      }
+    }
   if(type %in% c("bigsnp", "mash")){
     if(!is.na(n)[1] & !is.na(FDRalpha)[1]){
     names1 <- c(paste0("top", n, "SNPs_"), paste0("FDR", FDRalpha, "_"))
@@ -308,11 +334,13 @@ pvdiv_table_topsnps <- function(df, type = c("bigsnp", "mash", "rqtl2", "table")
     names1 <- c(paste0("top", n, "SNPs_"))
     } else {
     names1 <- c(paste0("FDR", FDRalpha, "_"))
+    names(topsnp_outputlist) <- paste0(rep(names1, length(rangevector)),
+                                       "within",
+                                       rep(rangevector, each = length(names1)),
+                                       "bp")
     }
-  names(topsnp_outputlist) <- paste0(rep(names1, length(rangevector)),
-                                     "within",
-                                     rep(rangevector, each = length(names1)),
-                                     "bp")
-  }
+    } else {
+      topsnp_outputlist <- topsnp_outputlist[[1]]
+    }
   return(topsnp_outputlist)
 }
