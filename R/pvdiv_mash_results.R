@@ -363,6 +363,155 @@ get_GxE = function(m, factor = 0.4, thresh = 0.05){
               S_1_col = S_j))
 }
 
+
+#' @title Get switchgrass metadata for SNPs in a mash object.
+#'
+#' @description Takes a mash object and a bigsnp object and returns
+#'     a dataframe containing summary metadata for each SNP in the mash object.
+#'     This information includes details for the alternate allele of each SNP
+#'     such as its frequency in the bigsnp object, the average latitude,
+#'     longitude, elevation, and year that the SNP was sampled, and how
+#'     frequently individuals with the SNP have specific subpop and ecotype
+#'     identities in the bigsnp object.
+#'     NB: This is VERY slow and best for up to tens of thousands of
+#'     SNPs, NOT millions of SNPs.
+#'
+#' @param m A mash object (outputted by mash).
+#' @param snp A bigsnp object
+#' @param saveoutput Logical. Should the output be saved to the path?
+#' @param suffix Character. Optional. A unique suffix used to save the files,
+#'     instead of the current date & time.
+#'
+#' @return A data frame containing details for the alternate allele of each SNP
+#'     such as its frequency in the bigsnp object, the average latitude,
+#'     longitude, elevation, and year that the SNP was sampled, and how
+#'     frequently individuals with the SNP have specific subpop and ecotype
+#'     identities in the bigsnp object.
+#'
+#' @note This function is VERY slow and best for up to tens of thousands of
+#'     SNPs, NOT millions of SNPs. Use vcftools instead for millions of SNPs.
+#'
+#' @importFrom dplyr summarise mutate filter select
+#' @importFrom tidyselect everything
+#' @importFrom lubridate year
+#' @importFrom stats weighted.mean
+#' @importFrom tibble add_row
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
+#' @export
+get_mash_metadata <- function(m, snp, suffix = "", saveoutput = FALSE){
+  if(attr(snp, "class") != "bigSNP"){
+    stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+  }
+  markers <- get_marker_df(m)
+  filtercol <- which(snp$map$marker.ID %in% markers$Marker)
+  if(str_sub(suffix, end = 1) %in% c("")){
+    suffix <- paste0("_", get_date_filename())
+  }
+
+  metadata1 <- switchgrassGWAS::pvdiv_metadata %>%
+    filter(.data$PLANT_ID %in% snp$fam$sample.ID) %>%
+    mutate(Atlantic = ifelse(.data$GENETIC_SUBPOP_KINSHIP == "Atlantic", 1, 0),
+           Gulf = ifelse(.data$GENETIC_SUBPOP_KINSHIP == "Gulf", 1, 0),
+           Midwest = ifelse(.data$GENETIC_SUBPOP_KINSHIP == "Midwest", 1, 0),
+           Coastal = ifelse(.data$ECOTYPE_NNET == "Coastal", 1, 0),
+           Upland = ifelse(.data$ECOTYPE_NNET == "Upland", 1, 0),
+           Lowland = ifelse(.data$ECOTYPE_NNET == "Lowland", 1, 0),
+           COLL_YEAR = year(.data$COLL_DATE))
+  m1 <- metadata1 %>%
+    mutate(SNP = snp$genotypes[,filtercol[1]]) %>%
+    summarise(Alt_freq = mean(.data$SNP/2, na.rm = TRUE),
+              Alt_Latitude = weighted.mean(.data$LATITUDE, .data$SNP,
+                                           na.rm = TRUE),
+              Alt_Longitude = weighted.mean(-.data$LONGITUDE, .data$SNP,
+                                            na.rm = TRUE),
+              Alt_Elevation = weighted.mean(.data$ELEVATION, .data$SNP,
+                                            na.rm = TRUE),
+              Alt_Year = weighted.mean(.data$COLL_YEAR, .data$SNP,
+                                       na.rm = TRUE),
+              Alt_Coastal_d = weighted.mean(.data$Coastal, .data$SNP,
+                                            na.rm = TRUE),
+              Alt_Coastal_c = weighted.mean(.data$COASTAL_ASSIGNMENT,
+                                            .data$SNP, na.rm = TRUE),
+              Alt_Lowland_d = weighted.mean(.data$Lowland, .data$SNP,
+                                            na.rm = TRUE),
+              Alt_Lowland_c = weighted.mean(.data$LOWLAND_ASSIGNMENT,
+                                            .data$SNP, na.rm = TRUE),
+              Alt_Upland_d = weighted.mean(.data$Upland, .data$SNP,
+                                           na.rm = TRUE),
+              Alt_Upland_c = weighted.mean(.data$UPLAND_ASSIGNMENT,
+                                           .data$SNP, na.rm = TRUE),
+              Alt_Atlantic_d = weighted.mean(.data$Atlantic, .data$SNP,
+                                             na.rm = TRUE),
+              Alt_Atlantic_c = weighted.mean(.data$ATLANTIC_Q, .data$SNP,
+                                             na.rm = TRUE),
+              Alt_Gulf_d = weighted.mean(.data$Gulf, .data$SNP, na.rm = TRUE),
+              Alt_Gulf_c = weighted.mean(.data$GULF_Q, .data$SNP,
+                                         na.rm = TRUE),
+              Alt_Midwest_d = weighted.mean(.data$Midwest, .data$SNP,
+                                            na.rm = TRUE),
+              Alt_Midwest_c = weighted.mean(.data$MIDWEST_DA, .data$SNP,
+                                            na.rm = TRUE)
+    ) %>%
+    mutate(Marker = snp$map$marker.ID[filtercol[1]]) %>%
+    select(.data$Marker, everything())
+
+  for(i in 2:length(filtercol)){
+    m_i <- metadata1 %>%
+      mutate(SNP = snp$genotypes[,filtercol[i]]) %>%
+      summarise(Alt_freq = mean(.data$SNP/2, na.rm = TRUE),
+                Alt_Latitude = weighted.mean(.data$LATITUDE, .data$SNP,
+                                             na.rm = TRUE),
+                Alt_Longitude = weighted.mean(-.data$LONGITUDE, .data$SNP,
+                                              na.rm = TRUE),
+                Alt_Elevation = weighted.mean(.data$ELEVATION, .data$SNP,
+                                              na.rm = TRUE),
+                Alt_Year = weighted.mean(.data$COLL_YEAR, .data$SNP,
+                                         na.rm = TRUE),
+                Alt_Coastal_d = weighted.mean(.data$Coastal, .data$SNP,
+                                              na.rm = TRUE),
+                Alt_Coastal_c = weighted.mean(.data$COASTAL_ASSIGNMENT,
+                                              .data$SNP, na.rm = TRUE),
+                Alt_Lowland_d = weighted.mean(.data$Lowland, .data$SNP,
+                                              na.rm = TRUE),
+                Alt_Lowland_c = weighted.mean(.data$LOWLAND_ASSIGNMENT,
+                                              .data$SNP, na.rm = TRUE),
+                Alt_Upland_d = weighted.mean(.data$Upland, .data$SNP,
+                                             na.rm = TRUE),
+                Alt_Upland_c = weighted.mean(.data$UPLAND_ASSIGNMENT,
+                                             .data$SNP, na.rm = TRUE),
+                Alt_Atlantic_d = weighted.mean(.data$Atlantic, .data$SNP,
+                                               na.rm = TRUE),
+                Alt_Atlantic_c = weighted.mean(.data$ATLANTIC_Q, .data$SNP,
+                                               na.rm = TRUE),
+                Alt_Gulf_d = weighted.mean(.data$Gulf, .data$SNP,
+                                           na.rm = TRUE),
+                Alt_Gulf_c = weighted.mean(.data$GULF_Q, .data$SNP,
+                                           na.rm = TRUE),
+                Alt_Midwest_d = weighted.mean(.data$Midwest, .data$SNP,
+                                              na.rm = TRUE),
+                Alt_Midwest_c = weighted.mean(.data$MIDWEST_DA, .data$SNP,
+                                              na.rm = TRUE)
+      ) %>%
+      mutate(Marker = snp$map$marker.ID[filtercol[i]]) %>%
+      select(.data$Marker, everything())
+    m1 <- m1 %>% add_row(m_i)
+    if(saveoutput == TRUE){
+      if(i%%1000 == 0){
+        write_rds(m1, paste0("Metadata_associated_with_alternate_alleles_",
+                             suffix, ".rds"), compress = "gz")
+      }
+    }
+  }
+  if(saveoutput == TRUE){
+    write_rds(m1, paste0("Metadata_associated_with_alternate_alleles_",
+                         suffix, "_full.rds"), compress = "gz")
+  }
+  return(m1)
+}
+
+
 #' @title Get the positions of objects in a mash object Ulist that are above
 #'      some mass threshold.
 #'

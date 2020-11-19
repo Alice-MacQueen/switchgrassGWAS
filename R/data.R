@@ -108,3 +108,96 @@ NULL
 #' @format A list containing ggplot2 specifications
 NULL
 
+#' Metadata table for the Panicum virgatum diversity panel
+#'
+#' A dataset containing the collected metadata information for individuals in
+#'     the Panicum virgatum diversity panel.
+#'     The variables are as follows:
+#'
+#' \itemize{
+#'   \item PLANT_ID Individual plant name. Unique to each plant. The column we
+#'       should be using for analyses.
+#'   \item SUBPOP Using clustering from an additive kinship matrix, which
+#'       genetic subpopulation does the PLANT_ID belong to? 4X and 8X
+#'       individuals have been assigned a ploidy by flow cytometry, but not a
+#'       subpopulation by sequencing, as of the end of 2020.
+#'   \item LIBRARY Four letter library code used for sequencing. IF NA, the
+#'       plant has not been sequenced as of the end of 2020.
+#'   \item GENETIC_SUBPOP_KINSHIP Using clustering from an additive kinship
+#'       matrix, which genetic subpopulation does the PLANT_ID belong to? NA
+#'       individuals were not included in the kinship matrix.
+#'   \item KINSHIP_ORDER Order of individuals in an additive kinship matrix.
+#'       Roughly speaking, closer numbers represent more similar individuals.
+#'   \item GENETIC_SUBPOP_50PER From hierarchical k=3 analysis done early 2020.
+#'       Which genetic subpopulation does the PLANT_ID belong to, at 50%
+#'       assignment or more. Admixed individuals are unassigned PLANT_IDs
+#'       included in the analysis; NA individuals were not included.
+#'   \item GENETIC_SUBPOP_95PER From hierarchical k=3 analysis done early 2020.
+#'       Which genetic subpopulation does the PLANT_ID belong to, at 95%
+#'       assignment or more. Admixed individuals are unassigned PLANT_IDs
+#'       included in the analysis; NA individuals were not included.
+#'   \item GULF_Q From hierarchical k=3 analysis done early 2020. Structure Q
+#'       value for assignment to the Gulf genetic subpopulation. NA individuals
+#'       were not included in the Structure analysis.
+#'   \item ATLANTIC_Q From hierarchical k=3 analysis done winter 2020. Structure
+#'       Q value for assignment to the Atlantic subpopulation. NA individuals
+#'       were not included in the Structure analysis.
+#'   \item MIDWEST_DA From hierarchical k=3 analysis done winter 2020. DAPC
+#'       value for assignment to the Midwest subpopulation. NA individuals were
+#'       not included in the DAPC analysis.
+#'   \item ECOTYPE From John's phenotypic analysis of Ecotypes. Which phenotypic
+#'       group does the PLANT_ID belong to, at 50% assignment or more. NA
+#'       individuals did not have phenotypic data for this classification.
+#'   \item ECOTYPE_NNET From John's neural network extending ecotype
+#'       classification to individuals without phenotypic data.
+#'   \item ECOTYPE_PC1 From John's phenotypic analysis of ecotypes done summer
+#'       2019. The first principle component separating individuals into
+#'       ecotypes.
+#'   \item UPLAND_ASSIGNMENT From John's phenotypic analysis of Ecotypes done
+#'       summer 2019. Assignment to the Upland ecotype.
+#'   \item LOWLAND_ASSIGNMENT From John's phenotypic analysis of Ecotypes done
+#'       summer 2019. Assignment to the Texas ecotype.
+#'   \item COASTAL_ASSIGNMENT: From John's phenotypic analysis of Ecotypes done
+#'       summer 2019. Assignment to the Coastal ecotype.
+#'   \item LIB_GROWN For tetraploid plants with sequencing libraries, was the
+#'       PLANT_ID grown at one or more of the 10 common garden sites in 2018?
+#'       "Y" = yes, "N" = no. Does not include plants where LIB_PHENO is "N".
+#'   \item LIB_BIOCLIM Do we have bioclim variables for this PLANT_ID?
+#'       "Y" = yes, "N" = no. Does not include plants where LIB_CLIMATE is "N".
+#'   \item LIB_CLIMATE John & Jason's decision on whether this PLANT_ID should
+#'       be used for climate analyses done summer 2019. "Y" = yes, "N" = no.
+#'   \item LIB_PHENO John & Jason's decision on whether this PLANT_ID should be
+#'       used for phenotypic analyses done summer 2019. "Y" = yes, "N" = no.
+#'   \item LIB_ACC John & Jason's decision on whether this PLANT_ID should be
+#'       used for analyses of a single plant per location done summer 2019 .
+#'       "Y" = yes, "N" = no.
+#'   \item LIB_NOTES Notes on John & Jason's decisions for the above 3 columns.
+#'       This analysis was done summer 2019.
+#'   \item PLOIDY Ploidy as determined by both sequencing & flow cytometry
+#'       analyses done in 2019. Typically 4X (tetraploid) or 8X (octoploid).
+#'   \item COLLECTION_TYPE Original plant collection metadata. What kind of
+#'       collection was this? Breeding selection, Natural collection, Cultivar.
+#'   \item COLLECTION_METHOD How was the plant collected?
+#'   \item COLLECTOR Who collected this plant?
+#'   \item STATE State of the United States that the plant was collected from.
+#'   \item COUNTY County that the plant was collected from.
+#'   \item LATITUDE Latitude of origin of the collected plant.
+#'   \item LONGITUDE Longitude of origin of the collected plant.
+#'   \item ELEVATION Elevation of origin of the collected plant.
+#'   \item NOTE_LATLONG Notes on exactness of latitude & longitude of collection
+#'   \item LOCALITY Additional details on plant collection location.
+#'   \item TAXON Genus & species of the collected plant.
+#'   \item HABITAT Details on habitat of plant collection location, if known.
+#'   \item COLL_DATE Information on plant collection date, if known.
+#'   \item PLANTED_2018 All plants clonally replicated and transplanted into
+#'       one or more common garden in the summer of 2018.
+#' }
+#'
+#' @name pvdiv_metadata
+#' @docType data
+#' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
+#' @references \url{data_blah.com}
+#' @keywords data
+#' @usage data(pvdiv_metadata)
+#' @format A data frame with 1347 rows and 37 variables.
+NULL

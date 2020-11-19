@@ -27,6 +27,7 @@ Imports:
     dplyr,
     GGally,
     ggplot2,
+    lubridate,
     magrittr,
     multtest,
     purrr,
