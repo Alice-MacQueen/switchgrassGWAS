@@ -1,0 +1,64 @@
+---
+title: "Annotation tables for top SNPs"
+author: "Alice MacQueen"
+date: 2020-01-06
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Annotation tables for top SNPs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/annotations-",
+  fig.width = 6,
+  fig.asp = 0.618,
+  out.width = "70%",
+  fig.align = "center"
+)
+```
+
+## Annotations for Top Associations
+
+You can also use `pvdiv_table_topsnps` to create dataframes containing annotation information. To do this, first load the provided annotation information. Currently, this is version 5.1 of the annotation information for *Panicum virgatum*. 
+
+If you have saved the genomic files you requested access to in your working directory, you would then run the following commands to load the annotation data:
+
+``` r
+library(AnnotationDbi)
+library(VariantAnnotation)
+load("markers.rda")
+txdb <- loadDb(file = "Pvirgatum_516_v5.1.gene.txdb.sqlite")
+anno_info <- read_delim(file = "Pvirgatum_516_v5.1.annotation_info.txt",
+                        col_names = TRUE, delim = "\t")
+gene_anno_info <- tbl_df(anno_info) %>%
+  distinct(locusName, .keep_all = TRUE)
+```
+
+You can select a number of top SNPs to find annotation information for, a FDR threshold to find annotation information for, and any distance away from the associated SNP (in bp) for which to pull annotations. Here, we find genes 10kb and 100kb away from the top 50 associations and for associations above a FDR of 5%.
+
+``` r
+anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp", n = 50, 
+                                  FDRalpha = 0.05, rangevector = c(10000, 100000),
+                                  markers = markers, anno_info = gene_anno_info,
+                                  txdb = txdb)
+                                 
+saveRDS(anno_tables, "Annotation_tables_BRKG_TC_EOS_2018.rds")
+```
+This function will return a list of all of the tables you requested, named according to the criteria used to create the table. You can then save these tables individually as csv or any other type of file.
+
+If the resultant tables are small, say, less than 2000 entries apiece, we favor saving these tables as individual sheets in an Excel file using the R package `XLConnect`.
+``` r 
+library(XLConnect)
+
+wb1 <- loadWorkbook(filename = "Annotation_tables_BRKG_TC_EOS_2018.xlsx", 
+                    create = TRUE)
+for(j in seq_along(anno_tables)){
+  createSheet(wb1, name = names(anno_tables)[j])
+  writeWorksheet(wb1, anno_tables[[j]], sheet = names(anno_tables)[j])
+  }
+saveWorkbook(wb1)
+```

@@ -6,15 +6,7 @@ Authors@R:
            family = "MacQueen",
            role = c("aut", "cre"),
            email = "alice.macqueen@gmail.com")
-Description: The switchgrass (Panicum virgatum) diversity panel
-    is now being grown at many locations across the United States and
-    Mexico. Many researchers are measuring phenotypes on this panel to
-    understand the genes and genetic regions affecting these phenotypes.
-    This package provides the code for fast, less memory intensive genome- 
-    wide association (GWAS) using bigsnpr. It also provides functions to link 
-    diversity panel phenotypic data with SNP data, to prepare basic plots
-    for further customization, and to prepare multiple GWAS results for
-    use in the downstream application mash.
+Description: The R package switchgrassGWAS provides functions for genome wide association analysis on the Panicum virgatum diversity (pvdiv) panel. switchgrassGWAS provides the code for fast, less memory intensive genome-wide association (GWAS) using bigsnpr. It also provides functions to link diversity panel phenotypic data with publicly available SNP data, to prepare GWAS results plots using ggplot, and to prepare multiple univariate GWAS results for use in the R package mashr.
 License: GPL (>= 2)
 Depends: 
     R (>= 3.5)
