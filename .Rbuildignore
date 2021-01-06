@@ -8,3 +8,6 @@
 ^upland-vs-lowland$
 ^envGWAS$
 ^wax-three-sites$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
