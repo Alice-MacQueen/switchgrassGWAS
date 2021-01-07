@@ -2,7 +2,7 @@
 % Please edit documentation in R/pvdiv_standard_gwas.R
 \name{pvdiv_standard_gwas}
 \alias{pvdiv_standard_gwas}
-\title{Wrapper for Juenger lab standard GWAS functions for switchgrass.}
+\title{Juenger lab standard GWAS function.}
 \usage{
 pvdiv_standard_gwas(
   snp,
@@ -69,10 +69,25 @@ to conduct a GWAS on? Default is 200. Use lower values with caution.}
 A big_SVD object.
 }
 \description{
-This is a wrapper to
+This function is a wrapper around the standard GWAS procedures
+in the Juenger lab. Singular value decomposition of the SNPs is done to
+get principal components for population structure correction; the 'best'
+number of PCs is chosen as the one that makes lambda_GC, the Genomic
+Control coefficient, closest to 1. (See the \code{lambdagc} parameter to set
+this yourself.) Next, genome-wide association is conducted, and the GWAS
+output can be saved, as well as Manhattan plots, QQ-plots, and annotation
+information for the top SNPs for each phenotype.
 }
 \examples{
+snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+library(bigsnpr)
+snp <- snp_attach(snpfile)
+pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", savegwas = FALSE,
+    saveplots = FALSE, ncores = 1)
+
 \dontrun{
+# Here we specify that we do want to generate and save the gwas dataframes,
+# the Manhattan and QQ-plots, and the annotation tables.
 pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", covar = svd,
     ncores = nb_cores(), lambdagc = TRUE, savegwas = TRUE, saveplots = TRUE,
     saveannos = TRUE, txdb = txdb)

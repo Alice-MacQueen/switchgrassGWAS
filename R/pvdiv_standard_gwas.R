@@ -36,9 +36,10 @@ get_date_filename <- function(){
 #' @importFrom rlang .data
 #'
 #' @examples
-#' \dontrun{
-#' svd20 <- pvdiv_autoSVD(snp = snp, k = 20, saveoutput = TRUE)
-#' }
+#' snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+#' library(bigsnpr)
+#' snp <- snp_attach(snpfile)
+#' svd5 <- pvdiv_autoSVD(snp = snp, k = 5, saveoutput = FALSE)
 #'
 #' @export
 pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
@@ -128,9 +129,10 @@ pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
 #' @import bigstatsr
 #'
 #' @examples
-#' \dontrun{
-#' K <- pvdiv_kinship(snp = snp, saveoutput = TRUE)
-#' }
+#' snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+#' library(bigsnpr)
+#' snp <- snp_attach(snpfile)
+#' K <- pvdiv_kinship(snp = snp, saveoutput = FALSE)
 #'
 #' @export
 pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
@@ -190,9 +192,16 @@ pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
   return(K)
 }
 
-#' @title Wrapper for Juenger lab standard GWAS functions for switchgrass.
+#' @title Juenger lab standard GWAS function.
 #'
-#' @description This is a wrapper to
+#' @description This function is a wrapper around the standard GWAS procedures
+#'     in the Juenger lab. Singular value decomposition of the SNPs is done to
+#'     get principal components for population structure correction; the 'best'
+#'     number of PCs is chosen as the one that makes lambda_GC, the Genomic
+#'     Control coefficient, closest to 1. (See the `lambdagc` parameter to set
+#'     this yourself.) Next, genome-wide association is conducted, and the GWAS
+#'     output can be saved, as well as Manhattan plots, QQ-plots, and annotation
+#'     information for the top SNPs for each phenotype.
 #'
 #' @param snp A "bigSNP" object; load with \code{bigsnpr::snp_attach()}.
 #'     Here, genomic information for Panicum virgatum. Contact tjuenger <at>
@@ -241,7 +250,15 @@ pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
 #' @importFrom cowplot save_plot
 #'
 #' @examples
+#' snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+#' library(bigsnpr)
+#' snp <- snp_attach(snpfile)
+#' pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", savegwas = FALSE,
+#'     saveplots = FALSE, ncores = 1)
+#'
 #' \dontrun{
+#' # Here we specify that we do want to generate and save the gwas dataframes,
+#' # the Manhattan and QQ-plots, and the annotation tables.
 #' pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", covar = svd,
 #'     ncores = nb_cores(), lambdagc = TRUE, savegwas = TRUE, saveplots = TRUE,
 #'     saveannos = TRUE, txdb = txdb)

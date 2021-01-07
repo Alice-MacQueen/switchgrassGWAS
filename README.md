@@ -28,7 +28,7 @@ devtools::install_github("Alice-MacQueen/switchgrassGWAS")
 ```
 
 This will give you access to the [package
-functions](https://alice-macqueen.github.io/switchgrassGWAS/docs/reference/index.html),
+functions](https://alice-macqueen.github.io/switchgrassGWAS/reference/index.html),
 example and previously published
 [phenotypes](https://alice-macqueen.github.io/switchgrassGWAS/reference/phenotypes.html),
 and the currently available information about the
@@ -70,7 +70,9 @@ results for use in the downstream application mash.
 
 ## Usage
 
-For a start, have a look at the code examples provided for
+For a start, have a look at the code example provided for [genome-wide
+association](https://alice-macqueen.github.io/switchgrassGWAS/articles/gwas.html),
+and the arguments for the function
 [`pvdiv_standard_gwas`](https://alice-macqueen.github.io/switchgrassGWAS/reference/pvdiv_standard_gwas.html).
 
 Download the SNP data [here](https://doi.org/10.18738/T8/J377KE).
@@ -82,5 +84,5 @@ for genotypes in the diversity panel, and the publicly available
 
 ## Documentation
 
-The HTML documentation of the development version is available on
+The HTML documentation for the development version is available on
 [Github](https://alice-macqueen.github.io/switchgrassGWAS/).

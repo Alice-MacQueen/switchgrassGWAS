@@ -28,8 +28,9 @@ Arguments that are recognized by bigsnpr::snp_autoSVD can also be
 specified in this function.
 }
 \examples{
-\dontrun{
-svd20 <- pvdiv_autoSVD(snp = snp, k = 20, saveoutput = TRUE)
-}
+snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+library(bigsnpr)
+snp <- snp_attach(snpfile)
+svd5 <- pvdiv_autoSVD(snp = snp, k = 5, saveoutput = FALSE)
 
 }

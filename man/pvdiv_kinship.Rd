@@ -28,8 +28,9 @@ that this matrix cannot currently be used with the GWAS methods in
 bigsnpr; however, this matrix could be used with other GWAS programs.
 }
 \examples{
-\dontrun{
-K <- pvdiv_kinship(snp = snp, saveoutput = TRUE)
-}
+snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+library(bigsnpr)
+snp <- snp_attach(snpfile)
+K <- pvdiv_kinship(snp = snp, saveoutput = FALSE)
 
 }
