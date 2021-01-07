@@ -22,8 +22,8 @@ envGWAS <- readRDS("~/Github/pvdiv-fitness-2019/data/Seven_climate_gwas.rds")
 fitnessGWAS <- readRDS("~/Github/pvdiv-fitness-2019/data/Phenotypes_fitness_linear.rds") %>%
   dplyr::select(PLANT_ID, FRAC_SRV_THREE, CLMB_BIOMASS, KBSM_BIOMASS, PKLE_BIOMASS)
 
-phenotypes <- exampleGWAS %>%
+pvdiv_phenotypes <- exampleGWAS %>%
   full_join(envGWAS) %>%
   full_join(fitnessGWAS)
 
-usethis::use_data(phenotypes, compress = "gzip", overwrite = TRUE)
+usethis::use_data(pvdiv_phenotypes, compress = "gzip", overwrite = TRUE)

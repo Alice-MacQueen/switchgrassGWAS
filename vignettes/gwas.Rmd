@@ -44,11 +44,11 @@ snp_example <- snp_attach(paste0(tmpfile, ".rds"))
 str(snp_example, max.level = 2, strict.width = "cut")
 
 # Load the pvdiv phenotypes into the R session.
-data(phenotypes) 
+data(pvdiv_phenotypes) 
 # Make an example dataframe of one phenotype where the first column is PLANT_ID.
 # This "phenotype", 'GWAS_CT', is the number of times a plant successfully 
 # clonally replicated to plant in the common gardens in 2018.
-one_phenotype <- phenotypes %>%
+one_phenotype <- pvdiv_phenotypes %>%
   dplyr::select(PLANT_ID, GWAS_CT)
 ```
 
@@ -62,7 +62,7 @@ pvdiv_standard_gwas(snp = snp_example, df = one_phenotype,
                     savegwas = FALSE, saveplots = TRUE,
                     saveannos = FALSE, ncores = 1)
 ```
-This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, `r tempdir`.
+This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: `r tempdir`.
 
 The example Manhattan plot should look like this: 
 

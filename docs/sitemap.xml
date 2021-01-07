@@ -85,9 +85,6 @@
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/mash_standard_run.html</loc>
   </url>
   <url>
-    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/phenotypes.html</loc>
-  </url>
-  <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/pipe.html</loc>
   </url>
   <url>
@@ -116,6 +113,9 @@
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/pvdiv_metadata.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/pvdiv_phenotypes.html</loc>
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/pvdiv_qqplot.html</loc>

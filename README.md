@@ -64,7 +64,7 @@ This package provides the code for fast, less memory intensive
 genome-wide association (GWAS) using
 [bigsnpr](https://privefl.github.io/bigsnpr/). It also provides
 functions to link diversity panel phenotypic data with publicly
-available [SNP data](https://doi.org/10.18738/T8/J377KE), to prepare
+available [SNP data](https://doi.org/10.18738/T8/ET9UAU), to prepare
 GWAS results plots using ggplot, and to prepare multiple univariate GWAS
 results for use in the downstream application mash.
 
@@ -75,7 +75,7 @@ association](https://alice-macqueen.github.io/switchgrassGWAS/articles/gwas.html
 and the arguments for the function
 [`pvdiv_standard_gwas`](https://alice-macqueen.github.io/switchgrassGWAS/reference/pvdiv_standard_gwas.html).
 
-Download the SNP data [here](https://doi.org/10.18738/T8/J377KE).
+Download the SNP data [here](https://doi.org/10.18738/T8/ET9UAU).
 
 Look at the
 [metadata](https://alice-macqueen.github.io/switchgrassGWAS/reference/pvdiv_metadata.html)

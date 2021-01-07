@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
   out.width = "70%",
   fig.align = "center"
 )
+library(knitr)
 ```
 
 ## Annotations for Top Association
@@ -34,8 +35,8 @@ txdb <- loadDb(file = "Pvirgatum_516_v5.1.gene.txdb.sqlite")
 ```
 
 ### Load SNP dataset and GWAS results
-We will use the same toy SNP dataset that we used for genome-wide association, and find annotations for the same phenotype, GWAS_CT. 
-``` r 
+We will use the same toy SNP dataset that we used for [genome-wide association](https://alice-macqueen.github.io/switchgrassGWAS/articles/gwas.html), and find annotations for the same phenotype, GWAS_CT. 
+```{r}
 library(bigsnpr)
 
 snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
@@ -66,9 +67,9 @@ anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp", n = 10,
                                   snp = snp, txdb = txdb)
 ```
 
-Let's look at the annotations for genes within 1000bp of SNPs above the 10% FDR cutoff. There are eight of these:
+Let's look at the annotations for genes within 1000bp of SNPs above the 10% FDR cutoff. In our toy example, there are seven of these:
 ```{r}
-anno_tables[[2]]
+kable(anno_tables[[2]])
 ```
 
 `pvdiv_table_topsnps` will return a list of all of the tables you requested, named according to the criteria used to create the table. You can then save these tables individually as csv or any other type of file.

@@ -13,9 +13,6 @@ data(gff_metadata)
 \description{
 A dataset containing the three metadata lines for the gff3 file gff_gene.
 }
-\references{
-\url{data_blah.com}
-}
 \author{
 Alice MacQueen \email{alice.macqueen@utexas.edu}
 }

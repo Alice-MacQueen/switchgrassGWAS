@@ -265,7 +265,7 @@ pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
 #' }
 #'
 #' @export
-pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
+pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::pvdiv_phenotypes,
                                 type = c("linear", "logistic"),
                                 ncores = nb_cores(),
                                 outputdir = ".", covar = NULL, lambdagc = TRUE,

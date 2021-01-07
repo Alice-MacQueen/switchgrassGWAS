@@ -27,9 +27,6 @@ The variables are as follows:
 \item attributes. A semicolon-separated list of tag-value pairs, providing additional information about each feature. Some of these tags are predefined, e.g. ID, Name, Alias, Parent.
 }
 }
-\references{
-\url{data_blah.com}
-}
 \author{
 Alice MacQueen \email{alice.macqueen@utexas.edu}
 }

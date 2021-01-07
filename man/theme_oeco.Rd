@@ -15,7 +15,7 @@ A list containing the oeco ggplot2 theme for use in cdbn_standard_gwas and
 mash_plot_ ... functions.
 }
 \references{
-\url{data_blah.com}
+\url{switchgrassgenomepaper.link}
 }
 \author{
 Alice MacQueen \email{alice.macqueen@utexas.edu}

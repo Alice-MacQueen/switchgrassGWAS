@@ -13,7 +13,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/mash-",
+  fig.path = "vignettes/man/figures/mash-",
   fig.width = 6,
   fig.asp = 0.618,
   out.width = "70%",
@@ -40,8 +40,8 @@ Third, you want to calculate the number of SNPs with low p-values to select from
 Finally, you run the `pvdiv_bigsnp2mashr()` function using these quantities. Choose the model type that you ran on your GWAS. Current options are "logistic" or "linear". Mixing these types is not supported (and statistically is probably a bad idea, also.) Also choose whether you want to save the output to a file in your path - recommended, though the default is FALSE, so the user needs to 'opt in' to this.
 
 ``` r
-data(phenotypes)
-gwas <- pvdiv_gwas(df = phenotypes, type = "linear",
+data(pvdiv_phenotypes)
+gwas <- pvdiv_gwas(df = pvdiv_phenotypes, type = "linear",
                    snp = snp, covar = svd0, ncores = NCORES)
 
 

@@ -1,2 +1,30 @@
 url: https://github.com/Alice-MacQueen/switchgrassGWAS/
 # url: https://alice-macqueen.github.io/switchgrassGWAS/
+
+reference:
+- title: "Datasets"
+  desc: "Datasets associated with the pvdiv panel"
+- contents:
+  - pvdiv_metadata
+  - pvdiv_phenotypes
+  - anno_info
+  - gff_gene
+- title: "Genome-wide association"
+  desc: "Functions for genome-wide association on the pvdiv panel"
+- contents:
+  - pvdiv_standard_gwas
+  - pvdiv_gwas
+  - pvdiv_qqplot
+  - pvdiv_table_topsnps
+  - pvdiv_results_in_folder
+  - pvdiv_kinship
+  - pvdiv_lambda_GC
+- title: "Multivariate adaptive shrinkage"
+  desc: "Functions for multi-condition SNP effect estimates using mash"
+- contents:
+  - pvdiv_results_in_folder
+  - pvdiv_bigsnp2mashr
+  - mash_standard_run
+  - starts_with("mash")
+  - starts_with("get")
+

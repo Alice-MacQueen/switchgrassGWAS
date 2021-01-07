@@ -4,19 +4,39 @@
 #'     The variables are as follows:
 #'
 #' \itemize{
-#'   \item PLANT_ID. ID of the Panicum virgatum genotype sequenced in the diversity panel.
-#'   \item GWAS_CT. The number of times this genotype was cloned and planted in the ten 2018 sites for the Panicum virgatum diversity panel.
-#'   \item BRKG_TC_EOS_2018.
-#'   \item BRKG_DEAD_2018.
+#'   \item PLANT_ID. ID of the Panicum virgatum genotype sequenced in the
+#'      diversity panel.
+#'   \item GWAS_CT. The number of times that genotype was clonally propagated
+#'       and planted at these common gardens.
+#'   \item MAT. Mean annual temperature at the genotype's location of origin.
+#'   \item bio17. Precipitation in the driest quarter at the genotype's location
+#'       of origin.
+#'   \item bio4. Temperature seasonality at the genotype's location of origin.
+#'   \item bio16. Precipitation in the wettest quarter at the genotype's
+#'      location of origin.
+#'   \item AHM. Annual heat moisture index, calculated as (MAT+10)/(MAP/1000),
+#'      at the genotype's location of origin.
+#'   \item bio2. Mean diurnal temperature range at the genotype's location of
+#'      origin.
+#'   \item bio5. Max temperature of the warmest month at the genotype's location
+#'      of origin.
+#'   \item FRAC_SRV_THREE. Fraction of individuals surviving winter 2018/2019
+#'      at three northern gardens (BRKG, LINC, CLMB).
+#'   \item CLMB_BIOMASS. Biomass at the end of the 2019 season in Columbia,
+#'      Missouri.
+#'   \item KBSM_BIOMASS. Biomass at the end of the 2019 season in Hickory
+#'      Corners, Michigan (Kellog Biological Station).
+#'   \item PKLE_BIOMASS. Biomass at the end of the 2019 season in Austin, Texas
+#'       (Pickle Research Campus).
 #' }
 #'
-#' @name phenotypes
+#' @name pvdiv_phenotypes
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{data_blah.com}
+#' @references \url{switchgrassgenomepaper.link}
 #' @keywords data
-#' @usage data(phenotypes)
-#' @format A data frame with 785 rows and 4 variables
+#' @usage data(pvdiv_phenotypes)
+#' @format A data frame with 1114 rows and 13 variables
 NULL
 
 #' GFF3 Gene information
@@ -39,7 +59,6 @@ NULL
 #' @name gff_gene
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{data_blah.com}
 #' @keywords data
 #' @usage data(gff_gene)
 #' @format A data frame with 1236881 rows and 9 variables
@@ -52,7 +71,6 @@ NULL
 #' @name gff_metadata
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{data_blah.com}
 #' @keywords data
 #' @usage data(gff_metadata)
 #' @format A data frame with 3 rows and 1 variable.
@@ -88,7 +106,7 @@ NULL
 #' @name anno_info
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{data_blah.com}
+#' @references \url{switchgrassgenomepaper.link}
 #' @keywords data
 #' @usage data(anno_info)
 #' @format A data frame with 80278 rows and 16 variables.
@@ -102,7 +120,7 @@ NULL
 #' @name theme_oeco
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{data_blah.com}
+#' @references \url{switchgrassgenomepaper.link}
 #' @keywords data
 #' @usage data(theme_oeco)
 #' @format A list containing ggplot2 specifications
@@ -196,7 +214,7 @@ NULL
 #' @name pvdiv_metadata
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{data_blah.com}
+#' @references \url{switchgrassgenomepaper.link}
 #' @keywords data
 #' @usage data(pvdiv_metadata)
 #' @format A data frame with 1347 rows and 37 variables.

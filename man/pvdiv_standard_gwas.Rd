@@ -6,7 +6,7 @@
 \usage{
 pvdiv_standard_gwas(
   snp,
-  df = switchgrassGWAS::phenotypes,
+  df = switchgrassGWAS::pvdiv_phenotypes,
   type = c("linear", "logistic"),
   ncores = nb_cores(),
   outputdir = ".",

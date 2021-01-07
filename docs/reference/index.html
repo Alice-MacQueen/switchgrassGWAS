@@ -134,8 +134,8 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-datasets" class="hasAnchor"><a href="#section-datasets" class="anchor"></a>Datasets</h2>
+          <p class="section-desc"><p>Datasets associated with the pvdiv panel</p></p>
         </th>
       </tr>
       
@@ -146,15 +146,149 @@
       <tr>
         
         <td>
+          <p><code><a href="pvdiv_metadata.html">pvdiv_metadata</a></code> </p>
+        </td>
+        <td><p>Metadata table for the Panicum virgatum diversity panel</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_phenotypes.html">pvdiv_phenotypes</a></code> </p>
+        </td>
+        <td><p>Phenotypes available for the Panicum virgatum diversity panel.</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="anno_info.html">anno_info</a></code> </p>
         </td>
         <td><p>Annotation information from Pvirgatum_516_v5.1.annotation_info</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="asv_best_PC_df.html">asv_best_PC_df()</a></code> </p>
+          <p><code><a href="gff_gene.html">gff_gene</a></code> </p>
         </td>
-        <td><p>Return best number of PCs in terms of lambda_GC following Cattrell's rule.</p></td>
+        <td><p>GFF3 Gene information</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-genome-wide-association" class="hasAnchor"><a href="#section-genome-wide-association" class="anchor"></a>Genome-wide association</h2>
+          <p class="section-desc"><p>Functions for genome-wide association on the pvdiv panel</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="pvdiv_standard_gwas.html">pvdiv_standard_gwas()</a></code> </p>
+        </td>
+        <td><p>Juenger lab standard GWAS function.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_gwas.html">pvdiv_gwas()</a></code> </p>
+        </td>
+        <td><p>Wrapper for bigsnpr for GWAS on Panicum virgatum.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_qqplot.html">pvdiv_qqplot()</a></code> </p>
+        </td>
+        <td><p>Create a quantile-quantile plot with ggplot2.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_table_topsnps.html">pvdiv_table_topsnps()</a></code> </p>
+        </td>
+        <td><p>Create a Table of Annotated Top SNPs for Panicum virgatum</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_results_in_folder.html">pvdiv_results_in_folder()</a></code> </p>
+        </td>
+        <td><p>Identify phenotype names from bigsnpr results in a folder.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_kinship.html">pvdiv_kinship()</a></code> </p>
+        </td>
+        <td><p>Find a kinship matrix using the van Raden method.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_lambda_GC.html">pvdiv_lambda_GC()</a></code> </p>
+        </td>
+        <td><p>Return lambda_GC for different numbers of PCs for GWAS on Panicum virgatum.</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-multivariate-adaptive-shrinkage" class="hasAnchor"><a href="#section-multivariate-adaptive-shrinkage" class="anchor"></a>Multivariate adaptive shrinkage</h2>
+          <p class="section-desc"><p>Functions for multi-condition SNP effect estimates using mash</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="pvdiv_results_in_folder.html">pvdiv_results_in_folder()</a></code> </p>
+        </td>
+        <td><p>Identify phenotype names from bigsnpr results in a folder.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pvdiv_bigsnp2mashr.html">pvdiv_bigsnp2mashr()</a></code> </p>
+        </td>
+        <td><p>Convert bigsnpr output to mashr input dataframes.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_standard_run.html">mash_standard_run()</a></code> </p>
+        </td>
+        <td><p>A standard run of mashr</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_plot_Ulist.html">mash_plot_Ulist()</a></code> </p>
+        </td>
+        <td><p>ggplot of specific covariance matrix patterns</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_plot_covar.html">mash_plot_covar()</a></code> </p>
+        </td>
+        <td><p>ggplot of covariance matrix masses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_plot_effects.html">mash_plot_effects()</a></code> </p>
+        </td>
+        <td><p>ggplot of single mash effect</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_plot_manhattan_by_condition.html">mash_plot_manhattan_by_condition()</a></code> </p>
+        </td>
+        <td><p>Manhattan plot in ggplot colored by significant conditions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_plot_pairwise_sharing.html">mash_plot_pairwise_sharing()</a></code> </p>
+        </td>
+        <td><p>Create a ggplot of pairwise sharing of mash effects</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mash_plot_sig_by_condition.html">mash_plot_sig_by_condition()</a></code> </p>
+        </td>
+        <td><p>Significant SNPs per number of conditions</p></td>
       </tr><tr>
         
         <td>
@@ -245,198 +379,6 @@ the mass.</p></td>
         </td>
         <td><p>From a mash result, get effects that are significant in at least
 one condition.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gff_gene.html">gff_gene</a></code> </p>
-        </td>
-        <td><p>GFF3 Gene information</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gff_metadata.html">gff_metadata</a></code> </p>
-        </td>
-        <td><p>Metadata lines for the gene GFF3</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="load_mash_df.html">load_mash_df()</a></code> </p>
-        </td>
-        <td><p>Read in the random and the strong datasets</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_plot_Ulist.html">mash_plot_Ulist()</a></code> </p>
-        </td>
-        <td><p>ggplot of specific covariance matrix patterns</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_plot_covar.html">mash_plot_covar()</a></code> </p>
-        </td>
-        <td><p>ggplot of covariance matrix masses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_plot_effects.html">mash_plot_effects()</a></code> </p>
-        </td>
-        <td><p>ggplot of single mash effect</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_plot_manhattan_by_condition.html">mash_plot_manhattan_by_condition()</a></code> </p>
-        </td>
-        <td><p>Manhattan plot in ggplot colored by significant conditions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_plot_pairwise_sharing.html">mash_plot_pairwise_sharing()</a></code> </p>
-        </td>
-        <td><p>Create a ggplot of pairwise sharing of mash effects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_plot_sig_by_condition.html">mash_plot_sig_by_condition()</a></code> </p>
-        </td>
-        <td><p>Significant SNPs per number of conditions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mash_standard_run.html">mash_standard_run()</a></code> </p>
-        </td>
-        <td><p>A standard run of mashr</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="phenotypes.html">phenotypes</a></code> </p>
-        </td>
-        <td><p>Phenotypes available for the Panicum virgatum diversity panel.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_autoSVD.html">pvdiv_autoSVD()</a></code> </p>
-        </td>
-        <td><p>Wrapper for the snp_autoSVD function for switchgrass.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_bigsnp2mashr.html">pvdiv_bigsnp2mashr()</a></code> </p>
-        </td>
-        <td><p>Convert bigsnpr output to mashr input dataframes.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_bigsnp2tibble.html">pvdiv_bigsnp2tibble()</a></code> </p>
-        </td>
-        <td><p>Convert A <code>FBM.code256</code> SNP subset to a dataframe.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_bigsnp_subset.html">pvdiv_bigsnp_subset()</a></code> </p>
-        </td>
-        <td><p>Make a SNP dataframe subset from annotation table or a genomic range.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_fdr.html">pvdiv_fdr()</a></code> </p>
-        </td>
-        <td><p>Compute Adjusted False Discovery Rate for pvdiv_gwas output.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_gwas.html">pvdiv_gwas()</a></code> </p>
-        </td>
-        <td><p>Wrapper for bigsnpr for GWAS on Panicum virgatum.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_kinship.html">pvdiv_kinship()</a></code> </p>
-        </td>
-        <td><p>Find a kinship matrix using the van Raden method.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_lambda_GC.html">pvdiv_lambda_GC()</a></code> </p>
-        </td>
-        <td><p>Return lambda_GC for different numbers of PCs for GWAS on Panicum virgatum.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_metadata.html">pvdiv_metadata</a></code> </p>
-        </td>
-        <td><p>Metadata table for the Panicum virgatum diversity panel</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_qqplot.html">pvdiv_qqplot()</a></code> </p>
-        </td>
-        <td><p>Create a quantile-quantile plot with ggplot2.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_results_in_folder.html">pvdiv_results_in_folder()</a></code> </p>
-        </td>
-        <td><p>Identify phenotype names from bigsnpr results in a folder.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_standard_gwas.html">pvdiv_standard_gwas()</a></code> </p>
-        </td>
-        <td><p>Juenger lab standard GWAS function.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_subset_popgenome.html">pvdiv_subset_popgenome()</a></code> </p>
-        </td>
-        <td><p>Get GFF subsets</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_table_topsnps.html">pvdiv_table_topsnps()</a></code> </p>
-        </td>
-        <td><p>Create a Table of Annotated Top SNPs for Panicum virgatum</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_top_effects_log10p.html">pvdiv_top_effects_log10p()</a></code> </p>
-        </td>
-        <td><p>Step One of bigsnp2mashr</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pvdiv_vcf_popgenome.html">pvdiv_vcf_popgenome()</a></code> </p>
-        </td>
-        <td><p>Format the VCF subset</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="reorder_cormat.html">reorder_cormat()</a></code> </p>
-        </td>
-        <td><p>Reorder correlation matrix</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="round2.html">round2()</a></code> </p>
-        </td>
-        <td><p>Return a number rounded to some number of digits</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="round_xy.html">round_xy()</a></code> </p>
-        </td>
-        <td><p>Return a dataframe binned into 2-d bins by some x and y.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="s_hat_bigsnp.html">s_hat_bigsnp()</a></code> </p>
-        </td>
-        <td><p>Step Two of bigsnp2mashr</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="theme_oeco.html">theme_oeco</a></code> </p>
-        </td>
-        <td><p>Oeco ggplot theme</p></td>
       </tr>
     </tbody>
     </table>

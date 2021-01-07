@@ -104,8 +104,8 @@
 <p>Third, you want to calculate the number of SNPs with low p-values to select from each GWAS. Ideally mash will have from 1-2M cells for reasonable run times. You can divide 2 million by the square of the number of phenotypes you have to get a reasonable starting point for this value. Depending on your computing power and the amount of overlap of low p-value SNPs between your GWAS, you may need to tweak this number further.</p>
 <p>Finally, you run the <code><a href="../reference/pvdiv_bigsnp2mashr.html">pvdiv_bigsnp2mashr()</a></code> function using these quantities. Choose the model type that you ran on your GWAS. Current options are “logistic” or “linear”. Mixing these types is not supported (and statistically is probably a bad idea, also.) Also choose whether you want to save the output to a file in your path - recommended, though the default is FALSE, so the user needs to ‘opt in’ to this.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">phenotypes</span><span class="op">)</span>
-<span class="va">gwas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pvdiv_gwas.html">pvdiv_gwas</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">phenotypes</span>, type <span class="op">=</span> <span class="st">"linear"</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">pvdiv_phenotypes</span><span class="op">)</span>
+<span class="va">gwas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pvdiv_gwas.html">pvdiv_gwas</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">pvdiv_phenotypes</span>, type <span class="op">=</span> <span class="st">"linear"</span>,
                    snp <span class="op">=</span> <span class="va">snp</span>, covar <span class="op">=</span> <span class="va">svd0</span>, ncores <span class="op">=</span> <span class="va">NCORES</span><span class="op">)</span>
 
 
@@ -150,7 +150,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nbycond</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_sig_by_condition.html">mash_plot_sig_by_condition</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">mash_output</span><span class="op">)</span>
 <span class="va">nbycond</span><span class="op">$</span><span class="va">ggobject</span></code></pre></div>
-<p><img src="man/figures/mash-unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p><img src="vignettes/man/figures/mash-unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
 <div id="b--manhattan-esque-plot-mashhattan" class="section level4">
 <h4 class="hasAnchor">
@@ -159,7 +159,7 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mashhattan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_manhattan_by_condition.html">mash_plot_manhattan_by_condition</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">mash_output</span><span class="op">)</span>
 <span class="va">mashhattan</span><span class="op">$</span><span class="va">ggmanobject</span></code></pre></div>
-<p><img src="man/figures/mash-unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p><img src="vignettes/man/figures/mash-unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
 <div id="c--pairwise-sharing-of-similar-effects" class="section level4">
 <h4 class="hasAnchor">
@@ -173,7 +173,7 @@
 <span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for 'colour',</span>
 <span class="co">#&gt; which will replace the existing scale.</span>
 <span class="va">pairwise_plot</span><span class="op">$</span><span class="va">gg_corr</span></code></pre></div>
-<p><img src="man/figures/mash-unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p><img src="vignettes/man/figures/mash-unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
 <div id="d--look-at-mash-effect-plots" class="section level4">
 <h4 class="hasAnchor">
@@ -184,7 +184,7 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_effects.html">mash_plot_effects</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">mash_output</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">effects</span><span class="op">$</span><span class="va">ggobject</span> </code></pre></div>
-<p><img src="man/figures/mash-unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p><img src="vignettes/man/figures/mash-unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>

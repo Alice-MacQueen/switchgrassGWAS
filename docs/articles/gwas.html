@@ -113,7 +113,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmpTR4fkX/file16e9075d430c2.rds"</span>
+<span class="co">#&gt; [1] "/tmp/Rtmp6vaTrd/file20000703ba0cb.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -142,11 +142,11 @@
 <span class="co">#&gt;  - attr(*, "class")= chr "bigSNP"</span>
 
 <span class="co"># Load the pvdiv phenotypes into the R session.</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">phenotypes</span><span class="op">)</span> 
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">pvdiv_phenotypes</span><span class="op">)</span> 
 <span class="co"># Make an example dataframe of one phenotype where the first column is PLANT_ID.</span>
 <span class="co"># This "phenotype", 'GWAS_CT', is the number of times a plant successfully </span>
 <span class="co"># clonally replicated to plant in the common gardens in 2018.</span>
-<span class="va">one_phenotype</span> <span class="op">&lt;-</span> <span class="va">phenotypes</span> <span class="op">%&gt;%</span>
+<span class="va">one_phenotype</span> <span class="op">&lt;-</span> <span class="va">pvdiv_phenotypes</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">PLANT_ID</span>, <span class="va">GWAS_CT</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="run-genome-wide-association-gwas" class="section level2">
@@ -192,7 +192,7 @@
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
 <span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, /tmp/RtmpTR4fkX.</p>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: /tmp/Rtmp6vaTrd.</p>
 <p>The example Manhattan plot should look like this:</p>
 <div class="figure">
 <img src="../inst/extdata/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>
