@@ -113,7 +113,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/Rtmp6vaTrd/file20000703ba0cb.rds"</span>
+<span class="co">#&gt; [1] "/tmp/Rtmp26wEXE/file223c550569cd9.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -192,7 +192,7 @@
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
 <span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: /tmp/Rtmp6vaTrd.</p>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: /tmp/Rtmp26wEXE.</p>
 <p>The example Manhattan plot should look like this:</p>
 <div class="figure">
 <img src="../inst/extdata/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>

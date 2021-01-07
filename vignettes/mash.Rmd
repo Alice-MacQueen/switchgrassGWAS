@@ -13,7 +13,6 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "vignettes/man/figures/mash-",
   fig.width = 6,
   fig.asp = 0.618,
   out.width = "70%",

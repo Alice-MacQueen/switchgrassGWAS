@@ -250,19 +250,21 @@ pvdiv_kinship <- function(snp, ind.row = NA, hasInbred = TRUE,
 #' @importFrom cowplot save_plot
 #'
 #' @examples
-#' snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
-#' library(bigsnpr)
-#' snp <- snp_attach(snpfile)
-#' pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", savegwas = FALSE,
-#'     saveplots = FALSE, ncores = 1)
-#'
 #' \dontrun{
 #' # Here we specify that we do want to generate and save the gwas dataframes,
 #' # the Manhattan and QQ-plots, and the annotation tables.
-#' pvdiv_standard_gwas(snp, df = phenotypes, type = "linear", covar = svd,
+#' pvdiv_standard_gwas(snp, df = pvdiv_phenotypes, type = "linear", covar = svd,
 #'     ncores = nb_cores(), lambdagc = TRUE, savegwas = TRUE, saveplots = TRUE,
 #'     saveannos = TRUE, txdb = txdb)
 #' }
+#' # In this example, we run GWAS on all the phenotypes in pvdiv_phenotypes
+#' # using an example SNP set of ~1800 SNPs.
+#' snpfile <- system.file("extdata", "example_bigsnp.rds", package = "switchgrassGWAS")
+#' library(bigsnpr)
+#' snp <- snp_attach(snpfile)
+#' pvdiv_standard_gwas(snp, df = pvdiv_phenotypes, type = "linear", savegwas = FALSE,
+#'     saveplots = FALSE, ncores = 1)
+#'
 #'
 #' @export
 pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::pvdiv_phenotypes,
