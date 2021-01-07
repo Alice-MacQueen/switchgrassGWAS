@@ -113,7 +113,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmpnegzmW/file13f16bef2d83.rds"</span>
+<span class="co">#&gt; [1] "/tmp/RtmpTR4fkX/file16e9075d430c2.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -144,8 +144,10 @@
 <span class="co"># Load the pvdiv phenotypes into the R session.</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">phenotypes</span><span class="op">)</span> 
 <span class="co"># Make an example dataframe of one phenotype where the first column is PLANT_ID.</span>
+<span class="co"># This "phenotype", 'GWAS_CT', is the number of times a plant successfully </span>
+<span class="co"># clonally replicated to plant in the common gardens in 2018.</span>
 <span class="va">one_phenotype</span> <span class="op">&lt;-</span> <span class="va">phenotypes</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">PLANT_ID</span>, <span class="va">BRKG_TC_EOS_2018</span><span class="op">)</span></code></pre></div>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">PLANT_ID</span>, <span class="va">GWAS_CT</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="run-genome-wide-association-gwas" class="section level2">
 <h2 class="hasAnchor">
@@ -163,37 +165,42 @@
 <span class="co">#&gt; Covariance matrix (covar) was not supplied - this will be generated using pvdiv_autoSVD().</span>
 <span class="co">#&gt; Loading required namespace: dots</span>
 <span class="co">#&gt; 'saveoutput' is FALSE, so the svd will not be saved to the working directory.</span>
-<span class="co">#&gt; Now starting GWAS pipeline for BRKG_TC_EOS_2018.</span>
+<span class="co">#&gt; Now starting GWAS pipeline for GWAS_CT.</span>
 <span class="co">#&gt; Now determining lambda_GC for GWAS models with 16 sets of PCs. This will take some time.</span>
 <span class="co">#&gt; saveoutput is FALSE, so lambda_GC values won't be saved to a csv.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 0 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 1 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 2 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 3 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 4 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 5 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 6 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 7 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 8 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 9 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 10 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 11 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 12 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 13 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 14 PCs.</span>
-<span class="co">#&gt; Finished Lambda_GC calculation for BRKG_TC_EOS_2018 using 15 PCs.</span>
-<span class="co">#&gt; Finished phenotype 1: BRKG_TC_EOS_2018</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 0 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 1 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 2 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 3 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 4 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 5 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 6 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 7 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 8 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 9 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 10 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 11 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 12 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 13 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 14 PCs.</span>
+<span class="co">#&gt; Finished Lambda_GC calculation for GWAS_CT using 15 PCs.</span>
+<span class="co">#&gt; Finished phenotype 1: GWAS_CT</span>
 <span class="co">#&gt; Warning: The `path` argument of `write_csv()` is deprecated as of readr 1.4.0.</span>
 <span class="co">#&gt; Please use the `file` argument instead.</span>
 <span class="co">#&gt; This warning is displayed once every 8 hours.</span>
 <span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span>
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
-<span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span>
-<span class="co">#&gt; Warning in min(.data$log10p): no non-missing arguments to min; returning Inf</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, /tmp/RtmpnegzmW.</p>
-<p>The example Manhattan plot should look like this: <img src="../inst/extdata/Ex_Manhattan.png" style="width:50.0%" alt="Manhattan"></p>
-<p>And the example QQ plot should look like this. <img src="../inst/extdata/Ex_QQ.png" style="width:50.0%" alt="QQ-plot"></p>
+<span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, /tmp/RtmpTR4fkX.</p>
+<p>The example Manhattan plot should look like this:</p>
+<div class="figure">
+<img src="../inst/extdata/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>
+</div>
+<p>And the example QQ plot should look like this.</p>
+<div class="figure">
+<img src="../inst/extdata/Ex_QQ.png" style="width:50.0%" alt=""><p class="caption">QQ-plot</p>
+</div>
 <p><code>pvdiv_standard_gwas</code> is a wrapper function for the standard GWAS done in the Juenger lab. You must specify three things to use this function: 1) a snp file in bigSNP format, 2) a phenotype file where the first column is PLANT_ID (as in <code><a href="../reference/pvdiv_metadata.html">switchgrassGWAS::pvdiv_metadata</a></code>), and 3) whether the GWAS should be a linear or logistic regression.</p>
 <div id="additional-features" class="section level3">
 <h3 class="hasAnchor">

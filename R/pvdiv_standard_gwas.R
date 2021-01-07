@@ -403,7 +403,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::phenotypes,
     gwas_data$FDR_adj <- p.adjust(gwas_data$pvalue, method = "BH")
     if(savegwas == TRUE){
       # Save a data.table object with the GWAS results
-      write_rds(gwas_data, path = file.path(outputdir,
+      write_rds(gwas_data, file = file.path(outputdir,
                                             paste0("GWAS_datatable_", phename,
                                                    "_", type, "_model_", nPhe,
                                                    "g_", nSNP_M, "M_SNPs_",

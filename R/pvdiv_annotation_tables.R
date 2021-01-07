@@ -3,25 +3,38 @@
 #' @importFrom multtest mt.rawp2adjp
 #' @importFrom stats predict
 bigsnp2anno <- function(df, markers, FDRalpha){
-  input_df <- df %>%
-    mutate(p.value = predict(df, log10 = FALSE))
-  if(!is.na(FDRalpha)[1]){
-    res <- mt.rawp2adjp(input_df$p.value, alpha = FDRalpha,
-                        proc = "BH")
-    adj_p <- res$adjp[order(res$index), ]
-    input_df <- cbind(markers, input_df, adj_p) %>%
+  if(attr(df, "class") == "tbl_df" & "bigsnpscore" %in% names(df) &
+     "pvalue" %in% names(df) & "FDR_adj" %in% names(df) &
+     "CHR" %in% names(df) & "POS" %in% names(df)
+     & "estim" %in% names(df) & "std_err" %in% names(df)){
+    input_df <- df %>%
       as_tibble() %>%
-      dplyr::rename(`p value` = .data$p.value,
-                    `FDR Adjusted p value` = .data$`BH`,
+      dplyr::rename(`p value` = .data$pvalue,
+                    `FDR Adjusted p value` = .data$`FDR_adj`,
                     `SNP Effect` = .data$estim,
-                    `SNP standard error` = .data$std.err)
-  } else {
-    input_df <- cbind(markers, input_df) %>%
-      as_tibble() %>%
-      dplyr::rename(`p value` = .data$p.value,
-                    `SNP Effect` = .data$estim,
-                    `SNP standard error` = .data$std.err)
-  }
+                    `SNP standard error` = .data$std_err)
+
+    } else { # else this is an object from pvdiv_gwas and needs additional vals
+    input_df <- df %>%
+      mutate(p.value = predict(df, log10 = FALSE))
+    if(!is.na(FDRalpha)[1]){
+      res <- mt.rawp2adjp(input_df$p.value, alpha = FDRalpha,
+                          proc = "BH")
+      adj_p <- res$adjp[order(res$index), ]
+      input_df <- cbind(markers, input_df, adj_p) %>%
+        as_tibble() %>%
+        dplyr::rename(`p value` = .data$p.value,
+                      `FDR Adjusted p value` = .data$`BH`,
+                      `SNP Effect` = .data$estim,
+                      `SNP standard error` = .data$std.err)
+    } else {
+      input_df <- cbind(markers, input_df) %>%
+        as_tibble() %>%
+        dplyr::rename(`p value` = .data$p.value,
+                      `SNP Effect` = .data$estim,
+                      `SNP standard error` = .data$std.err)
+      }
+    }
   return(input_df)
 }
 
