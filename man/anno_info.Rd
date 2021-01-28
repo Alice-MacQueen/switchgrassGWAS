@@ -38,7 +38,7 @@ variant is included in this dataset.
 }
 }
 \references{
-\url{switchgrassgenomepaper.link}
+\url{https://www.nature.com/articles/s41586-020-03127-1}
 }
 \author{
 Alice MacQueen \email{alice.macqueen@utexas.edu}

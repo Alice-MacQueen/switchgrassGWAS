@@ -33,7 +33,7 @@
 #' @name pvdiv_phenotypes
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{switchgrassgenomepaper.link}
+#' @references \url{https://www.nature.com/articles/s41586-020-03127-1}
 #' @keywords data
 #' @usage data(pvdiv_phenotypes)
 #' @format A data frame with 1114 rows and 13 variables
@@ -106,7 +106,7 @@ NULL
 #' @name anno_info
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{switchgrassgenomepaper.link}
+#' @references \url{https://www.nature.com/articles/s41586-020-03127-1}
 #' @keywords data
 #' @usage data(anno_info)
 #' @format A data frame with 80278 rows and 16 variables.
@@ -120,7 +120,7 @@ NULL
 #' @name theme_oeco
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{switchgrassgenomepaper.link}
+#' @references \url{https://www.nature.com/articles/s41586-020-03127-1}
 #' @keywords data
 #' @usage data(theme_oeco)
 #' @format A list containing ggplot2 specifications
@@ -214,7 +214,7 @@ NULL
 #' @name pvdiv_metadata
 #' @docType data
 #' @author Alice MacQueen \email{alice.macqueen@@utexas.edu}
-#' @references \url{switchgrassgenomepaper.link}
+#' @references \url{https://www.nature.com/articles/s41586-020-03127-1}
 #' @keywords data
 #' @usage data(pvdiv_metadata)
 #' @format A data frame with 1347 rows and 37 variables.

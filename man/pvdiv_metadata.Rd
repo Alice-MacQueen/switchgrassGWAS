@@ -96,7 +96,7 @@ one or more common garden in the summer of 2018.
 }
 }
 \references{
-\url{switchgrassgenomepaper.link}
+\url{https://www.nature.com/articles/s41586-020-03127-1}
 }
 \author{
 Alice MacQueen \email{alice.macqueen@utexas.edu}

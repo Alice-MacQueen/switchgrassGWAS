@@ -13,7 +13,8 @@ status](https://ci.appveyor.com/api/projects/status/github/Alice-MacQueen/switch
 
 The R package <b>switchgrassGWAS</b> provides functions for genome-wide
 association analysis on the *<b>P</b>anicum <b>v</b>irgatum*
-<b>div</b>ersity (<b>pvdiv</b>) panel.
+<b>div</b>ersity (<b>pvdiv</b>) panel. It’s associated with [this
+paper](https://www.nature.com/articles/s41586-020-03127-1).
 
 ## Installation
 
@@ -66,7 +67,8 @@ genome-wide association (GWAS) using
 functions to link diversity panel phenotypic data with publicly
 available [SNP data](https://doi.org/10.18738/T8/ET9UAU), to prepare
 GWAS results plots using ggplot, and to prepare multiple univariate GWAS
-results for use in the downstream application mash.
+results for use in the downstream application
+[mash](https://www.nature.com/articles/s41588-018-0268-8).
 
 ## Usage
 
@@ -86,3 +88,13 @@ for genotypes in the diversity panel, and the publicly available
 
 The HTML documentation for the development version is available on
 [Github](https://alice-macqueen.github.io/switchgrassGWAS/).
+
+## Citing this work
+
+If you find the switchgrassGWAS package or any of the source code in
+this repository useful for your work, please cite:
+
+> Lovell, J.T., MacQueen, A.H., Mamidi, S. <i>et al.</i> [Genomic
+> mechanisms of climate adaptation in polyploid bioenergy
+> switchgrass](https://doi.org/10.1038/s41586-020-03127-1).
+> <i>Nature</i> (2021). <https://doi.org/10.1038/s41586-020-03127-1>
