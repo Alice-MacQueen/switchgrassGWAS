@@ -51,7 +51,7 @@ devtools::install_github("lcolladotor/dots")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 install.packages("curl")
-BiocManager::install(c("GenomicFeatures", "VariantAnnotation"))
+BiocManager::install(c("GenomicFeatures", "VariantAnnotation", "multtest"))
 ```
 
 ## Background
