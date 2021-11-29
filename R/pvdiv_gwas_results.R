@@ -264,7 +264,7 @@ thresholdFBM <- function(X, ind, thr, quantile = NA) {
 #' @importFrom tibble add_column
 #'
 #' @export
-get_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA){
+pvdiv_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA){
   if (attr(snp, "class") != "bigSNP") {
     stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
   }
@@ -340,7 +340,7 @@ get_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA){
 #' @import hexbin
 #'
 #' @export
-plot_qq_two_gwas <- function(effects, metadata, e_row = 1,
+pvdiv_fbm_qq <- function(effects, metadata, e_row = 1,
                              o_row = 2:nrow(metadata), thr = 5,
                              suffix = NA, outputdir = ".") {
   requireNamespace("hexbin")

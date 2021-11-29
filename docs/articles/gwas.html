@@ -78,7 +78,7 @@
 
       
 
-      </header><script src="gwas_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="gwas_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Genome-Wide Association</h1>
@@ -116,14 +116,14 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/RtmpZiRM4K/file94d6e5dad452b.rds"</span>
+<span class="co">#&gt; [1] "/tmp/Rtmpua08s1/file1365c1bb06318.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># What does the bigSNP object look like?</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">snp_example</span>, max.level <span class="op">=</span> <span class="fl">2</span>, strict.width <span class="op">=</span> <span class="st">"cut"</span><span class="op">)</span>
 <span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ genotypes:Reference class 'FBM.code256' [package "bigstatsr"] with 15 fields</span>
+<span class="co">#&gt;  $ genotypes:Reference class 'FBM.code256' [package "bigstatsr"] with 16 fields</span>
 <span class="co">#&gt;   ..and 26 methods, of which 12 are  possibly relevant:</span>
 <span class="co">#&gt;   ..  add_columns, as.FBM, bm, bm.desc, check_dimensions,</span>
 <span class="co">#&gt;   ..  check_write_permissions, copy#envRefClass, initialize, initialize#FBM,</span>
@@ -149,7 +149,7 @@
 <span class="co"># Make an example dataframe of one phenotype where the first column is PLANT_ID.</span>
 <span class="co"># This "phenotype", 'GWAS_CT', is the number of times a plant successfully </span>
 <span class="co"># clonally replicated to plant in the common gardens in 2018.</span>
-<span class="va">one_phenotype</span> <span class="op">&lt;-</span> <span class="va">pvdiv_phenotypes</span> <span class="op">%&gt;%</span>
+<span class="va">one_phenotype</span> <span class="op">&lt;-</span> <span class="va">pvdiv_phenotypes</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">PLANT_ID</span>, <span class="va">GWAS_CT</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="run-genome-wide-association-gwas" class="section level2">
@@ -190,12 +190,10 @@
 <span class="co">#&gt; Finished phenotype 1: GWAS_CT</span>
 <span class="co">#&gt; Warning: The `path` argument of `write_csv()` is deprecated as of readr 1.4.0.</span>
 <span class="co">#&gt; Please use the `file` argument instead.</span>
-<span class="co">#&gt; This warning is displayed once every 8 hours.</span>
-<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span>
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
 <span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: /tmp/RtmpZiRM4K.</p>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: /tmp/Rtmpua08s1.</p>
 <p>The example Manhattan plot should look like this:</p>
 <div class="figure">
 <img src="../inst/extdata/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>

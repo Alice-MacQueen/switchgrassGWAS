@@ -31,6 +31,9 @@
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/get_estimated_pi.html</loc>
   </url>
   <url>
+    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/get_fbm_upset_df.html</loc>
+  </url>
+  <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/get_lambdagc.html</loc>
   </url>
   <url>
@@ -86,6 +89,9 @@
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/plot_qq_two_gwas.html</loc>
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/pvdiv_autoSVD.html</loc>
@@ -155,6 +161,9 @@
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/theme_oeco.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//reference/thresholdFBM.html</loc>
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS//articles/annotations.html</loc>

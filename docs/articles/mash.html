@@ -78,7 +78,7 @@
 
       
 
-      </header><script src="mash_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="mash_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Multivariate Adaptive Shrinkage</h1>
@@ -161,7 +161,9 @@
 <p>This plot can help answer questions like, “What is the genomic distribution of SNPs with significant effects, and at how many planting sites do these SNPs affect the phenotype?”</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mashhattan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_manhattan_by_condition.html">mash_plot_manhattan_by_condition</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">mash_output</span><span class="op">)</span>
-<span class="va">mashhattan</span><span class="op">$</span><span class="va">ggmanobject</span></code></pre></div>
+<span class="va">mashhattan</span><span class="op">$</span><span class="va">ggmanobject</span>
+<span class="co">#&gt; Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please</span>
+<span class="co">#&gt; use `guide = "none"` instead.</span></code></pre></div>
 <p><img src="mash_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
 <div id="c--pairwise-sharing-of-similar-effects" class="section level4">

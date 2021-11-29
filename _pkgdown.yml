@@ -19,6 +19,8 @@ reference:
   - pvdiv_results_in_folder
   - pvdiv_kinship
   - pvdiv_lambda_GC
+  - pvdiv_fbm_upset_df
+  - pvdiv_fbm_qq
 - title: "Multivariate adaptive shrinkage"
   desc: "Functions for multi-condition SNP effect estimates using mash"
 - contents:

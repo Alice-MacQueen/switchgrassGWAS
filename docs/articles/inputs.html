@@ -78,7 +78,7 @@
 
       
 
-      </header><script src="inputs_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="inputs_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SNP file inputs and QC</h1>
@@ -167,16 +167,16 @@
 
 <span class="co"># Filter to individuals that you have at least one phenotype for</span>
 <span class="co"># In this example, we only keep non-NA individuals for the bio5 phenotype</span>
-<span class="va">my_ind</span> <span class="op">&lt;-</span> <span class="va">pvdiv_phenotypes</span> <span class="op">%&gt;%</span>
+<span class="va">my_ind</span> <span class="op">&lt;-</span> <span class="va">pvdiv_phenotypes</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
     <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">bio5</span><span class="op">)</span><span class="op">)</span> 
 
 <span class="co"># Make numeric vector to select the individuals to keep using bigsnpr</span>
-<span class="va">ind_selector</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">snp</span><span class="op">$</span><span class="va">fam</span><span class="op">$</span><span class="va">sample.ID</span> <span class="op">%in%</span> <span class="va">my_ind</span><span class="op">$</span><span class="va">PLANT_ID</span><span class="op">)</span>
+<span class="va">ind_selector</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/which.html">which</a></span><span class="op">(</span><span class="va">snp</span><span class="op">$</span><span class="va">fam</span><span class="op">$</span><span class="va">sample.ID</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html">%in%</a></span> <span class="va">my_ind</span><span class="op">$</span><span class="va">PLANT_ID</span><span class="op">)</span>
  <span class="co"># Choose subset name</span>
 <span class="va">subset_name</span> <span class="op">&lt;-</span> <span class="st">"Pvirgatum_V5_GWAS_phenotyped_subset"</span>
 
 <span class="co"># Subset SNP files to phenotyped individuals</span>
-<span class="va">snpfile_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">snp</span>, ind.row <span class="op">=</span> <span class="va">ind_selector</span><span class="op">)</span>
+<span class="va">snpfile_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/subset.html">subset</a></span><span class="op">(</span><span class="va">snp</span>, ind.row <span class="op">=</span> <span class="va">ind_selector</span><span class="op">)</span>
 <span class="co"># Attach new SNP subset file for QC</span>
 <span class="va">snp_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html">snp_attach</a></span><span class="op">(</span><span class="va">snpfile_subset</span><span class="op">)</span>
 <span class="co"># Save SNP subset file as a bed file for QC</span>
