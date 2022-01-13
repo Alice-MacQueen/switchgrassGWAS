@@ -7,14 +7,14 @@
 #'
 #' @param gwas_obj A dataframe with a \code{p.value} column.
 #' @param alpha The type I error threshold. Default is 0.05.
-#' @param proc The procedure (from \code{multtest::mt.rawp2adjp}) used
-#' to calculate the False Discovery Rate. Default is Benjamini Hochberg, "BH".
+#' @param proc The procedure (used wholesale from \code{multtest::mt.rawp2adjp})
+#'     used to calculate the False Discovery Rate. Default is Benjamini
+#'     Hochberg, "BH".
 #'
 #' @return A \code{tbl_df()} of the original dataframe with a new column named
 #' \code{FDR_adjusted_p}.
 #'
 #' @importFrom dplyr arrange bind_cols select rename mutate
-#' @importFrom multtest mt.rawp2adjp
 #' @importFrom magrittr %>%
 #' @importFrom rlang !! .data
 #' @importFrom tibble as_tibble

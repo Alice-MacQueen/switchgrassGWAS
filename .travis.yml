@@ -22,17 +22,15 @@ before_install:
   - sudo apt-get install -y libgsl0-dev
   - sudo apt-get install -y libcurl4-openssl-dev
   - sudo apt-get install -y libxml2-dev
-  - sudo apt-get install -y libssl-dev 
+  - sudo apt-get install -y libssl-dev
   - sudo apt-get install -y libgit2-dev
 
 r_packages:
   - covr
 
-bioc_packages: multtest
 bioc_packages: VariantAnnotation
 bioc_packages: GenomicFeatures
 r_github_packages: privefl/bigsnpr
-r_github_packages: lcolladotor/dots
 r_github_packages: stephenslab/mashr@v0.2-11
 r_github_packages: stephens999/ashr
 

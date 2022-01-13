@@ -943,23 +943,22 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
                                        saveoutput = FALSE, filename = NA,
                                        suffix = "", ...){
   # Additional arguments for get_pairwise_sharing, ggcorr, and save_plot
-  requireNamespace("dots")
-  factor <- dots::dots(name = 'factor', value = 0.5, ...)
-  lfsr_thresh <- dots::dots(name = 'lfsr_thresh', value = 0.05, ...)
-  FUN <- dots::dots(name = 'FUN', value = identity, ...)
-  geom <- dots::dots(name = 'geom', value = 'circle', ...)
-  label <- dots::dots(name = 'label', value = FALSE, ...)
-  label_alpha <- dots::dots(name = 'label_alpha', value = TRUE, ...)
-  label_size <- dots::dots(name = 'label_size', value = 3, ...)
-  hjust <- dots::dots(name = 'hjust', value = 0.95, ...)
-  vjust <- dots::dots(name = 'vjust', value = 0.3, ...)
-  layout.exp <- dots::dots(name = 'layout.exp', value = 9, ...)
-  min_size <- dots::dots(name = 'min_size', value = 0, ...)
-  max_size <- dots::dots(name = 'max_size', value = 3.5, ...)
-  option <- dots::dots(name = 'option', value = 'B', ...)
-  dpi <- dots::dots(name = 'dpi', value = 500, ...)
+  factor <- dots(name = 'factor', value = 0.5, ...)
+  lfsr_thresh <- dots(name = 'lfsr_thresh', value = 0.05, ...)
+  FUN <- dots(name = 'FUN', value = identity, ...)
+  geom <- dots(name = 'geom', value = 'circle', ...)
+  label <- dots(name = 'label', value = FALSE, ...)
+  label_alpha <- dots(name = 'label_alpha', value = TRUE, ...)
+  label_size <- dots(name = 'label_size', value = 3, ...)
+  hjust <- dots(name = 'hjust', value = 0.95, ...)
+  vjust <- dots(name = 'vjust', value = 0.3, ...)
+  layout.exp <- dots(name = 'layout.exp', value = 9, ...)
+  min_size <- dots(name = 'min_size', value = 0, ...)
+  max_size <- dots(name = 'max_size', value = 3.5, ...)
+  option <- dots(name = 'option', value = 'B', ...)
+  dpi <- dots(name = 'dpi', value = 500, ...)
 
-  base_aspect_ratio <- dots::dots(name = 'base_aspect_ratio', value = 1.1, ...)
+  base_aspect_ratio <- dots(name = 'base_aspect_ratio', value = 1.1, ...)
 
   if(is.na(filename)[1]){
     if(!(str_sub(suffix, end = 1) %in% c("", "_"))){
@@ -992,7 +991,7 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
                 "3.  a correlation matrix (corrmatrix)."))
   }
 
-  base_height <- dots::dots(name = 'base_height',
+  base_height <- dots(name = 'base_height',
                             value = nrow(shared_effects)*0.33+1, ...)
 
   if(reorder == TRUE){

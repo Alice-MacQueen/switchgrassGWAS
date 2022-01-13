@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">switchgrassGWAS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1.0000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -55,6 +51,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/annotations.html">Annotation tables for top SNPs</a>
+    </li>
+    <li>
+      <a href="../articles/fbm.html">Using FBM GWAS Results</a>
     </li>
     <li>
       <a href="../articles/gwas.html">Genome-Wide Association</a>
@@ -78,13 +77,13 @@
 
       
 
-      </header><script src="mash_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Multivariate Adaptive Shrinkage</h1>
-                        <h4 class="author">Alice MacQueen</h4>
+                        <h4 data-toc-skip class="author">Alice MacQueen</h4>
             
-            <h4 class="date">2020-01-06</h4>
+            <h4 data-toc-skip class="date">2020-01-06</h4>
       
       
       <div class="hidden name"><code>mash.Rmd</code></div>
@@ -93,43 +92,43 @@
 
     
     
-<div id="analysis-of-multiple-phenotypes-or-planting-locations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#analysis-of-multiple-phenotypes-or-planting-locations" class="anchor"></a>Analysis of multiple phenotypes or planting locations</h2>
+<div class="section level2">
+<h2 id="analysis-of-multiple-phenotypes-or-planting-locations">Analysis of multiple phenotypes or planting locations<a class="anchor" aria-label="anchor" href="#analysis-of-multiple-phenotypes-or-planting-locations"></a>
+</h2>
 <p>Many researchers are measuring phenotypes on the <em>Panicum virgatum</em> diversity panel to understand the genes and genetic regions affecting these phenotypes. When similar phenotypes are collected at many locations, researchers may be interested in the extent to which effects of SNPs are similar or different across these different locations. The R package <code>mashr</code> can be used to conduct this kind of analysis, and downstream plotting functions in <code>switchgrassGWAS</code> can be used to further visualize and interpret the results of this analysis.</p>
 <p>After you run your GWAS using bigsnpr, there are three steps to running a mash analysis. First, you must convert the bigsnpr results to mashr input format. Second, you run the mash analysis. Third, you can visualize the mash results using <code>mashr</code> functions or using functions from <code>switchgrassGWAS</code>.</p>
-<div id="run-pvdiv_bigsnp2mashr-function" class="section level3">
-<h3 class="hasAnchor">
-<a href="#run-pvdiv_bigsnp2mashr-function" class="anchor"></a>1. Run <code>pvdiv_bigsnp2mashr</code> function</h3>
+<div class="section level3">
+<h3 id="run-pvdiv_bigsnp2mashr-function">1. Run <code>pvdiv_bigsnp2mashr</code> function<a class="anchor" aria-label="anchor" href="#run-pvdiv_bigsnp2mashr-function"></a>
+</h3>
 <p>The first three commands are setup for running the <code>pvdiv_bigsnp2mashr</code> function.</p>
-<p>You want a character vector containing the names of the rds files containing your GWAS results - you can find that with <code><a href="https://rdrr.io/r/base/list.files.html">list.files()</a></code> or with <code><a href="../reference/pvdiv_results_in_folder.html">pvdiv_results_in_folder()</a></code>. The path should be the location of the gwas files, and can be a relative or absolute path. The pattern to match can be anything, but defaults to "*.rds". Here I have used regular expressions to find four files to demonstrate mashr on.</p>
+<p>You want a character vector containing the names of the rds files containing your GWAS results - you can find that with <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code> or with <code><a href="../reference/pvdiv_results_in_folder.html">pvdiv_results_in_folder()</a></code>. The path should be the location of the gwas files, and can be a relative or absolute path. The pattern to match can be anything, but defaults to "*.rds". Here I have used regular expressions to find four files to demonstrate mashr on.</p>
 <p>Second, you what a character vector the same length as the one containing your GWAS rds files. This contains strings of whatever you want your phenotypic column names to ultimately be. If you’ve put the phenotype name into the GWAS rds file name (which I’d certainly recommend!), you can find this with a str_sub() command.</p>
 <p>Third, you want to calculate the number of SNPs with low p-values to select from each GWAS. Ideally mash will have from 1-2M cells for reasonable run times. You can divide 2 million by the square of the number of phenotypes you have to get a reasonable starting point for this value. Depending on your computing power and the amount of overlap of low p-value SNPs between your GWAS, you may need to tweak this number further.</p>
 <p>Finally, you run the <code><a href="../reference/pvdiv_bigsnp2mashr.html">pvdiv_bigsnp2mashr()</a></code> function using these quantities. Choose the model type that you ran on your GWAS. Current options are “logistic” or “linear”. Mixing these types is not supported (and statistically is probably a bad idea, also.) Also choose whether you want to save the output to a file in your path - recommended, though the default is FALSE, so the user needs to ‘opt in’ to this.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">pvdiv_phenotypes</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">pvdiv_phenotypes</span><span class="op">)</span>
 <span class="va">gwas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pvdiv_gwas.html">pvdiv_gwas</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">pvdiv_phenotypes</span>, type <span class="op">=</span> <span class="st">"linear"</span>,
                    snp <span class="op">=</span> <span class="va">snp</span>, covar <span class="op">=</span> <span class="va">svd0</span>, ncores <span class="op">=</span> <span class="va">NCORES</span><span class="op">)</span>
 
 
-<span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"markers.rda"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"markers2.rda"</span><span class="op">)</span>
-<span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html">snp_attach</a></span><span class="op">(</span><span class="st">"Pvirgatum_4x_784g_imp_phased_maf0.02_QC.rds"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"markers.rda"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"markers2.rda"</span><span class="op">)</span>
+<span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="st">"Pvirgatum_4x_784g_imp_phased_maf0.02_QC.rds"</span><span class="op">)</span>
 <span class="va">G</span> <span class="op">&lt;-</span> <span class="va">snp</span><span class="op">$</span><span class="va">genotypes</span>
 <span class="va">gwas_rds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pvdiv_results_in_folder.html">pvdiv_results_in_folder</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, pattern <span class="op">=</span> <span class="st">"GWAS_object_"</span><span class="op">)</span>
 
 <span class="va">phenotype_names</span> <span class="op">&lt;-</span> <span class="fu">str_sub</span><span class="op">(</span><span class="va">gwas_rds</span>, start <span class="op">=</span> <span class="fl">13</span>, end <span class="op">=</span> <span class="op">-</span><span class="fl">5</span><span class="op">)</span>
 
-<span class="va">numSNPs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="fl">1500000</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">phenotype_names</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
+<span class="va">numSNPs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fl">1500000</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">phenotype_names</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
 
 <span class="va">mash_input</span> <span class="op">&lt;-</span> <span class="fu">bigsnp2mashr</span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, gwas_rds <span class="op">=</span> <span class="va">gwas_rds</span>, 
                            phenotypes <span class="op">=</span> <span class="va">phenotype_names</span>, numSNPs <span class="op">=</span> <span class="va">numSNPs</span>, 
                            markers <span class="op">=</span> <span class="va">markers</span>, markers2 <span class="op">=</span> <span class="va">markers2</span>, G <span class="op">=</span> <span class="va">G</span>, 
                            model <span class="op">=</span> <span class="st">"linear"</span>, saveoutput <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="run-a-standard-mash-analysis" class="section level3">
-<h3 class="hasAnchor">
-<a href="#run-a-standard-mash-analysis" class="anchor"></a>2. Run a standard mash analysis</h3>
+<div class="section level3">
+<h3 id="run-a-standard-mash-analysis">2. Run a standard mash analysis<a class="anchor" aria-label="anchor" href="#run-a-standard-mash-analysis"></a>
+</h3>
 <p>Here, the input is the list object you obtained from <code>bigsnp2mashr()</code> in the previous step. Again, you can choose to save the output to a file in your path. You can optionally specify <code>numSNPs</code>, or if you are running this in a session where you don’t have the output from <code>bigsnp2mashr()</code> in your environment, you can specify <code>numSNPs</code> equivalent to your <code>bigsnp2mashr()</code> run and this function will find the rds files it saved (on that path, with that number of SNPs) for you.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mash_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_standard_run.html">mash_standard_run</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, list_input <span class="op">=</span> <span class="va">mash_input</span>, 
@@ -141,23 +140,23 @@
 <span class="co"># mash_output &lt;- mash_standard_run(path = ".", numSNPs = numSNPs,</span>
 <span class="co">#                                  saveoutput = TRUE)</span></code></pre></div>
 </div>
-<div id="visualize-mash-output" class="section level3">
-<h3 class="hasAnchor">
-<a href="#visualize-mash-output" class="anchor"></a>3. Visualize mash output</h3>
+<div class="section level3">
+<h3 id="visualize-mash-output">3. Visualize mash output<a class="anchor" aria-label="anchor" href="#visualize-mash-output"></a>
+</h3>
 <p>You have a lot of options here, and some great ones (most importantly, <code>mash_plot_meta</code>) are already included in the <code>mashr</code> package.</p>
 <p>However, this package adds a few additional options for viewing mash outputs.</p>
-<div id="a--number-of-significant-snps-per-number-of-conditions" class="section level4">
-<h4 class="hasAnchor">
-<a href="#a--number-of-significant-snps-per-number-of-conditions" class="anchor"></a>3a. Number of Significant SNPs per Number of Conditions</h4>
+<div class="section level4">
+<h4 id="a--number-of-significant-snps-per-number-of-conditions">3a. Number of Significant SNPs per Number of Conditions<a class="anchor" aria-label="anchor" href="#a--number-of-significant-snps-per-number-of-conditions"></a>
+</h4>
 <p>This plot can help answer questions like, “at how many planting sites do SNPs affect this phenotype?”</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nbycond</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_sig_by_condition.html">mash_plot_sig_by_condition</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">mash_output</span><span class="op">)</span>
 <span class="va">nbycond</span><span class="op">$</span><span class="va">ggobject</span></code></pre></div>
 <p><img src="mash_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
-<div id="b--manhattan-esque-plot-mashhattan" class="section level4">
-<h4 class="hasAnchor">
-<a href="#b--manhattan-esque-plot-mashhattan" class="anchor"></a>3b. Manhattan-esque plot (“Mashhattan”)</h4>
+<div class="section level4">
+<h4 id="b--manhattan-esque-plot-mashhattan">3b. Manhattan-esque plot (“Mashhattan”)<a class="anchor" aria-label="anchor" href="#b--manhattan-esque-plot-mashhattan"></a>
+</h4>
 <p>This plot can help answer questions like, “What is the genomic distribution of SNPs with significant effects, and at how many planting sites do these SNPs affect the phenotype?”</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mashhattan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_manhattan_by_condition.html">mash_plot_manhattan_by_condition</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">mash_output</span><span class="op">)</span>
@@ -166,23 +165,22 @@
 <span class="co">#&gt; use `guide = "none"` instead.</span></code></pre></div>
 <p><img src="mash_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
-<div id="c--pairwise-sharing-of-similar-effects" class="section level4">
-<h4 class="hasAnchor">
-<a href="#c--pairwise-sharing-of-similar-effects" class="anchor"></a>3c. Pairwise sharing of similar effects</h4>
+<div class="section level4">
+<h4 id="c--pairwise-sharing-of-similar-effects">3c. Pairwise sharing of similar effects<a class="anchor" aria-label="anchor" href="#c--pairwise-sharing-of-similar-effects"></a>
+</h4>
 <p>This plot can help answer questions like, “How many SNPs have similar effects at pairs of planting sites?”. As most analyses of GxE typically only consider interactions between pairs of sites, this plot is a useful extension of two-site models.</p>
 <p>If you saved the output of a mash_standard_run(), then you have saved two get_pairwise_sharing() outputs as rds objects already. All you need to do then is tell this function 1) the path to the RDS, for effectRDS; or 2) the correlation matrix you’re using if it’s an object in your environment, for corrmatrix.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pairwise_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mash_plot_pairwise_sharing.html">mash_plot_pairwise_sharing</a></span><span class="op">(</span>effectRDS <span class="op">=</span> <span class="va">pairwisefilepath</span>,
                                             reorder <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> 
-<span class="co">#&gt; Loading required namespace: dots</span>
 <span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for 'colour',</span>
 <span class="co">#&gt; which will replace the existing scale.</span>
 <span class="va">pairwise_plot</span><span class="op">$</span><span class="va">gg_corr</span></code></pre></div>
 <p><img src="mash_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
-<div id="d--look-at-mash-effect-plots" class="section level4">
-<h4 class="hasAnchor">
-<a href="#d--look-at-mash-effect-plots" class="anchor"></a>3d. Look at mash effect plots</h4>
+<div class="section level4">
+<h4 id="d--look-at-mash-effect-plots">3d. Look at mash effect plots<a class="anchor" aria-label="anchor" href="#d--look-at-mash-effect-plots"></a>
+</h4>
 <p>This plot can help answer questions like, “What are the effects of a single SNP on the phenotype across planting sites?”</p>
 <p>This will return ggplot objects for the effect plots for the <code>n</code>th significant SNP, ranked by the most significant local false sign rate. You can find the names of the top ten effects, for example, using <code>get_significant_results(m = mashoutput)[1:10]</code>.</p>
 <p>Alternatively, if you have the row number of the SNP you want to plot (which you can find with <code><a href="../reference/get_marker_df.html">get_marker_df()</a></code>), you can put that in as <code>i</code>.</p>
@@ -206,11 +204,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Alice MacQueen.</p>
+  <p></p>
+<p>Developed by Alice MacQueen.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -218,6 +218,8 @@
 
   
 
+
+  
 
   </body>
 </html>

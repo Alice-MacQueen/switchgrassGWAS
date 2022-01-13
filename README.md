@@ -46,12 +46,11 @@ These packages can be installed from within R with:
 ``` r
 install.packages("bigsnpr")
 install.packages("mashr")
-devtools::install_github("lcolladotor/dots")
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 install.packages("curl")
-BiocManager::install(c("GenomicFeatures", "VariantAnnotation", "multtest"))
+BiocManager::install(c("GenomicFeatures", "VariantAnnotation"))
 ```
 
 ## Background

@@ -81,3 +81,16 @@ And the example QQ plot should look like this.
     * Specify `saveplots = TRUE` if you want Manhattan and QQ-plots to be generated and saved to the output directory. (NB: This is the default.)
     * Specify `saveannos = TRUE` and specify a txdb object loaded into your environment with AnnotationDbi::loadDb, if you want annotation tables for top SNPs to be generated and saved to the output directory.
     * Specify an integer value for `minphe` if you want to specify a minimum number of phenotyped individuals to conduct a GWAS on. 
+    
+### Troubleshooting:
+
+If you get the error "Error in snp_autoSVD(G = G, infos.chr = CHRN$CHRN, infos.pos = POS, ncores = ncores,  :   object 'LD.wiki34' not found"
+
+Likely you have not called `library(bigsnpr)` in your current R session. You may need to run `install.packages("bigsnpr")` and then `library(bigsnpr)`, then try running the `pvdiv_standard_gwas()` command again.
+
+
+If you cannot find the temporary directory you created (tempdir): Try setting the output directory (outputdir) to your current working directory using outputdir = "." within `pvdiv_standard_gwas()`, or tempdir <- "." & keeping the `pvdiv_standard_gwas()` function as-is, then try running the `pvdiv_standard_gwas()` command again.
+
+
+
+

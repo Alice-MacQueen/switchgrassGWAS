@@ -1,6 +1,5 @@
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
-#' @importFrom multtest mt.rawp2adjp
 #' @importFrom stats predict
 bigsnp2anno <- function(df, markers, FDRalpha){
   if(attr(df, "class") == "tbl_df" & "bigsnpscore" %in% names(df) &
@@ -211,7 +210,6 @@ get_tidy_annos <- function(df, input, anno_info, txdb){
 #'
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
-#' @importFrom multtest mt.rawp2adjp
 #' @importFrom rlang is_null
 #' @importFrom tibble as_tibble
 #'

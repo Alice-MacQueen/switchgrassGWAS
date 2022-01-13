@@ -28,5 +28,20 @@ reference:
   - pvdiv_bigsnp2mashr
   - mash_standard_run
   - starts_with("mash")
-  - starts_with("get")
+  - get_colnames
+  - get_log10bf
+  - get_marker_df
+  - get_n_significant_conditions
+  - get_significant_results
+  - get_estimated_pi
+  - get_U_by_mass
+  - get_mash_metadata
+  - get_GxE
+  - get_pairwise_sharing
+
+
+
+
+
+
 

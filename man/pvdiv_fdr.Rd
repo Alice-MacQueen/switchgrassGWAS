@@ -11,8 +11,9 @@ pvdiv_fdr(gwas_obj, alpha = 0.05, proc = "BH")
 
 \item{alpha}{The type I error threshold. Default is 0.05.}
 
-\item{proc}{The procedure (from \code{multtest::mt.rawp2adjp}) used
-to calculate the False Discovery Rate. Default is Benjamini Hochberg, "BH".}
+\item{proc}{The procedure (used wholesale from \code{multtest::mt.rawp2adjp})
+used to calculate the False Discovery Rate. Default is Benjamini
+Hochberg, "BH".}
 }
 \value{
 A \code{tbl_df()} of the original dataframe with a new column named

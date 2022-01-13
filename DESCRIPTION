@@ -1,6 +1,6 @@
 Package: switchgrassGWAS
 Title: Genome Wide Association on Panicum virgatum
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Authors@R: 
     person(given = "Alice",
            family = "MacQueen",
@@ -23,7 +23,6 @@ Imports:
     lubridate,
     magrittr,
     matrixStats,
-    multtest,
     purrr,
     readr,
     rlang,
@@ -36,7 +35,6 @@ Imports:
     utils,
     viridis
 Suggests: 
-    dots,
     GenomicFeatures,
     knitr,
     mashr,

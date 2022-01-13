@@ -43,17 +43,16 @@ get_date_filename <- function(){
 #'
 #' @export
 pvdiv_autoSVD <- function(snp, k = 10, ncores = 1, saveoutput = FALSE, ...){
-  requireNamespace("dots")
-  fun.scaling <- dots::dots(name = 'fun.scaling', value = snp_scaleBinom(),
+  fun.scaling <- dots(name = 'fun.scaling', value = snp_scaleBinom(),
                             ...)
-  thr.r2 <- dots::dots(name = 'thr.r2', value = 0.2, ...)
-  size <- dots::dots(name = 'size', value = 100/thr.r2, ...)
-  roll.size <- dots::dots(name = 'roll.size', value = 50, ...)
-  int.min.size <- dots::dots(name = 'int.min.size', value = 20, ...)
+  thr.r2 <- dots(name = 'thr.r2', value = 0.2, ...)
+  size <- dots(name = 'size', value = 100/thr.r2, ...)
+  roll.size <- dots(name = 'roll.size', value = 50, ...)
+  int.min.size <- dots(name = 'int.min.size', value = 20, ...)
   #alpha.tukey <- dots::dots(name = 'alpha.tukey', value = 0.05, ...)
   #min.mac <- dots::dots(name = 'min.mac', value = 10, ...)
   #max.iter <- dots::dots(name = 'max.iter', value = 5, ...)
-  verbose <- dots::dots(name = 'verbose', value = FALSE, ...)
+  verbose <- dots(name = 'verbose', value = FALSE, ...)
 
   # Argument error checks; Set up numeric chromosome data frame.
   if(attr(snp, "class") != "bigSNP"){
@@ -344,8 +343,7 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::pvdiv_phenotypes,
   if (is.null(covar)) {
     message(paste0("Covariance matrix (covar) was not supplied - this will be",
                    " generated using pvdiv_autoSVD()."))
-    requireNamespace("dots")
-    k <- dots::dots(name = 'k', value = 15, ...)
+    k <- dots(name = 'k', value = 15, ...)
     covar <- pvdiv_autoSVD(snp, k = k, ncores = ncores, saveoutput = FALSE)
     if (savegwas == TRUE) {
       saveRDS(covar, file = file.path(outputdir, paste0("SVD_", nInd, "g_",
@@ -602,10 +600,9 @@ pvdiv_standard_gwas <- function(snp, df = switchgrassGWAS::pvdiv_phenotypes,
       message(paste0("Now creating annotation data frames for the top 10 & ",
                      "top 500 SNPs by p-value, and for SNPs above a 10% FDR."))
       ## Save annotation tables for the top associations
-      requireNamespace("dots")
-      n <- dots::dots(name = 'n', value = c(10, 500), ...)
-      FDRalpha <- dots::dots(name = 'FDRalpha', value = 0.1, ...)
-      rangevector <- dots::dots(name = 'rangevector', value = c(0, 50000), ...)
+      n <- dots(name = 'n', value = c(10, 500), ...)
+      FDRalpha <- dots(name = 'FDRalpha', value = 0.1, ...)
+      rangevector <- dots(name = 'rangevector', value = c(0, 50000), ...)
       anno_tables <- pvdiv_table_topsnps(df = gwas, type = "bigsnp",
                                          n = n, FDRalpha = FDRalpha,
                                          rangevector = rangevector,

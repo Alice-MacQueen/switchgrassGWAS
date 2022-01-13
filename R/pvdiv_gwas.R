@@ -401,6 +401,61 @@ pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
   }
 }
 
+pvdiv_manhattan <- function(X, ind, snp, thresh, ncores){
+  roundFBM <- function(X, ind, at) ceiling(X[, ind] / at) * at
+  observed <- big_apply(X, ind = ind, a.FUN = roundFBM, at = 0.01,
+                        a.combine = 'plus', ncores = ncores)
+
+  plot_data <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos,
+                      marker.ID = snp$map$marker.ID, observed = observed)
+
+  if (length(unique(snp$map$physical.pos)) >= 500000) {
+    plot_data <- plot_data %>%
+      mutate(POS = round2(.data$POS, at = 250000))
+  }
+  plot_data <- plot_data %>%
+    group_by(.data$CHR, .data$POS, .data$observed) %>%
+    slice(1) %>%
+    mutate(CHR = as.factor(.data$CHR))
+
+  nchr <- length(unique(plot_data$CHR))
+  log10P <- expression(paste("-log"[10], plain("("), italic(p-value),
+                             plain(")")))
+  p1 <- plot_data %>%
+    ggplot(aes(x = .data$POS, y = .data$observed)) +
+    geom_point(aes(color = .data$CHR, fill = .data$CHR)) +
+    geom_hline(yintercept = thresh, color = "black", linetype = 2,
+               size = 1) +
+    facet_wrap(~ .data$CHR, nrow = 1, scales = "free_x",
+               strip.position = "bottom") +
+    scale_color_manual(values = rep(c("#1B0C42FF", "#48347dFF",
+                                      "#95919eFF"), ceiling(nchr/3)),
+                       guide = FALSE) +
+    theme_classic() +
+    theme(axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          panel.background = element_rect(fill=NA),
+          legend.position = "none",
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 10),
+          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
+          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
+          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
+          legend.justification = c(1, 0.75),
+          legend.key.size = unit(0.35, 'cm'),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 9),
+          legend.text.align = 0, legend.background = element_blank(),
+          plot.subtitle = element_text(size = 10, vjust = 0),
+          strip.background = element_blank(),
+          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
+          strip.placement = 'outside', panel.spacing.x = unit(-0.1, 'cm')) +
+    labs(x = "Chromosome", y = log10P) +
+    scale_x_continuous(expand = c(0.15, 0.15))
+  return(p1)
+}
+
+
 #' Find lambda_GC value for non-NA p-values
 #'
 #' @description Finds the lambda GC value for some vector of p-values.
@@ -423,4 +478,217 @@ get_lambdagc <- function(ps, tol = 1e-8){
                                  tol = tol)$root
   lamGC <- signif(xtr_p)
   return(lamGC)
+}
+
+
+#' Adjusted p-values for simple multiple testing procedures
+#'
+#' @description This function computes adjusted p-values for simple multiple
+#'     testing procedures from a vector of raw (unadjusted) p-values. The
+#'     procedures include the Bonferroni, Holm (1979), Hochberg (1988), and
+#'     Sidak procedures for strong control of the family-wise Type I error
+#'     rate (FWER), and the Benjamini & Hochberg (1995) and Benjamini &
+#'     Yekutieli (2001) procedures for (strong) control of the false discovery
+#'     rate (FDR). The less conservative adaptive Benjamini & Hochberg (2000)
+#'     and two-stage Benjamini & Hochberg (2006) FDR-controlling procedures are
+#'     also included. This function is taken from the multtest package. It is
+#'     the only function used from this package and is added to this package
+#'     wholesale to reduce user installation burden.
+#'
+#' @usage mt.rawp2adjp(rawp, proc=c("Bonferroni", "Holm", "Hochberg", "SidakSS",
+#'     "SidakSD", "BH", "BY","ABH","TSBH"), alpha = 0.05, na.rm = FALSE)
+#'
+#' @param rawp A vector of raw (unadjusted) p-values for each hypothesis under
+#'     consideration. These could be nominal p-values, for example, from
+#'     t-tables, or permutation p-values as given in mt.maxT and mt.minP. If
+#'     the mt.maxT or mt.minP functions are used, raw p-values should be given
+#'     in the original data order, ordered by the index of that data.
+#' @param proc A vector of character strings containing the names of the
+#'     multiple testing procedures for which adjusted p-values are to be
+#'     computed. This vector should include any of the following: "Bonferroni",
+#'     "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY", "ABH", "TSBH".
+#' @param alpha A nominal type I error rate, or a vector of error rates, used
+#'     for estimating the number of true null hypotheses in the two-stage
+#'     Benjamini & Hochberg procedure ("TSBH"). Default is 0.05.
+#' @param na.rm An option for handling NA values in a list of raw p-values.
+#'     If FALSE, the number of hypotheses considered is the length of the vector
+#'      of raw p-values. Otherwise, if TRUE, the number of hypotheses is the
+#'      number of raw p-values which were not NAs.
+#'
+#' @author Sandrine Dudoit, http://www.stat.berkeley.edu/~sandrine,
+#' @author Yongchao Ge, yongchao.ge@mssm.edu,
+#' @author Houston Gilbert, http://www.stat.berkeley.edu/~houston.
+#'
+#' @return A list with components: adjp, index, h0.ABH, h0.TSBH. See multtest
+#'    package on Bioconductor for details.
+mt.rawp2adjp <- function (rawp, proc = c("Bonferroni", "Holm", "Hochberg",
+                         "SidakSS", "SidakSD", "BH", "BY",
+                         "ABH", "TSBH"), alpha = 0.05, na.rm = FALSE)
+{
+  m <- length(rawp)
+  if (na.rm) {
+    mgood <- sum(!is.na(rawp))
+  }
+  else {
+    mgood <- m
+  }
+  n <- length(proc)
+  a <- length(alpha)
+  index <- order(rawp)
+  h0.ABH <- NULL
+  h0.TSBH <- NULL
+  spval <- rawp[index]
+  adjp <- matrix(0, m, n + 1)
+  dimnames(adjp) <- list(NULL, c("rawp", proc))
+  adjp[, 1] <- spval
+  if (is.element("TSBH", proc)) {
+    TS.spot <- which(proc == "TSBH")
+    TSBHs <- paste("TSBH", alpha, sep = "_")
+    newprocs <- append(proc, TSBHs, after = TS.spot)
+    newprocs <- newprocs[newprocs != "TSBH"]
+    adjp <- matrix(0, m, n + a)
+    dimnames(adjp) <- list(NULL, c("rawp", newprocs))
+    adjp[, 1] <- spval
+    tmp <- spval
+    for (i in (m - 1):1) {
+      tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
+                                    1, na.rm = TRUE), na.rm = TRUE)
+      if (is.na(spval[i]))
+        tmp[i] <- NA
+    }
+    h0.TSBH <- rep(0, length(alpha))
+    names(h0.TSBH) <- paste("h0.TSBH", alpha, sep = "_")
+    for (i in 1:length(alpha)) {
+      h0.TSBH[i] <- mgood - sum(tmp < alpha[i]/(1 + alpha[i]),
+                                na.rm = TRUE)
+      adjp[, TS.spot + i] <- tmp * h0.TSBH[i]/mgood
+    }
+  }
+  if (is.element("Bonferroni", proc)) {
+    tmp <- mgood * spval
+    tmp[tmp > 1] <- 1
+    adjp[, "Bonferroni"] <- tmp
+  }
+  if (is.element("Holm", proc)) {
+    tmp <- spval
+    tmp[1] <- min(mgood * spval[1], 1)
+    for (i in 2:m) tmp[i] <- max(tmp[i - 1], min((mgood -
+                                                    i + 1) * spval[i], 1))
+    adjp[, "Holm"] <- tmp
+  }
+  if (is.element("Hochberg", proc)) {
+    tmp <- spval
+    for (i in (m - 1):1) {
+      tmp[i] <- min(tmp[i + 1], min((mgood - i + 1) * spval[i],
+                                    1, na.rm = TRUE), na.rm = TRUE)
+      if (is.na(spval[i]))
+        tmp[i] <- NA
+    }
+    adjp[, "Hochberg"] <- tmp
+  }
+  if (is.element("SidakSS", proc))
+    adjp[, "SidakSS"] <- 1 - (1 - spval)^mgood
+  if (is.element("SidakSD", proc)) {
+    tmp <- spval
+    tmp[1] <- 1 - (1 - spval[1])^mgood
+    for (i in 2:m) tmp[i] <- max(tmp[i - 1], 1 - (1 - spval[i])^(mgood -
+                                                                   i + 1))
+    adjp[, "SidakSD"] <- tmp
+  }
+  if (is.element("BH", proc)) {
+    tmp <- spval
+    for (i in (m - 1):1) {
+      tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
+                                    1, na.rm = TRUE), na.rm = TRUE)
+      if (is.na(spval[i]))
+        tmp[i] <- NA
+    }
+    adjp[, "BH"] <- tmp
+  }
+  if (is.element("BY", proc)) {
+    tmp <- spval
+    a <- sum(1/(1:mgood))
+    tmp[m] <- min(a * spval[m], 1)
+    for (i in (m - 1):1) {
+      tmp[i] <- min(tmp[i + 1], min((mgood * a/i) * spval[i],
+                                    1, na.rm = TRUE), na.rm = TRUE)
+      if (is.na(spval[i]))
+        tmp[i] <- NA
+    }
+    adjp[, "BY"] <- tmp
+  }
+  if (is.element("ABH", proc)) {
+    tmp <- spval
+    h0.m <- rep(0, mgood)
+    for (k in 1:mgood) {
+      h0.m[k] <- (mgood + 1 - k)/(1 - spval[k])
+    }
+    grab <- min(which(diff(h0.m, na.rm = TRUE) > 0), na.rm = TRUE)
+    h0.ABH <- ceiling(min(h0.m[grab], mgood))
+    for (i in (m - 1):1) {
+      tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
+                                    1, na.rm = TRUE), na.rm = TRUE)
+      if (is.na(spval[i]))
+        tmp[i] <- NA
+    }
+    adjp[, "ABH"] <- tmp * h0.ABH/mgood
+  }
+  list(adjp = adjp, index = index, h0.ABH = h0.ABH[1], h0.TSBH = h0.TSBH[1:length(alpha)])
+}
+
+
+#' Set an advanced argument
+#'
+#' From the \code{...} argument used in your function, find if a specific
+#' argument was included and extract its value.
+#'
+#' @description This function is taken from the lcolladotor/dots package. It is
+#'     the only function used from this package and is added to this package
+#'     wholesale to reduce user installation burden. Please use the original
+#'     package from Github if you use this in your own work.
+#'
+#' @param name Name of the advanced argument to look for in \code{...}
+#' @param value The default value of the advanged argument. If this advanced
+#' argument is used in several of your functions, we recommend using
+#' \code{getOption('value')} and explaining this option in your package
+#' vignette geared towards experienced users.
+#' @param ... Advanced arguments. See \link[methods]{dotsMethods}.
+#'
+#' @details
+#' Note that you can make dots() even more powerful by using \link{getOption}
+#' to define \code{value}. This is particularly useful if you use the
+#' same advanced argument in several functions.
+#'
+#' @export
+#' @seealso \link[methods]{dotsMethods}
+#' @aliases advanced...
+#' @author L. Collado-Torres
+#'
+#' @examples
+#'
+#' ## Simple example that calculates the max between 'x' and 'y' with a
+#' ## specified minimum value to return.
+#'
+#' minMax <- function(x, y, ...) {
+#'     minValue <- dots('minValue', 0, ...)
+#'     res <- max(x, y, minValue)
+#'     return(res)
+#' }
+#' minMax(1:2, 3:4)
+#' minMax(1:2, 3:4, minValue = 5)
+#'
+#'
+#' ## Arguably these examples are simple, but the idea is that dots()
+#' ## can simplify very long function calls where some parameters will be used
+#' ## by a minority of the users.
+#'
+dots <- function(name, value, ...) {
+  args <- list(...)
+  if(!name %in% names(args)) {
+    ## Default value
+    return(value)
+  } else {
+    ## If the argument was defined in the ... part, return it
+    return(args[[name]])
+  }
 }
