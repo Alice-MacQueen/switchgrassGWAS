@@ -43,6 +43,4 @@ vignettes/*.pdf
 rsconnect/
 
 inst/doc
-docs
-/doc/
 /Meta/
