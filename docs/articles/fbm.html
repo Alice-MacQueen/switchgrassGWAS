@@ -148,7 +148,7 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Load packages bigsnpr and switchgrassGWAS</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">switchgrassGWAS</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://alice-macqueen.github.io/switchgrassGWAS" class="external-link">switchgrassGWAS</a></span><span class="op">)</span>
 <span class="co">#&gt; Registered S3 method overwritten by 'GGally':</span>
 <span class="co">#&gt;   method from   </span>
 <span class="co">#&gt;   +.gg   ggplot2</span>
@@ -161,7 +161,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html" class="external-link">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\Rtmp6Hi2co\\file190853fc1a40.rds"</span>
+<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\RtmpeEmN9D\\file26f051945ae6.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -195,7 +195,7 @@
 <span class="co"># This "phenotype", 'GWAS_CT', is the number of times a plant successfully </span>
 <span class="co"># clonally replicated to plant in the common gardens in 2018.</span>
 <span class="va">four_phenotype</span> <span class="op">&lt;-</span> <span class="va">pvdiv_phenotypes</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">PLANT_ID</span>, <span class="va">GWAS_CT</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"BIOMASS"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">PLANT_ID</span>, <span class="va">GWAS_CT</span>, <span class="fu">matches</span><span class="op">(</span><span class="st">"BIOMASS"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="run-genome-wide-association-gwas">Run genome-wide association (GWAS)<a class="anchor" aria-label="anchor" href="#run-genome-wide-association-gwas"></a>
@@ -301,7 +301,7 @@
 <span class="co">#&gt; Finished phenotype 1: PKLE_BIOMASS</span>
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span></code></pre></div>
-<p>This command will save a set of gwas results to a temporary directory, which will have a randomly generated name like: C:6Hi2co.</p>
+<p>This command will save a set of gwas results to a temporary directory, which will have a randomly generated name like: C:9D.</p>
 <p>Let’s load these files into R.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gwas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigstatsr/reference/big_attach.html" class="external-link">big_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tempdir</span>, <span class="st">"gwas_effects_0M_SNPs.rds"</span><span class="op">)</span><span class="op">)</span>

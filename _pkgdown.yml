@@ -39,6 +39,30 @@ reference:
   - get_mash_metadata
   - get_GxE
   - get_pairwise_sharing
+- title: internal
+- contents:
+  - asv_best_PC_df
+  - dots
+  - get_best_PC_df
+  - get_date_filename
+  - get_lambdagc
+  - get_ncond
+  - gff_metadata
+  - load_mash_df
+  - mt.rawp2adjp
+  - pvdiv_autoSVD
+  - pvdiv_bigsnp2tibble
+  - pvdiv_bigsnp_subset
+  - pvdiv_fdr
+  - pvdiv_subset_popgenome
+  - pvdiv_top_effects_log10p
+  - pvdiv_vcf_popgenome
+  - reorder_cormat
+  - round2
+  - round_xy
+  - s_hat_bigsnp
+  - theme_oeco
+  - thresholdFBM
 
 
 

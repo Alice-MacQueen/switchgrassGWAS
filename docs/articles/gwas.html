@@ -107,7 +107,7 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Load packages bigsnpr and switchgrassGWAS</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">switchgrassGWAS</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://alice-macqueen.github.io/switchgrassGWAS" class="external-link">switchgrassGWAS</a></span><span class="op">)</span>
 <span class="co">#&gt; Registered S3 method overwritten by 'GGally':</span>
 <span class="co">#&gt;   method from   </span>
 <span class="co">#&gt;   +.gg   ggplot2</span>
@@ -120,7 +120,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html" class="external-link">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\RtmpOGx3b2\\file211c2f056bc8.rds"</span>
+<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\RtmpE36QfP\\file17b859d24b84.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -194,7 +194,7 @@
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
 <span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: C:3b2.</p>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: C:36QfP.</p>
 <p>The example Manhattan plot should look like this:</p>
 <div class="figure">
 <img src="../reference/figures/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>
