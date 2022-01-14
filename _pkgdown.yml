@@ -14,6 +14,7 @@ reference:
 - contents:
   - pvdiv_standard_gwas
   - pvdiv_gwas
+  - pvdiv_manhattan
   - pvdiv_qqplot
   - pvdiv_table_topsnps
   - pvdiv_results_in_folder

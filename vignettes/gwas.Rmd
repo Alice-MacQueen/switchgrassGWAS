@@ -66,12 +66,12 @@ This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the examp
 
 The example Manhattan plot should look like this: 
 
-![Manhattan](../inst/extdata/Ex_Manhattan.png){ width=100% }
+![Manhattan](../man/figures/Ex_Manhattan.png){ width=100% }
 
 
 And the example QQ plot should look like this. 
 
-![QQ-plot](../inst/extdata/Ex_QQ.png){ width=50% }
+![QQ-plot](../man/figures/Ex_QQ.png){ width=50% }
 
 `pvdiv_standard_gwas` is a wrapper function for the standard GWAS done in the Juenger lab. You must specify three things to use this function: 1) a snp file in bigSNP format, 2) a phenotype file where the first column is PLANT_ID (as in `switchgrassGWAS::pvdiv_metadata`), and 3) whether the GWAS should be a linear or logistic regression. 
 

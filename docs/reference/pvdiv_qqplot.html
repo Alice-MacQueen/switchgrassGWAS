@@ -80,13 +80,27 @@ will result in similar test statistics.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">pvdiv_qqplot</span><span class="op">(</span><span class="va">ps</span>, ci <span class="op">=</span> <span class="fl">0.95</span>, lambdaGC <span class="op">=</span> <span class="cn">FALSE</span>, tol <span class="op">=</span> <span class="fl">1e-08</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">pvdiv_qqplot</span><span class="op">(</span>
+  <span class="va">ps</span>,
+  effects <span class="op">=</span> <span class="cn">NULL</span>,
+  ind <span class="op">=</span> <span class="cn">NULL</span>,
+  ci <span class="op">=</span> <span class="fl">0.95</span>,
+  lambdaGC <span class="op">=</span> <span class="cn">FALSE</span>,
+  tol <span class="op">=</span> <span class="fl">1e-08</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>ps</dt>
 <dd><p>Numeric vector of p-values.</p></dd>
+<dt>effects</dt>
+<dd><p>a gwas effects FBM object created using 'pvdiv_standard_gwas'.
+Saved under the name "gwas_effects_suffix.rds" and can be loaded into
+R using the bigstatsr function "big_attach".</p></dd>
+<dt>ind</dt>
+<dd><p>If effects is a FBM object, this should be the row number of the
+phenotype from the associated metadata for the FBM object.</p></dd>
 <dt>ci</dt>
 <dd><p>Numeric. Size of the confidence interval, 0.95 by default.</p></dd>
 <dt>lambdaGC</dt>

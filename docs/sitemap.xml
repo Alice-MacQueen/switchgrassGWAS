@@ -118,9 +118,6 @@
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS/reference/mt.rawp2adjp.html</loc>
   </url>
   <url>
-    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS/reference/phenotypes.html</loc>
-  </url>
-  <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS/reference/pipe.html</loc>
   </url>
   <url>
@@ -152,6 +149,9 @@
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS/reference/pvdiv_lambda_GC.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/Alice-MacQueen/switchgrassGWAS/reference/pvdiv_manhattan.html</loc>
   </url>
   <url>
     <loc>https://github.com/Alice-MacQueen/switchgrassGWAS/reference/pvdiv_metadata.html</loc>

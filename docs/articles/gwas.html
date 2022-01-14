@@ -117,7 +117,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html" class="external-link">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\RtmpWS8yJb\\file23181fdd36e9.rds"</span>
+<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\Rtmp6Tp4Zg\\file314c777e23.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -191,14 +191,14 @@
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
 <span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: C:8yJb.</p>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: C:6Tp4Zg.</p>
 <p>The example Manhattan plot should look like this:</p>
 <div class="figure">
-<img src="../inst/extdata/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>
+<img src="../reference/figures/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>
 </div>
 <p>And the example QQ plot should look like this.</p>
 <div class="figure">
-<img src="../inst/extdata/Ex_QQ.png" style="width:50.0%" alt=""><p class="caption">QQ-plot</p>
+<img src="../reference/figures/Ex_QQ.png" style="width:50.0%" alt=""><p class="caption">QQ-plot</p>
 </div>
 <p><code>pvdiv_standard_gwas</code> is a wrapper function for the standard GWAS done in the Juenger lab. You must specify three things to use this function: 1) a snp file in bigSNP format, 2) a phenotype file where the first column is PLANT_ID (as in <code><a href="../reference/pvdiv_metadata.html">switchgrassGWAS::pvdiv_metadata</a></code>), and 3) whether the GWAS should be a linear or logistic regression.</p>
 <div class="section level3">

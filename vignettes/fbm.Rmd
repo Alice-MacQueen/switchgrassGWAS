@@ -13,7 +13,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/gwas-",
+  fig.path = "man/figures/fbm-",
   fig.width = 6,
   fig.asp = 0.618,
   out.width = "70%",
@@ -136,11 +136,11 @@ pvdiv_fbm_qq(effects = gwas, metadata = gwas_metadata, e_row = 2, o_row = 3:4,
 
 This function will again save plots to the tempdir. These plots should look like this:
 
-![CLMB_vs_KBSM](../inst/extdata/GWAS_significance_thr_log10p_0_CLMB_BIOMASS_vs_KBSM_BIOMASS.png){ width=50% }
+![CLMB_vs_KBSM](../man/figures/GWAS_significance_thr_log10p_0_CLMB_BIOMASS_vs_KBSM_BIOMASS.png){ width=50% }
 
 and this:
 
-![CLMB_vs_PKLE](../inst/extdata/GWAS_significance_thr_log10p_0_CLMB_BIOMASS_vs_PKLE_BIOMASS.png){ width=50% }
+![CLMB_vs_PKLE](../man/figures/GWAS_significance_thr_log10p_0_CLMB_BIOMASS_vs_PKLE_BIOMASS.png){ width=50% }
 
 If these GWAS results were perfectly related, all the hexagons would fall on the red dashed 1:1 line. The blue line indicates the actual relationship between the p-values in the two GWAS. We can see that there is a modest positive relationship between biomass in these environments, but it's by no means strong. This indicates the presence of genotype-by-environment interactions between these environments.
 
@@ -180,7 +180,7 @@ upset_plot <- upset(upset_df, intersect = colnames(upset_df)[-(1:2)],
 upset_plot                    
 ```
 
-![upset_ex](../inst/extdata/Ex_Upset.png){ width=50% }
+![upset_ex](../man/figures/Ex_Upset.png){ width=50% }
 In this Upset plot, we can see that there are many more SNPs significant in one or more biomass phenotype than there are significant for the phenotype 'GWAS_CT' and any biomass phenotype. Though, overall, most SNPs are significant in only one of the four conditions.
 
 Sometimes this could be because different SNPs in the same gene or genomic region are coming up as highly associated with the different phenotypes. To test this, we can summarize our upset_df slightly based on position, and make a new Upset plot.
@@ -203,7 +203,8 @@ upset_1Mb <- upset(upset_df_1Mb, intersect = colnames(upset_df_1Mb)[-(1:2)],
   labs(title = "Significant at -log10p > 2 in 1Mb intervals")
 upset_1Mb  
 ```
-![upset_ex](../inst/extdata/Ex_Upset_1Mb.png){ width=50% }
+![upset_ex](../man/figures/Ex_Upset_1Mb.png){ width=50% }
+
 This binning by genomic interval does result in more genomic regions with significant effects on multiple phenotypes. It doesn't change the ordering of the kinds of intersections very much, with the exception that the three-way intersection between the three biomass phenotypes is now the least common intersection (with 4 1Mb regions containing significant associations for all three phenotypes).
 
 What if we want to learn more about these 4 1Mb regions? We can go back to our upset dataframes to extract these regions.

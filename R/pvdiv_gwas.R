@@ -329,6 +329,8 @@ round2 <- function(x, at) ceiling(x / at) * at
 #' @param roundby Numeric. The amount to round the x and y vectors by for 2d
 #'     binning.
 #'
+#' @importFrom dplyr distinct
+#'
 #' @return A dataframe containing the 2-d binned values for x and y, and their
 #'     confidence intervals.
 round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
@@ -337,11 +339,14 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
   if(!is.na(cl[1]) & !is.na(cu[1])){
     clower <- round2(cl, at = roundby)
     cupper <- round2(cu, at = roundby)
-    tp <- cbind(expected, observed, clower, cupper)
-    return(tp[!duplicated(tp),])
+    tp <- tibble(expected = expected, observed = observed, clower = clower,
+                 cupper = cupper)
+    tp <- tp %>% dplyr::distinct()
+    return(tp)
   } else {
-    tp <- cbind(expected, observed)
-    return(tp[!duplicated(tp),])
+    tp <- tibble(expected = expected, observed = observed)
+    tp <- tp %>% dplyr::distinct()
+    return(tp)
   }
 }
 
@@ -357,6 +362,11 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
 #'     will result in similar test statistics.
 #'
 #' @param ps Numeric vector of p-values.
+#' @param effects a gwas effects FBM object created using 'pvdiv_standard_gwas'.
+#'     Saved under the name "gwas_effects_{suffix}.rds" and can be loaded into
+#'     R using the bigstatsr function "big_attach".
+#' @param ind If effects is a FBM object, this should be the row number of the
+#'     phenotype from the associated metadata for the FBM object.
 #' @param ci Numeric. Size of the confidence interval, 0.95 by default.
 #' @param lambdaGC Logical. Add the Genomic Control coefficient as subtitle to
 #'     the plot?
@@ -370,7 +380,15 @@ round_xy <- function(x, y, cl = NA, cu = NA, roundby = 0.001){
 #' @return A ggplot2 plot.
 #'
 #' @export
-pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
+pvdiv_qqplot <- function(ps, effects = NULL, ind = NULL, ci = 0.95,
+                       lambdaGC = FALSE, tol = 1e-8) {
+  if(!is.null(effects) & !is.null(ind)){
+    ind <- ind*3
+    roundFBM <- function(X, ind, at) ceiling(X[, ind] / at) * at
+    observed <- big_apply(effects, ind = ind, a.FUN = roundFBM, at = 0.01,
+                          a.combine = 'plus', ncores = 1)
+    ps <- 10^-observed
+  }
   ps <- ps[which(!is.na(ps))]
   n  <- length(ps)
   df <- data.frame(
@@ -390,7 +408,22 @@ pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
     geom_line(aes(.data$expected, .data$cupper), linetype = 2) +
     geom_line(aes(.data$expected, .data$clower), linetype = 2) +
     xlab(log10Pe) +
-    ylab(log10Po)
+    ylab(log10Po) +
+    theme_classic() +
+    theme(axis.title = element_text(size = 10),
+          axis.text = element_text(size = 10),
+          axis.line.x = element_line(size = 0.35, colour = 'grey50'),
+          axis.line.y = element_line(size = 0.35, colour = 'grey50'),
+          axis.ticks = element_line(size = 0.25, colour = 'grey50'),
+          legend.justification = c(1, 0.75), legend.position = c(1, 0.9),
+          legend.key.size = unit(0.35, 'cm'),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 9),
+          legend.text.align = 0, legend.background = element_blank(),
+          plot.subtitle = element_text(size = 10, vjust = 0),
+          strip.background = element_blank(),
+          strip.text = element_text(hjust = 0.5, size = 10 ,vjust = 0),
+          strip.placement = 'outside', panel.spacing.x = unit(-0.4, 'cm'))
 
   if (lambdaGC) {
     lamGC <- get_lambdagc(ps = ps, tol = tol)
@@ -401,22 +434,64 @@ pvdiv_qqplot <- function(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-8) {
   }
 }
 
-pvdiv_manhattan <- function(X, ind, snp, thresh, ncores){
-  roundFBM <- function(X, ind, at) ceiling(X[, ind] / at) * at
-  observed <- big_apply(X, ind = ind, a.FUN = roundFBM, at = 0.01,
-                        a.combine = 'plus', ncores = ncores)
+#' Create a Manhattan plot with ggplot2.
+#'
+#' @description Create a Manhattan plot using ggplot2 on either RDS or FBM
+#'     object GWAS results.
+#'
+#' @param effects Either a gwas effects RDS or FBM object created using
+#'     'pvdiv_standard_gwas' (with savetype = "rds" or savetype = "fbm"). If a
+#'     fbm, this file is saved under the name "gwas_effects_{suffix}.rds" and
+#'     can be loaded into R using the bigstatsr function "big_attach".
+#' @param ind If effects is a FBM object, this should be the row number of the
+#'     phenotype from the associated metadata for the FBM object.
+#' @param snp If effects is a FBM object, you must also supply a "bigSNP" object;
+#'     load into R with \code{bigsnpr::snp_attach()}.
+#' @param thr Numeric. Significance threshold plotted as a horizontal line.
+#'     Default is Bonferroni.
+#' @param ncores Integer. Number of cores to use for parallelization.
+#'
+#' @import ggplot2
+#' @importFrom tibble as_tibble
+#' @importFrom rlang .data
+#' @importFrom dplyr distinct mutate
+#' @importFrom stats qbeta ppoints
+#'
+#' @return A ggplot2 plot.
+#'
+#' @export
+pvdiv_manhattan <- function(effects, ind = NULL, snp = NULL, thr = NULL,
+                            ncores = 1){
+  if(!is.null(ind) & !is.null(snp)){
+    if (attr(snp, "class") != "bigSNP") {
+      stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
+    }
+    ind <- ind*3
+    roundFBM <- function(X, ind, at) ceiling(X[, ind] / at) * at
+    observed <- big_apply(effects, ind = ind, a.FUN = roundFBM, at = 0.01,
+                          a.combine = 'plus', ncores = ncores)
 
-  plot_data <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos,
-                      marker.ID = snp$map$marker.ID, observed = observed)
-
-  if (length(unique(snp$map$physical.pos)) >= 500000) {
+    plot_data <- tibble(CHR = snp$map$chromosome, POS = snp$map$physical.pos,
+                        observed = observed)
+  } else if(is.null(ind) & !is.null(snp)) {
+    stop("must specify both ind and snp if effects is a fbm")
+  } else if(!is.null(ind) & is.null(snp)) {
+    stop("must specify both ind and snp if effects is a fbm")
+  } else {
+    plot_data <- tibble(CHR = effects$CHR, POS = effects$POS,
+                        observed = effects$log10p) %>%
+      mutate(observed = round2(.data$observed, at = 0.01))
+  }
+  if(is.null(thr)) {
+    thr <- -log10(.05/nrow(plot_data))
+  }
+  # If more than half a million markers, round data slightly to reduce the
+  # number of markers plotted.
+  if (nrow(plot_data) >= 500000) {
     plot_data <- plot_data %>%
       mutate(POS = round2(.data$POS, at = 250000))
   }
-  plot_data <- plot_data %>%
-    group_by(.data$CHR, .data$POS, .data$observed) %>%
-    slice(1) %>%
-    mutate(CHR = as.factor(.data$CHR))
+  plot_data <- plot_data %>% dplyr::distinct()
 
   nchr <- length(unique(plot_data$CHR))
   log10P <- expression(paste("-log"[10], plain("("), italic(p-value),
@@ -424,7 +499,7 @@ pvdiv_manhattan <- function(X, ind, snp, thresh, ncores){
   p1 <- plot_data %>%
     ggplot(aes(x = .data$POS, y = .data$observed)) +
     geom_point(aes(color = .data$CHR, fill = .data$CHR)) +
-    geom_hline(yintercept = thresh, color = "black", linetype = 2,
+    geom_hline(yintercept = thr, color = "black", linetype = 2,
                size = 1) +
     facet_wrap(~ .data$CHR, nrow = 1, scales = "free_x",
                strip.position = "bottom") +

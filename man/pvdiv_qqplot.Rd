@@ -4,10 +4,24 @@
 \alias{pvdiv_qqplot}
 \title{Create a quantile-quantile plot with ggplot2.}
 \usage{
-pvdiv_qqplot(ps, ci = 0.95, lambdaGC = FALSE, tol = 1e-08)
+pvdiv_qqplot(
+  ps,
+  effects = NULL,
+  ind = NULL,
+  ci = 0.95,
+  lambdaGC = FALSE,
+  tol = 1e-08
+)
 }
 \arguments{
 \item{ps}{Numeric vector of p-values.}
+
+\item{effects}{a gwas effects FBM object created using 'pvdiv_standard_gwas'.
+Saved under the name "gwas_effects_{suffix}.rds" and can be loaded into
+R using the bigstatsr function "big_attach".}
+
+\item{ind}{If effects is a FBM object, this should be the row number of the
+phenotype from the associated metadata for the FBM object.}
 
 \item{ci}{Numeric. Size of the confidence interval, 0.95 by default.}
 
