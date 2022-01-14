@@ -38,7 +38,7 @@ specified in this function."><!-- mathjax --><script src="https://cdnjs.cloudfla
       <a href="../articles/annotations.html">Annotation tables for top SNPs</a>
     </li>
     <li>
-      <a href="../articles/fbm.html">Using FBM GWAS Results</a>
+      <a href="../articles/fbm.html">Using file-backed matrices - FBM</a>
     </li>
     <li>
       <a href="../articles/gwas.html">Genome-Wide Association</a>
@@ -50,6 +50,9 @@ specified in this function."><!-- mathjax --><script src="https://cdnjs.cloudfla
       <a href="../articles/mash.html">Multivariate Adaptive Shrinkage</a>
     </li>
   </ul></li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -98,9 +101,9 @@ directory?</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">snpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"example_bigsnp.rds"</span>, package <span class="op">=</span> <span class="st">"switchgrassGWAS"</span><span class="op">)</span></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://privefl.github.io/bigsnpr/" class="external-link">bigsnpr</a></span><span class="op">)</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package 'bigsnpr' was built under R version 4.1.2</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package ‘bigsnpr’ was built under R version 4.1.2</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: bigstatsr</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package 'bigstatsr' was built under R version 4.1.2</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package ‘bigstatsr’ was built under R version 4.1.2</span>
 <span class="r-in"><span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="va">snpfile</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">svd5</span> <span class="op">&lt;-</span> <span class="fu">pvdiv_autoSVD</span><span class="op">(</span>snp <span class="op">=</span> <span class="va">snp</span>, k <span class="op">=</span> <span class="fl">5</span>, saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'saveoutput' is FALSE, so the svd will not be saved to the working directory.</span>

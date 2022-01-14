@@ -1,13 +1,14 @@
 ---
-title: "Using FBM GWAS Results"
+title: "Using file-backed matrices - FBM"
 author: "Alice MacQueen"
 date: 2022-01-13
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using FBM GWAS Results}
+  %\VignetteIndexEntry{Using file-backed matrices - FBM}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

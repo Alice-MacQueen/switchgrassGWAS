@@ -53,7 +53,7 @@
       <a href="../articles/annotations.html">Annotation tables for top SNPs</a>
     </li>
     <li>
-      <a href="../articles/fbm.html">Using FBM GWAS Results</a>
+      <a href="../articles/fbm.html">Using file-backed matrices - FBM</a>
     </li>
     <li>
       <a href="../articles/gwas.html">Genome-Wide Association</a>
@@ -65,6 +65,9 @@
       <a href="../articles/mash.html">Multivariate Adaptive Shrinkage</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -117,7 +120,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html" class="external-link">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\Rtmp6Tp4Zg\\file314c777e23.rds"</span>
+<span class="co">#&gt; [1] "C:\\Users\\Alice\\AppData\\Local\\Temp\\RtmpOGx3b2\\file211c2f056bc8.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -191,7 +194,7 @@
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span>
 <span class="co">#&gt; Now generating and saving Manhattan and QQ plots.</span></code></pre></div>
-<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: C:6Tp4Zg.</p>
+<p>This command will save a Manhattan and QQ-plot for the ~1800 SNPs from the example file to a temporary directory, which will have a randomly generated name like: C:3b2.</p>
 <p>The example Manhattan plot should look like this:</p>
 <div class="figure">
 <img src="../reference/figures/Ex_Manhattan.png" style="width:100.0%" alt=""><p class="caption">Manhattan</p>

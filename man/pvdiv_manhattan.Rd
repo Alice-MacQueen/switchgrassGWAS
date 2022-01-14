@@ -22,12 +22,11 @@ load into R with \code{bigsnpr::snp_attach()}.}
 Default is Bonferroni.}
 
 \item{ncores}{Integer. Number of cores to use for parallelization.}
-
-\item{tol}{Numeric. Tolerance for optional Genomic Control coefficient.}
 }
 \value{
 A ggplot2 plot.
 }
 \description{
-
+Create a Manhattan plot using ggplot2 on either RDS or FBM
+object GWAS results.
 }
