@@ -80,7 +80,7 @@ the rows/SNPs significant in at least one univariate GWAS at the
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">pvdiv_fbm_upset_df</span><span class="op">(</span><span class="va">effects</span>, <span class="va">snp</span>, <span class="va">metadata</span>, thr <span class="op">=</span> <span class="fl">7</span>, quantile <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">pvdiv_fbm_upset_df</span><span class="op">(</span><span class="va">effects</span>, <span class="va">snp</span>, <span class="va">metadata</span>, thr <span class="op">=</span> <span class="fl">7</span>, quantile <span class="op">=</span> <span class="cn">NA</span>, ncores <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -100,6 +100,9 @@ Saved under the name "gwas_effects_suffix_associated_metadata.csv"</p></dd>
 <dt>quantile</dt>
 <dd><p>Numeric. Top quantile/percentile to keep for each GWAS for
 comparisons.</p></dd>
+<dt>ncores</dt>
+<dd><p>Numeric. Number of cores used for fbm functions. Default is
+nb_cores() from bigstatsr.</p></dd>
 </dl></div>
 
   </div>

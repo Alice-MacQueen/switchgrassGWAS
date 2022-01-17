@@ -159,7 +159,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html" class="external-link">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/Rtmp25bTTv/file2f714935d6c7.rds"</span>
+<span class="co">#&gt; [1] "/tmp/RtmpgAXKt5/file2f365fdb9ef7.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -299,7 +299,7 @@
 <span class="co">#&gt; Finished phenotype 1: PKLE_BIOMASS</span>
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span></code></pre></div>
-<p>This command will save a set of gwas results to a temporary directory, which will have a randomly generated name like: /tmp/Rtmp25bTTv.</p>
+<p>This command will save a set of gwas results to a temporary directory, which will have a randomly generated name like: /tmp/RtmpgAXKt5.</p>
 <p>Let’s load these files into R.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gwas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigstatsr/reference/big_attach.html" class="external-link">big_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tempdir</span>, <span class="st">"gwas_effects_0M_SNPs.rds"</span><span class="op">)</span><span class="op">)</span>
@@ -444,22 +444,68 @@
 <p>We can also optionally specify a -log10p threshold with ‘thr’. By default, that threshold is 7. A good target is to set this above the noise floor for all of the GWAS you are comparing. For our toy example, we set this artificially low, to 2.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">upset_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pvdiv_fbm_upset_df.html">pvdiv_fbm_upset_df</a></span><span class="op">(</span>effects <span class="op">=</span> <span class="va">gwas</span>, snp <span class="op">=</span> <span class="va">snp_example</span>, 
-                               metadata <span class="op">=</span> <span class="va">gwas_metadata</span>, thr <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="va">upset_df</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 343 × 6</span></span>
-<span class="co">#&gt;    CHR         POS GWAS_CT CLMB_BIOMASS KBSM_BIOMASS PKLE_BIOMASS</span>
-<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Chr01K  1<span style="text-decoration: underline;">147</span>074       0            0            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Chr01K  4<span style="text-decoration: underline;">761</span>900       0            0            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Chr01K  5<span style="text-decoration: underline;">505</span>667       0            0            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Chr01K  7<span style="text-decoration: underline;">103</span>018       0            0            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Chr01K  7<span style="text-decoration: underline;">475</span>083       0            0            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Chr01K  8<span style="text-decoration: underline;">046</span>966       0            0            1            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Chr01K 10<span style="text-decoration: underline;">626</span>578       0            0            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Chr01K 16<span style="text-decoration: underline;">537</span>641       0            1            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Chr01K 16<span style="text-decoration: underline;">575</span>349       0            1            0            1</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Chr01K 18<span style="text-decoration: underline;">316</span>176       0            1            0            0</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 333 more rows</span></span></code></pre></div>
+                               metadata <span class="op">=</span> <span class="va">gwas_metadata</span>, thr <span class="op">=</span> <span class="fl">2</span>, ncores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
+<span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">upset_df</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">CHR</th>
+<th align="right">POS</th>
+<th align="right">GWAS_CT</th>
+<th align="right">CLMB_BIOMASS</th>
+<th align="right">KBSM_BIOMASS</th>
+<th align="right">PKLE_BIOMASS</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Chr01K</td>
+<td align="right">1147074</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Chr01K</td>
+<td align="right">4761900</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Chr01K</td>
+<td align="right">5505667</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Chr01K</td>
+<td align="right">7103018</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Chr01K</td>
+<td align="right">7475083</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Chr01K</td>
+<td align="right">8046966</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
 <p>This dataframe has CHR &amp; POS from the SNP file, and then an additional column for each phenotype. If that SNP is not significant at the -log10p value threshold for that phenotype (here, <code>thr = 2</code>), then that row &amp; column combination will have a ‘0’. If that SNP is significant for the phenotype, that value will be ‘1’.</p>
 <p>Now, let’s make an upset plot using the R package ComplexUpset.</p>
 <p>There are two required arguments:</p>
