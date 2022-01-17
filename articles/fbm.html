@@ -159,7 +159,7 @@
 <span class="co"># Let's put them in an temporary directory for this demo.</span>
 <span class="va">tmpfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_readBed.html" class="external-link">snp_readBed</a></span><span class="op">(</span><span class="va">bedfile</span>, backingfile <span class="op">=</span> <span class="va">tmpfile</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/tmp/Rtmp4j2xcD/file300444e77c27.rds"</span>
+<span class="co">#&gt; [1] "/tmp/RtmpJQUWze/file2faf33e48d62.rds"</span>
 
 <span class="co"># Attach the "bigSNP" object to the R session.</span>
 <span class="va">snp_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigsnpr/reference/snp_attach.html" class="external-link">snp_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">tmpfile</span>, <span class="st">".rds"</span><span class="op">)</span><span class="op">)</span>
@@ -299,7 +299,7 @@
 <span class="co">#&gt; Finished phenotype 1: PKLE_BIOMASS</span>
 <span class="co">#&gt; Now running GWAS with the best population structure correction.</span>
 <span class="co">#&gt; [1] "saveoutput is FALSE so GWAS object will not be saved to disk."</span></code></pre></div>
-<p>This command will save a set of gwas results to a temporary directory, which will have a randomly generated name like: /tmp/Rtmp4j2xcD.</p>
+<p>This command will save a set of gwas results to a temporary directory, which will have a randomly generated name like: /tmp/RtmpJQUWze.</p>
 <p>Let’s load these files into R.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gwas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigstatsr/reference/big_attach.html" class="external-link">big_attach</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tempdir</span>, <span class="st">"gwas_effects_0M_SNPs.rds"</span><span class="op">)</span><span class="op">)</span>
