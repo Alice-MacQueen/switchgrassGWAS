@@ -137,8 +137,7 @@ get_marker_df <- function(m){
 #'     a small number of SNPs from an annotation table.
 #'
 #' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
-#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
-#'    pre-publication.
+#'    SNP data is available at doi:10.18738/T8/ET9UAU
 #' @param type One of "anno" or "range", depending on if you are using an
 #'    annotation dataframe from pvdiv_table_topsnps() or a genomic interval.
 #' @param anno_df One dataframe of annotations from pvdiv_table_topsnps(). This
@@ -200,8 +199,7 @@ pvdiv_bigsnp_subset <- function(snp, type = c("anno", "range"), anno_df, chr,
 #'     manipulated using data frame tools in R.
 #'
 #' @param snp A `FBM.code256` object. Genomic information for Panicum virgatum.
-#'    Contact tjuenger <at> utexas <dot> edu to obtain this information
-#'    pre-publication.
+#'    SNP data is available at doi:10.18738/T8/ET9UAU
 #'
 #' @return A \code{tbl_df()} of the SNP calls for all individuals for the
 #'    subset of SNPs on that chromosome between the two positions specified.
@@ -260,7 +258,6 @@ thresholdFBM <- function(X, ind, thr, quantile = NA) {
 #' @param quantile Numeric. Top quantile/percentile to keep for each GWAS for
 #'     comparisons.
 #'
-#' @importFrom matrixStats rowMaxs
 #' @importFrom tibble add_column
 #'
 #' @export
@@ -271,6 +268,7 @@ pvdiv_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA){
   if (attr(effects, "class") != "FBM") {
     stop("effects needs to be a FBM object, produced by pvdiv_standard_gwas().")
   }
+  ncores <- nb_cores()
   gwas_ok <- floor(effects$ncol / 3)
   if (gwas_ok != nrow(metadata)) {
     stop(paste0("metadata needs to be the dataframe saved with the FBM object",
@@ -282,11 +280,14 @@ pvdiv_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA){
   if(effects$ncol < (sum(gwas_ok)*3 + 1))  {
     effects$add_columns(ncol_add = 1)
   }  # add a column for the threshold score if there isn't one already
-  thr_df <- big_apply(effects,
-                      a.FUN = function(X, ind) rowMaxs(as.matrix(effects[, ind])),
-                      ind = ind_p, a.combine = 'c', block.size = 100)
-  effects[,(sum(gwas_ok)*3 + 1)] <- thr_df
-  thr_df <- which(thr_df > thr)
+  eff_sub <- big_copy(effects, ind.col = ind_p)
+  thr_log10p <- big_apply(eff_sub,
+                          a.FUN = function(X, ind) max(X[ind, ]),
+                          ind = rows_along(eff_sub),
+                          a.combine = 'c', block.size = 1,
+                          ncores = ncores)
+  effects[,(sum(gwas_ok)*3 + 1)] <- thr_log10p
+  thr_df <- which(thr_log10p > thr)
   snpfile_subset <- snp_subset(snp, ind.col = thr_df)
   snp_subset <- snp_attach(snpfile_subset)
   thr_df <- big_copy(effects, ind.row = thr_df, ind.col = ind_p)

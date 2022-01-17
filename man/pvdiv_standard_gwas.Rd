@@ -24,8 +24,8 @@ pvdiv_standard_gwas(
 }
 \arguments{
 \item{snp}{A "bigSNP" object; load with \code{bigsnpr::snp_attach()}.
-Here, genomic information for Panicum virgatum. Contact tjuenger <at>
-utexas <dot> edu to obtain this information pre-publication.}
+Here, genomic information for Panicum virgatum. SNP data
+is available at doi:10.18738/T8/ET9UAU}
 
 \item{df}{Dataframe of phenotypes where the first column is PLANT_ID.}
 

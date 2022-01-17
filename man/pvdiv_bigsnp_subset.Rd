@@ -8,8 +8,7 @@ pvdiv_bigsnp_subset(snp, type = c("anno", "range"), anno_df, chr, pos1, pos2)
 }
 \arguments{
 \item{snp}{A \code{FBM.code256} object. Genomic information for Panicum virgatum.
-Contact tjuenger <at> utexas <dot> edu to obtain this information
-pre-publication.}
+SNP data is available at doi:10.18738/T8/ET9UAU}
 
 \item{type}{One of "anno" or "range", depending on if you are using an
 annotation dataframe from pvdiv_table_topsnps() or a genomic interval.}

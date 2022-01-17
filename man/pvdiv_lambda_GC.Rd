@@ -21,9 +21,8 @@ PLANT_ID occurs only once in the dataframe.}
 \item{type}{Character string. Type of univarate regression to run for GWAS.
 Options are "linear" or "logistic".}
 
-\item{snp}{Genomic information to include for Panicum virgatum. Contact
-tjuenger <at> utexas <dot> edu to obtain this information
-pre-publication.}
+\item{snp}{Genomic information to include for Panicum virgatum. SNP data
+is available at doi:10.18738/T8/ET9UAU}
 
 \item{covar}{Covariance matrix to include in the regression. You
 can generate these using \code{bigsnpr::snp_autoSVD()}.}

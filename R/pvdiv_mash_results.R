@@ -847,7 +847,6 @@ mash_plot_Ulist <- function(m, range = NA, saveoutput = FALSE, suffix = "",
 #' @import ggplot2
 #' @importFrom tibble as_tibble rownames_to_column enframe
 #' @importFrom tidyr separate
-#' @import viridis
 #'
 #' @examples
 #' \dontrun{manhattan_out <- mash_ggman_by_condition(m = m, saveoutput = TRUE)}
@@ -885,7 +884,8 @@ mash_plot_manhattan_by_condition <- function(m, cond = NA, saveoutput = FALSE,
     geom_point(aes(color = .data$Num_Sig_Conditions, fill = .data$Num_Sig_Conditions,
                    shape = as.factor(.data$Chr))) +
     facet_wrap(~ .data$Chr, nrow = 1, scales = "free_x", strip.position = "bottom") +
-    scale_color_viridis(option = "B", end = 0.95) + scale_fill_viridis(option = "B", end = 0.95) +
+    scale_color_viridis_c(option = "B", end = 0.95) +
+    scale_fill_viridis_c(option = "B", end = 0.95) +
     theme(strip.text = element_text(size = 8),
           axis.text.y = element_text(size = 8),
           axis.text.x = element_blank(),
@@ -930,7 +930,6 @@ mash_plot_manhattan_by_condition <- function(m, cond = NA, saveoutput = FALSE,
 #'      \code{\link{ggcorr}}.
 #'
 #' @importFrom GGally ggcorr
-#' @import viridis
 #' @importFrom stringr str_replace_all
 #' @importFrom rlang .data
 #'
@@ -1001,14 +1000,14 @@ mash_plot_pairwise_sharing <- function(m = NULL, effectRDS = NULL,
                        label_size = label_size, hjust = hjust, vjust = vjust,
                        layout.exp = layout.exp, min_size = min_size,
                        max_size = max_size) +
-      scale_color_viridis(option = option)
+      scale_color_viridis_c(option = option)
   } else {
     corrplot <- ggcorr(data = NULL, cor_matrix = shared_effects, geom = geom,
                        label = label, label_alpha = label_alpha,
                        label_size = label_size, hjust = hjust, vjust = vjust,
                        layout.exp = layout.exp, min_size = min_size,
                        max_size = max_size) +
-      scale_color_viridis(option = option)
+      scale_color_viridis_c(option = option)
   }
 
   if(saveoutput == TRUE){

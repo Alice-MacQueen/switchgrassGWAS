@@ -22,7 +22,6 @@ Imports:
     hexbin,
     lubridate,
     magrittr,
-    matrixStats,
     purrr,
     readr,
     rlang,

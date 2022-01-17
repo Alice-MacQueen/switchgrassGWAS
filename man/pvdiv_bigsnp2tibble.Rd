@@ -8,8 +8,7 @@ pvdiv_bigsnp2tibble(snp)
 }
 \arguments{
 \item{snp}{A \code{FBM.code256} object. Genomic information for Panicum virgatum.
-Contact tjuenger <at> utexas <dot> edu to obtain this information
-pre-publication.}
+SNP data is available at doi:10.18738/T8/ET9UAU}
 }
 \value{
 A \code{tbl_df()} of the SNP calls for all individuals for the

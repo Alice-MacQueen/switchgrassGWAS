@@ -237,11 +237,10 @@ sel_snp_annos <- pvdiv_table_topsnps(df = sel_snp_annos, type = "table", txdb = 
 ```{r, include = FALSE}
 anno_file <- system.file("extdata", "Annotation_tables_3_BIOMASS.rds", 
                          package = "switchgrassGWAS")
-anno_tables <- readRDS(anno_file)
+sel_snp_annos <- readRDS(anno_file)
 ```
 
 ```{r}
-
-kable(anno_tables)
+kable(sel_snp_annos)
 ```
 

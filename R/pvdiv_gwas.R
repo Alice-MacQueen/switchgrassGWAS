@@ -11,9 +11,8 @@
 #'     PLANT_ID occurs only once in the dataframe.
 #' @param type Character string. Type of univarate regression to run for GWAS.
 #'     Options are "linear" or "logistic".
-#' @param snp Genomic information to include for Panicum virgatum. Contact
-#'     tjuenger <at> utexas <dot> edu to obtain this information
-#'     pre-publication.
+#' @param snp Genomic information to include for Panicum virgatum. SNP data
+#'     is available at doi:10.18738/T8/ET9UAU
 #' @param covar Covariance matrix to include in the regression. You
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.
@@ -224,9 +223,8 @@ asv_best_PC_df <- function(df){
 #' @param df Dataframe of phenotypes where the first column is PLANT_ID.
 #' @param type Character string. Type of univarate regression to run for GWAS.
 #'     Options are "linear" or "logistic".
-#' @param snp Genomic information to include for Panicum virgatum. Contact
-#'     tjuenger <at> utexas <dot> edu to obtain this information
-#'     pre-publication.
+#' @param snp Genomic information to include for Panicum virgatum. SNP data
+#'     is available at doi:10.18738/T8/ET9UAU#'
 #' @param covar Optional covariance matrix to include in the regression. You
 #'     can generate these using \code{bigsnpr::snp_autoSVD()}.
 #' @param ncores Number of cores to use. Default is one.

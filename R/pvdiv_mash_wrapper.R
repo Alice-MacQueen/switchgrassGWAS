@@ -108,7 +108,7 @@ get_loglik=function(a){a$loglik}
 #'     Ideally this will give 1 million or fewer total cells in the resultant
 #'     mash dataframes. Defaults to 1000.
 #' @param suffix Character. Optional. Should be the unique suffix used to
-#'     save \code{cdbn_bigsnp2mashr} output as RDS files, if it was used.
+#'     save \code{pvdiv_bigsnp2mashr} output as RDS files, if it was used.
 #' @param saveoutput Logical. Should the function's output also be saved to RDS
 #' files? Default is FALSE.
 #' @param U_ed An optional list of data-driven covariance matrices, or a
@@ -117,7 +117,7 @@ get_loglik=function(a){a$loglik}
 #' @param U_hyp An optional list of covariance matrices specified by the user.
 #'
 #' @return A mash result, manipulable using functions in mashr and by mash_plot
-#'     functions in the CDBNgenomics package.
+#'     functions in the switchgrassGWAS package.
 #'
 #' @note This is a convenience function for users who have prepared their data
 #'     using gapit2mashr or bigsnp2mashr. If you have not used these functions

@@ -39,7 +39,8 @@ reference:
   - get_mash_metadata
   - get_GxE
   - get_pairwise_sharing
-- title: internal
+- title: "Edge-case functions"
+  desc: "Additional utility or expert user functions"
 - contents:
   - asv_best_PC_df
   - dots

@@ -27,7 +27,7 @@ Ideally this will give 1 million or fewer total cells in the resultant
 mash dataframes. Defaults to 1000.}
 
 \item{suffix}{Character. Optional. Should be the unique suffix used to
-save \code{cdbn_bigsnp2mashr} output as RDS files, if it was used.}
+save \code{pvdiv_bigsnp2mashr} output as RDS files, if it was used.}
 
 \item{saveoutput}{Logical. Should the function's output also be saved to RDS
 files? Default is FALSE.}
@@ -40,7 +40,7 @@ matrices.}
 }
 \value{
 A mash result, manipulable using functions in mashr and by mash_plot
-functions in the CDBNgenomics package.
+functions in the switchgrassGWAS package.
 }
 \description{
 If you have prepared mash input using the bigsnp2mashr function

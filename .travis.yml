@@ -15,7 +15,7 @@ env:
 # This is the minimal set of R packages needed to run "R CMD check" on
 # the package.
 install:
-  - R -e 'install.packages(c("assertthat","abind","GGally","mvtnorm","Rcpp","RcppArmadillo","RcppGSL","rmeta","cluster","cowplot","dplyr","ggplot2","magrittr","purrr","readr","rlang","rlist","stats","stringr","tibble","tidyr","tidyselect","viridis","testthat","devtools"))'
+  - R -e 'install.packages(c("ashr","assertthat","abind","bigsnpr","GGally","hexbin","mashr","mvtnorm","Rcpp","RcppArmadillo","RcppGSL","rmeta","cluster","cowplot","dplyr","ggplot2","magrittr","purrr","readr","rlang","rlist","stats","stringr","tibble","tidyr","tidyselect","testthat","devtools"))'
   - R -e 'devtools::install_github("stephens999/ashr")'
 
 before_install:
@@ -30,9 +30,6 @@ r_packages:
 
 bioc_packages: VariantAnnotation
 bioc_packages: GenomicFeatures
-r_github_packages: privefl/bigsnpr
-r_github_packages: stephenslab/mashr@v0.2-11
-r_github_packages: stephens999/ashr
 
 after_success:
   - Rscript -e 'covr::codecov()'
