@@ -257,18 +257,24 @@ thresholdFBM <- function(X, ind, thr, quantile = NA) {
 #' @param thr Numeric. Threshold above which SNP/row is kept for comparisons.
 #' @param quantile Numeric. Top quantile/percentile to keep for each GWAS for
 #'     comparisons.
+#' @param ncores Numeric. Number of cores used for fbm functions. Default is
+#'     nb_cores() from bigstatsr.
 #'
 #' @importFrom tibble add_column
+#' @importFrom bigstatsr nb_cores
 #'
 #' @export
-pvdiv_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA){
+pvdiv_fbm_upset_df <- function(effects, snp, metadata, thr = 7, quantile = NA,
+                               ncores = NA){
   if (attr(snp, "class") != "bigSNP") {
     stop("snp needs to be a bigSNP object, produced by the bigsnpr package.")
   }
   if (attr(effects, "class") != "FBM") {
     stop("effects needs to be a FBM object, produced by pvdiv_standard_gwas().")
   }
-  ncores <- nb_cores()
+  if (is.na(ncores)) {
+    ncores <- nb_cores()
+  }
   gwas_ok <- floor(effects$ncol / 3)
   if (gwas_ok != nrow(metadata)) {
     stop(paste0("metadata needs to be the dataframe saved with the FBM object",

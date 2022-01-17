@@ -5,7 +5,7 @@
 \title{Plot the -log10p-value distributions for two univariate GWAS against
 one another using ggplot.}
 \usage{
-pvdiv_fbm_upset_df(effects, snp, metadata, thr = 7, quantile = NA)
+pvdiv_fbm_upset_df(effects, snp, metadata, thr = 7, quantile = NA, ncores = NA)
 }
 \arguments{
 \item{effects}{fbm created using 'pvdiv_standard_gwas'.
@@ -22,6 +22,9 @@ Saved under the name "gwas_effects_{suffix}_associated_metadata.csv"}
 
 \item{quantile}{Numeric. Top quantile/percentile to keep for each GWAS for
 comparisons.}
+
+\item{ncores}{Numeric. Number of cores used for fbm functions. Default is
+nb_cores() from bigstatsr.}
 }
 \description{
 This function takes GWAS results from the dive_ functions of

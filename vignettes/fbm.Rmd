@@ -162,8 +162,8 @@ There are three required arguments:
 We can also optionally specify a -log10p threshold with 'thr'. By default, that threshold is 7. A good target is to set this above the noise floor for all of the GWAS you are comparing. For our toy example, we set this artificially low, to 2.
 ```{r}
 upset_df <- pvdiv_fbm_upset_df(effects = gwas, snp = snp_example, 
-                               metadata = gwas_metadata, thr = 2)
-upset_df
+                               metadata = gwas_metadata, thr = 2, ncores = 1)
+kable(head(upset_df))
 ```
 This dataframe has CHR & POS from the SNP file, and then an additional column for each phenotype. If that SNP is not significant at the -log10p value threshold for that phenotype (here, `thr = 2`), then that row & column combination will have a '0'. If that SNP is significant for the phenotype, that value will be '1'.
 
