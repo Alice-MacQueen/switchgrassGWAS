@@ -5,8 +5,7 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.org/Alice-MacQueen/switchgrassGWAS.svg?branch=master)](https://travis-ci.org/Alice-MacQueen/switchgrassGWAS)
+[![Travis build status](https://travis-ci.com/alice-macqueen/switchgrassGWAS.svg?branch=master)](https://travis-ci.com/alice-macqueen/switchgrassGWAS)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/Alice-MacQueen/switchgrassGWAS?branch=master&svg=true)](https://ci.appveyor.com/project/Alice-MacQueen/switchgrassGWAS)
 <!-- badges: end -->
